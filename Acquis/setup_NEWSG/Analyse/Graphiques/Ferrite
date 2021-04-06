@@ -1,0 +1,5 @@
+#
+Figures = (
+	{ 2D-histo := x = ampl-sphere, x.min = 0, x.max = 20000, x.nb_bins = 100, y = descente-sphere, y.min = 0, y.max = 0.1, y.nb_bins = 100  },
+	{ 2D-histo := x = ampl-sphere, x.min = 0, x.max = 20000, x.nb_bins = 100, y = montee-sphere, y.min = 0, y.max = 0.06, y.nb_bins = 100  }
+)

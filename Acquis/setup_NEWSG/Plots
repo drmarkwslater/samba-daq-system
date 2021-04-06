@@ -1,0 +1,15 @@
+# [claps]
+Fenetres = (
+	{ "high amplitude signal" := signal, min = -30000, max = 30000, duree_ms = 20, donnees = (
+		{ capteur = ball, detecteur = sphere, etat = brute, couleur = { rouge = 0, vert = 100, bleu = 0 } },
+		{ capteur = ball, detecteur = sphere, etat = traitee, couleur = { rouge = 0, vert = 0, bleu = 100 } }
+	), dimension = { l = 490, h = 210 }, position = { x = 10, y = 375 }, affichage = oui, grille = non },
+	{ "low amplitude signal" := signal, min = -2000, max = 800, duree_ms = 20, donnees = { capteur = ball, detecteur = sphere, etat = brute, couleur = { rouge = 0, vert = 100, bleu = 0 } }, dimension = { l = 361, h = 209 }, position = { x = 517, y = 375 }, affichage = oui, grille = non },
+	{ "baseline RMS" := histo, bin_min = 0, bin_max = 50, nb.bins = 200, max.evts = 0, donnees = { var = bruit, capteur = ball, detecteur = sphere, couleur = { rouge = 0, vert = 100, bleu = 0 } }, dimension = { l = 325, h = 189 }, position = { x = 10, y = 624 }, affichage = oui, grille = non },
+	{ "high amplitudes" := histo, bin_min = 2000, bin_max = 35000, nb.bins = 200, max.evts = 0, donnees = { var = amplitude, capteur = ball, detecteur = sphere, couleur = { rouge = 0, vert = 100, bleu = 0 } }, dimension = { l = 277, h = 180 }, position = { x = 685, y = 625 }, affichage = oui, grille = non },
+	{ "low amplitudes" := histo, bin_min = 0, bin_max = 2000, nb.bins = 200, max.evts = 0, donnees = { var = amplitude, capteur = ball, detecteur = sphere, couleur = { rouge = 0, vert = 100, bleu = 0 } }, dimension = { l = 317, h = 180 }, position = { x = 351, y = 625 }, affichage = oui, grille = non },
+	{ "signal risetime" := histo, bin_min = 0, bin_max = 0.1, nb.bins = 100, max.evts = 0, donnees = { var = tps.montee, capteur = ball, detecteur = sphere, couleur = { rouge = 0, vert = 100, bleu = 0 } }, dimension = { l = 325, h = 200 }, position = { x = 1025, y = 45 }, affichage = non, grille = non },
+	{ "signal baseline" := histo, bin_min = -40000, bin_max = 40000, nb.bins = 100, max.evts = 0, donnees = { var = base, capteur = ball, detecteur = sphere, couleur = { rouge = 0, vert = 100, bleu = 0 } }, dimension = { l = 325, h = 200 }, position = { x = 1025, y = 375 }, affichage = non, grille = non },
+	{ "FFT window" := FFT, nb.points = 100000, freq_min = 1, freq_max = 1041.67, bruit_min = 1, bruit_max = 10000, intervalles = 1, axe_X = log, hors_evts = non, donnees = { capteur = ball, detecteur = sphere, etat = brute, couleur = { rouge = 0, vert = 100, bleu = 0 } }, dimension = { l = 371, h = 254 }, position = { x = 897, y = 329 }, affichage = oui, grille = non },
+	{ "rise time" := histo, bin_min = 0, bin_max = 0.1, nb.bins = 100, max.evts = 0, donnees = { var = tps.montee, capteur = ball, detecteur = sphere, couleur = { rouge = 0, vert = 100, bleu = 0 } }, dimension = { l = 288, h = 171 }, position = { x = 982, y = 625 }, affichage = oui, grille = non }
+)

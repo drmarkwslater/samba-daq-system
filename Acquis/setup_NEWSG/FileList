@@ -1,0 +1,65 @@
+#
+Intitule = "U-Alberta's Sphere" 	# Designation de la configuration
+#
+# ===== Electronique =====
+IP.port = 2048 			# Valeur plancher du port de lecture via IP
+Sat.port = 3072 		# Valeur plancher du port de lecture des satellites
+Prgm.repartiteur = 0x1e 	# Page de programmation des IBB
+Lect.DMA = oui 			# Lecture en DMA si c'est possible
+FIFO.dim = 262144 		# Profondeur des FIFO IP ou NI (16 bits)
+Voie.status = neant 		# Nom de la voie avec status
+Oscillateur = 60 		# Horloge fondamentale du systeme (MHz)
+Diviseur.0 = 10 		# Valeur du diviseur 0
+Diviseur.1 = 60 		# Valeur du diviseur 1 (nombre de bits a produire par echantillon)
+#
+# ===== Fichiers de Gestion =====
+Bolo.max = 4 			# Nombre maximum de detecteurs geres
+Voie.max = 16 			# Nombre maximum de voies gerees
+Run.start.script =  		# Script de demarrage des runs (relatif au repertoire des procedures)
+Run.stop.script =  		# Script d'arret des runs (relatif au repertoire des procedures)
+Entretien.start.script =  	# Script de debut de l'entretien periodique (relatif au repertoire des procedures)
+Entretien.stop.script =  	# Script de fin de l'entretien periodique (relatif au repertoire des procedures)
+Run.regen.entree = regen_demarre 	# Script de mise en regeneration (relatif au repertoire des procedures)
+Run.regen.sortie = regen_termine 	# Script de fin de regeneration (meme remarque!)
+Calendrier.place = Calendar 	# Description de l'emplacement des calendriers
+Calendrier.nom = Samba 		# Nom du calendrier des evenements destines a SAMBA
+Calendrier.run = run 		# Nom des evenements du calendrier definissant les periodes de run
+Imprime.configs = non 		# Imprime les configs
+Database.serveur = neant 	# Adresse de la Base de Donnees
+Cahier.manip = neant 		# Type de cahier de manip (neant/texte/elog)
+Cahier.adrs =  			# Nom du cahier de manip (fichier ou serveur, selon type)
+Cahier.cible = "-u acquis darkmatr -l STPC -a A" 	# Coordonnees d'acces au cahier de manip (si serveur)
+#              (typiquement, -u acquis darkmatr -l STPC -a Author=SAMBA -a Category=Acquisition)
+Gardiens =  			# Personnes a avertir en cas d'arret acquisition (cf 'mail')
+#
+# ===== Fichiers de Description du Montage =====
+Fichier.modeles = ../ModelsList 			# Liste des modeles de materiel et de support
+Fichier.media = Media 					# Liste des media auxiliaires
+Fichier.simu = Simu 					# Liste des modes de simulation
+Fichier.reseau = Hardware/Computers 			# Liste des adresses IP des satellites
+Fichier.satellites = Satellites 			# Liste des satellites a controler
+Fichier.compte-rendu = InitialReport 			# Options de compte-rendu de demarrage
+Fichier.parametres = Parameters 			# Parametrisation generale
+Fichier.dictionnaire = Synonims 			# Dictionnaires de synonymes
+Fichier.detecteurs = Hardware/Detectors/Connexions 	# Definition des detecteurs
+Fichier.repartiteurs = Hardware/Dispatcher 		# Liste des repartiteurs
+Fichier.cablage = Hardware/Cabling 			# Definition du cablage
+Fichier.numeriseurs = Hardware/Digitizers/Connexions 	# Liste des numeriseurs
+Fichier.procedures = Procedures 			# Repertoire des procedures
+Fichier.filtres = Filters 				# Definition des filtres
+Fichier.sequences = Sequences 				# Definition des sequences
+Fichier.regul.evt = RegulEvt 				# Definition de la regulation du taux d'evenements
+Fichier.VI = Vi 					# Jeu de V(I)
+Fichier.evt-unite = EvtUnity 				# Evenements unite
+Fichier.lecture = Readout 				# Parametrisation de la lecture
+Fichier.affichage = Graphics 				# Parametrisation des affichages
+Fichier.automates = Support/prefs 			# Parametrisation des automates
+Fichier.banc = Banc 					# Parametrisation du banc de tests des numeriseurs
+Fichier.calculs = Processings 				# Parametrisation des calculs
+Fichier.verifs = Debug 					# Options de verification
+Fichier.finesses = ExpertOnly 				# Parametrisation secondaire
+Fichier.basique = Basic 				# Parametrisation des acces basiques
+Fichier.comptage = ../LastRun 				# Gestion automatique des noms des runs
+Fichier.etat-elec = EtatPolars 				# Etat de l'electronique
+Fichier.conditions = RunConditions 			# Conditions de run courantes
+Fichier.caract = RunCaracteristics 			# Caracteristiques des run

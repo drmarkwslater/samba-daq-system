@@ -1,0 +1,189 @@
+ ____________________________________________________________________________________
+| Lecture declenchee: vb05p000, du 05.02.21 a 16:21:15 (avec la version 9.45.166)    |
+| Run de  avec:                                                                      |
+| . Object of the run: labo                                                          |
+| . Sensor voltage (V): 1800                                                         |
+| . Total pressure (mb): 200                                                         |
+| . Main gas: He                                                                     |
+| . Quencher nature: CH4                                                             |
+| . Relative quencher rate (%): 0.7                                                  |
+| . Calibration source in place: ar37                                                |
+| . Shielding configuration: open                                                    |
+| Sauvegarde des detecteurs individuelle, avec leurs associes                        |
+| Photos sauvees dans /Users/markslater/Acquis/Runs/events/vb05p000                  |
+|____________________________________________________________________________________|
+
+ ____________________________________________________________________________________
+| Configuration | U-Alberta's Sphere                                                 |
+|      lue dans | /Users/markslater/Acquis/setup_NEWSG/                              |
+|_______________|____________________________________________________________________|
+
+ ____________________________________________________________________________________
+|                              Connection des detecteurs                             |
+|____________________________________________________________________________________|
+|                        | position |           | prise |    numeriseur   |     |    |
+|       detecteur        | interne  |  capteur  | cryo  | nom         ADC | Rep |hote|
+|________________________|__________|___________|_______|____________|____|_____|____|
+| ok: sphere             |   1      | (tous)    |    01 | AdcRP#30   |  * | 1   | .  |
+|________________________|__________|___________|_______|____________|____|_____|____|
+
+. Selection de certaines voies
+. RP-U30: a utiliser
+
+
+ ____________________________________________________________________________
+|                           Selection des voies                              |
+|____________________________________________________________________________|
+| entree |    numeriseur    | voie                              | statut     |
+|________|__________________|___________________________________|____________|
+| RP-U30 (Red Pitaya, IP 192.168.2.30)                                       |
+|____________________________________________________________________________|
+|    1   | AdcRP#30         |+ball sphere                       | lue        |
+|        |                  |+UVlight sphere                    | lue        |
+|        |                  | (neant)                           |            |
+|        |                  | (neant)                           |            |
+|________|__________________|___________________________________|____________|
+| 2 voies lues en stream                                                     |
+| Ecrit: 'w 0 e0/w 4 1/w 6 80/w 0 3'                                         |
+| Gestion de BB inutile                                                      |
+|____________________________________________________________________________|
+ _______________________________________________________________
+|         Structure du bloc pour 1 echantillon de temps         |
+|_______________________________________________________________|
+| rang repartiteur      voie                                    |
+|_______________________________________________________________|
+|   1: RP-U30           ball sphere                             |
+|   2: |                UVlight sphere                          |
+|_______________________________________________________________|
+ _______________________________________________________________
+|              Liste des repartiteurs utilisables               |
+|_______________________________________________________________|
+|           RP-U30 | active                                     |
+|__________________|____________________________________________|
+
+ _______________________________________________________________ 
+|           Ajustement du tampon de donnees traitees            |
+|_______________________________________________________________|
+| Voie                              |    demande  |   attribue  |
+|___________________________________|_____________|_____________|
+| ball sphere                       |    10000000 |    10000000 |
+| UVlight sphere                    |           0 |        9765 |
+|___________________________________|_____________|_____________|
+
+ ____________________________________________________________________________________________ 
+|                                    Filtrage par templates                                  |
+|____________________________________________________________________________________________|
+| Voie                | type                 |  Tmont  |  Tdesc1 |  Tdesc2 |  Fact2  | delta |
+|_____________________|______________________|_________|_________|_________|_________|_______|
+| ball sphere         | ---                  |         |         |         |         |     0 |
+| UVlight sphere      | ---                  |         |         |         |         |     0 |
+|_____________________|______________________|_________|_________|_________|_________|_______|
+| Template analytique: A(t) = [1 - e(-t/Tm)] * [e(-t/T1) + F2 * e(-t/T2)]                    |
+|____________________________________________________________________________________________|
+
+
+ ____________________________________________________________________________________
+|                                     Traitements                                    |
+|____________________________________________________________________________________|
+| RP-U @IP 2.30    |   gains    ADU(nV)| Au vol               | Pretrigger           |
+|..................|...................|......................|......................|
+| ball sphere      |    1 x1.0  122070.3|neant                 |ButH4/0.100       x 1 |
+| UVlight sphere   |    1 x1.0  122070.3|neant                 |neant                 |
+|__________________|___________________|______________________|______________________|
+| Lu               | 2 donnees                                                       |
+| Transmis         | 2 voies                                                         |
+|__________________|_________________________________________________________________|
+| Soustraction du pattern OMISE                                                      |
+|____________________________________________________________________________________|
+
+ ____________________________________________________________________________________
+|                            Pas de sequencement du run                              |
+|____________________________________________________________________________________|
+
+ ________________________________ 
+| Voies sans stockage pre-triger |
+|________________________________|
+| UVlight sphere                 |
+|________________________________|
+
+ ____________________________________________________________________________________
+|                               Recherche d'evenements                               |
+|____________________________________________________________________________________|
+| Toutes les 9 synchros D2 (soit 0.9216 ms)                                          |
+| Calcul des evenements par verification de l'amplitude max par defaut.              |
+| Les evenements sont calcules quand ils sont termines, sans recalage du temps.      |
+| Les fenetres sont calees conformement a la definition des evenements.              |
+| Le controle de conformite a posteriori est abandonne.                              |
+| Les coupures sur amplitude, duree et bruit sont utilisees.                         |
+| Il n'y a pas de coupure, et n'y a pas de veto                                      |
+| Le declenchement est actuellement actif.                                           |
+| Ntuples desactives (voir le fichier Parameters).                                   |
+|____________________________________________________________________________________|
+|      voie          |   ms  | points | pretrig | susp | condition                   |
+|____________________|_______|________|_________|______|_____________________________|
+|        ball sphere |  1.00 |    976 |    50.0 |  976 | deriv >100  /0.020          |
+|                   Temps mort evt >  40000 ADU |4882812                             |
+|     UVlight sphere |  0.00 |      0 |    25.0 |    0 |  --                         |
+|                   Temps mort evt >  40000 ADU |    0                               |
+|____________________|_______|________|_________|______|_____________________________|
+| Pas de regulation des seuils de declenchement                                      |
+|____________________________________________________________________________________|
+  . Fichier /Users/markslater/Acquis/setup_NEWSG/RunConditions modifie
+ ____________________________________________________________________________________
+|                                   Gestion du run                                   |
+|____________________________________________________________________________________|
+| Acquisition #0 du 05.02.21 (nouveau run, 'vb05p000')                               |
+| Sauvegarde des Evenements dans le repertoire:                                      |
+|   /Users/markslater/Acquis/Runs/events/vb05p000                                    |
+| Sauvegarde des detecteurs individuelle avec leurs associes;                        |
+| Sauvegarde des ntuples ASCII dans le fichier:                                      |
+|   /Users/markslater/Acquis/Runs/events/vb05p000/vb05p000_ntp                       |
+| Aucun numeriseur n'a de status a sauvegarder;                                      |
+| Materiel decrit dans le fichier:                                                   |
+|   /Users/markslater/Acquis/Runs/events/vb05p000/vb05p000_setup.csv                 |
+| Pas de cahier de manip.                                                            |
+|____________________________________________________________________________________|
+
+Reglages fins:
+  Echantillonnage          : 1.024 us (976.562 kHz)
+  Synchro D2               : 100 echantillons (une par 0.102 ms, soit 9.76562 kHz)
+  Lecture                  : toutes les  5 ms, version 4
+  Duree donnees brutes     :  9 secondes         (8789062 echantillons)
+  Traitement               : toutes les     1   ms (    9 synchros D2)
+  Sequencement             : toutes les    60.00 s (585937 synchros D2)
+  Action utilisateur       : toutes les     0.10 s (  976 synchros D2)
+  Affichage donnees        : toutes les     0.40 s ( 3925 synchros D2)
+  Profondeur n-tuples      : 131072 evenements
+  Relance UDP              : toutes les  1444 s (activee)
+  Trames UDP               : taille dynamique pour des echantillons entiers
+            |  Echantillon : 2 voies;
+            |  Trame       : 360 echantillons [0.36864 ms], 1456 octets;
+            |  SynchroD3   : 360 echantillons [0.00036864 s], derniere trame: #0.
+  Demarrage detecteurs         : desactive
+  Maintenance detecteurs       : desactivee
+  Exportation  synchrone       :
+  | catalogue                  : fin de run
+  Synchronisation de demarrage : neant
+  Pas d'arret impose initialement
+  Affichage des evenements
+* Variable globale SambaPartage[8200] allouee en 0x30922E00
+* Demarrage le 05.02.21 a 16:21:16
+* Prise en compte des status et des donnees
+* Trigger: actuellement actif
+
+Deroulement:
+-----------
+16:21:16/ Mise a jour du catalogue (/Users/markslater/Acquis/./Catalogue_local)
+16:21:16/ Mise en service des detecteurs
+          . Detecteur sphere
+           | initialisation terminee
+16:21:16/ Mise en service terminee
+16:21:16/ Pas de demarrage de detecteur
+16:21:16/ Arret de tous les repartiteurs
+16:21:16/ . Arret Red Pitaya RP-U30 @IP 192.168.2.30
+16:21:16/   . Acces en lecture sur 192.168.2.30:2048 ouvert en <0>
+16:21:16/   . Ecrit 'w 1 2/q'
+16:21:16/   . [350647] Transmission arretee
+16:21:16/   . Vidage de la FIFO
+16:21:16/   . Acces en lecture depuis 192.168.2.30:2048 ferme
+16:21:16/   . Fermeture de la liaison

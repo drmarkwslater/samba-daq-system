@@ -1,0 +1,7 @@
+# Definition des filtres, enregistree le 10.10.11 a 18:55:12
+#
+Echantillonnage = 1   # Echantillonnage (kHz) pour personnalisation des standards
+#
+#
+=ButH4/0.100 : 
+    =Butterworth/h (passe-haut) *4 @0.1 ech. @0.0001 ech.

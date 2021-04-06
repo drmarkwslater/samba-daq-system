@@ -1,0 +1,16 @@
+#
+ordi.hardware = non 	# Configuration materielle de la machine d'acquisition
+ordi.software = non 	# Configuration logicielle de la machine d'acquisition
+electronique = non 	# Configuration de l'electronique d'acquisition
+initialisation = non 	# Phases de l'initialisation
+detecteurs.fichier = non 	# Fichier de definition pour chaque detecteur
+detecteurs.associes = non 	# Detecteurs associes pour chaque detecteur
+detecteurs.maintenance = non 	# Script de maintenance pour chaque detecteur
+detecteurs.classement = non 	# Classement initial des detecteurs
+numeriseurs.sauvegarde = non 	# Ressources des numeriseurs a sauver
+numeriseurs.classement = non 	# Classement initial des numeriseurs
+cablage.repartiteurs = non 	# Cablage des repartiteurs
+cablage.detecteurs = non 	# Cablage des detecteurs
+vars_manip = non 	# Liste des variables du montage experimental a utiliser
+voies.locales = non 	# Liste des voies locales
+voies.composition = non 	# Composition des pseudo voies (si voies.locales uniquement)

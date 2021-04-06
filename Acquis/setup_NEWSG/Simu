@@ -1,0 +1,10 @@
+# Modes de simulation
+#
+Simulations = (
+	{ "Particle" := voies = "ball sphere",
+		niveau_DC = -1000, bruit = 5.0, frequence_evt = 10, energie_ADU = 800, resolution = 10
+	},
+	{"Laser" := voies = "UVlight sphere",
+		niveau_DC = -800, bruit = 5.0, frequence_evt = 5, energie_ADU = 500, resolution = 10
+	}
+)

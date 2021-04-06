@@ -1,0 +1,5 @@
+#
+Fichier-Blocs = /Users/nostos/acq/prefs_CALI1/Commandes 	# Fichier des blocs a ecrire
+LectureSeule = non 	# Pas d'impression pendant la lecture
+FIFOEmpty = count 	# si FIFO vide: compter ou attendre
+AttenteModul = 0 	# Attente pour synchro sur une synchronisation

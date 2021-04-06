@@ -5328,6 +5328,8 @@ int main(int argc, char *argv[]) {
 		SambaInitBasique();
 	}
 	existe = SambaParms(argc,argv);
+	return 1;
+
 	affiche = SambaInitOpium();
 	if(affiche && !existe && !InstalleSamba) {
 		PanelBoutonText(pArgs,PNL_CANCEL,"No Future");

@@ -34,7 +34,7 @@
 #ifdef ForOpiumX
 	#define X11
 #endif
-#ifndef X11
+#if !defined(X11) && !defined(WXWIDGETS)
 	#ifdef ForOpiumGL
 		#define OPENGL
 	#else
@@ -130,6 +130,92 @@ typedef enum {
 		couleur? couleur->red: 0xcaca,couleur? couleur->green: 0xcaca,couleur? couleur->blue: 0xcaca)
 
 //#ifdef WND_C
+/* ------------------------------------------------------------------------ */
+/* ------------------------- IMPLEMENTATION WXWIDGETS --------------------- */
+/* ------------------------------------------------------------------------ */
+#ifdef WXWIDGETS
+typedef struct SambaWnd      *WndIdent;
+typedef struct SambaApp      *WndScreen;
+typedef struct wxImage   *WndSurface,WndTypeSurface;
+typedef struct wxCursor      *WndCursor;
+typedef int          WndFontId;
+typedef int    		 WndFontInfo;
+typedef struct {
+	unsigned short  red;
+	unsigned short  green;
+	unsigned short  blue;
+} WndColor;
+typedef struct {
+	short font;
+	WndColor *foreground,*background;
+	short line_width,line_style;
+} WndContextVal,*WndContextPtr;
+typedef struct  {
+	WndIdent       w;
+	UInt16         what;
+	unsigned long  message;
+	Ulong         when;
+	struct {
+		short      v;
+		short      h;
+	}              where;
+	UInt16         modifiers;
+} WndEvent;
+typedef enum {
+	WND_EXPOSE = 0,
+	WND_MOVED,
+	WND_RESIZE,
+	WND_CONFIG,
+	WND_IN_USE,
+	WND_DELETE,
+	WND_KEY,
+	WND_NOKEY,
+	WND_PRESS,
+	WND_RELEASE,
+	WND_DOUBLE,
+	WND_BARRE,
+	WND_NBEVENTS
+} WND_EVENTTYPE;
+
+typedef enum {
+	WND_MSELEFT   = 0,
+	WND_MSEMIDDLE,
+	WND_MSERIGHT,
+	WND_MSEMONTE,
+	WND_MSEDESC,
+	WND_NBBUTTONS
+} WND_MSEBUTTONS;
+
+typedef enum {
+	WND_ABS = 0,
+	WND_REL = 1
+} WND_COORDINATES;
+
+#define WND_ASCINT_WIDZ 15
+
+typedef enum {
+	XK_ASCII = 0,
+	XK_Alt_L,
+	XK_Home,
+	XK_KP_F4,
+	XK_Left,
+	XK_Right,
+	XK_Up,
+	XK_Down,
+	XK_NBKEYS
+} WND_KEYS;
+
+typedef enum {
+	WND_CURS_STD = 0,
+	WND_CURS_FLECHE_DR,
+	WND_CURS_FLECHE_GA,
+	WND_CURS_CROIX,
+	WND_CURS_VISEUR,
+	WND_CURS_MAIN
+} WND_CURSORS;
+
+#endif
+
 /* ------------------------------------------------------------------------ */
 /* ------------------------- IMPLEMENTATION OPENGL ------------------------ */
 /* ------------------------------------------------------------------------ */

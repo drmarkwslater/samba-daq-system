@@ -1,0 +1,7 @@
+# Description du cablage
+#
+# <position> '<' [<nom>'/'][<type>] '>' { <connecteur> [ { '.' <entree> | '*' [ 'x' <gain_V/pC> [ '/' <capa_pF> ] ] } ] [','] }
+# <gain> par defaut: 1, <capa_pF> par defaut: 10
+#
+1 < input1_UV2 > 01
+

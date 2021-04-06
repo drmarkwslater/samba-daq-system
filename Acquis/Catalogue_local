@@ -1,0 +1,2 @@
+# Date    heure   nom       mode  type      duree  taille(MB)  expo(Kg.j)   evts
+21.02.05 16:21:16 vb05p000  event        00h00'19       0.0      0.0000      1 # Goal=labo, HV=1800, Pressure_mb=200, Gas=He, Quencher=CH4, Rate=0.7, Source=ar37, Shielding=opentrgr[ball]=derivee, seuil[ball]=100

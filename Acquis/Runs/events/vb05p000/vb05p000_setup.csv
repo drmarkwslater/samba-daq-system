@@ -1,0 +1,3 @@
+;etat;detecteur         ; position ;  capteur  ; cryostat ; numeriseur ; ADC ; Rep  ; reglage ; adrs ; valeur ;
+; ok ; sphere           ;    1     ; ball      ;     01   ;  AdcRP#30  ;   0 ;    1 ;
+; ok ; sphere           ;    1     ; UVlight   ;     01   ;  AdcRP#30  ;   1 ;    1 ;

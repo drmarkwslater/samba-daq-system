@@ -1,0 +1,9 @@
+# [claps]
+Goal = labo 	# Object of the run
+HV = 1800 	# Sensor voltage (V)
+Pressure_mb = 200 	# Total pressure (mb)
+Gas = He 	# Main gas
+Quencher = CH4 	# Quencher nature
+Rate = 0.7 	# Relative quencher rate (%)
+Source = ar37 	# Calibration source in place
+Shielding = open 	# Shielding configuration

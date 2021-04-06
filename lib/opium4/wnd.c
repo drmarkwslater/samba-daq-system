@@ -51,6 +51,17 @@ typedef unsigned long long UInt64,uint64;
 /* ------------------------------------------------------------------------ */
 /* -------------------------- IMPLEMENTATION OpenGL ----------------------- */
 /* ------------------------------------------------------------------------ */
+#ifdef WXWIDGETS
+
+	static void *WndFontPtr = NULL;
+	// GLUT_BITMAP_8_BY_13; // GLUT_BITMAP_9_BY_15 // == &glutBitmap8By13 ou &glutBitmap9By15
+	static char WndFontName[MAXFILENAME] = "Bitmap8By13";
+
+#endif
+
+/* ------------------------------------------------------------------------ */
+/* -------------------------- IMPLEMENTATION OpenGL ----------------------- */
+/* ------------------------------------------------------------------------ */
 #ifdef OPENGL
 	#ifdef VERIFIE_WM
 		#pragma message("Application OPENGL")
@@ -2589,7 +2600,7 @@ void WndClear(WndFrame f) {
 			for(num=0; num<f->nb_gc; num++) WndContextFree(f,f->gc[qual].coul[num]);
 			if(f->gc[qual].coul) free(f->gc[qual].coul);
 		}
-	#ifndef X11
+	#if !defined(X11) && !defined(WXWIDGETS)
 		if(f->image.surf) {
 			if((f->image.surf)->pixels) free((f->image.surf)->pixels);
 			free(f->image.surf);
@@ -4358,8 +4369,9 @@ static void WndImageCree(WndFrame f, int larg, int haut, WndColor *lut, int dim)
 
 	// f->image.dx = f->image.dy = 0; par defaut a la creation de f. Peut avoir ete modifie par WndImageOffset
 	surface = larg * haut;
+#ifdef WXWIDGETS
 
-#ifdef X11
+#elif defined X11
 	WndIdent w; WndServer *s; WndScreen d;
 	w = f->w; s = f->s; d = s->d;
 	if(f->image.surf) XDestroyImage(f->image.surf);
@@ -4426,10 +4438,13 @@ static void WndImageCree(WndFrame f, int larg, int haut, WndColor *lut, int dim)
 	}
 #endif /* !X11 */
 
+#ifndef WXWIDGETS
 	// printf("(%s) Surface @%08lX[%d] %d x %d creee\n",__func__,(lhex)((f->image.surf)->pixels),surface,(f->image.surf)->width,(f->image.surf)->height);
 	if(f->image.surf) {
 		if((p = (f->image.surf)->pixels)) { i = nb; while(i--) *p++ = 0; }
 	}
+
+#endif
 }
 /* ========================================================================== */
 void WndImageInit(WndFrame f, int larg, int haut, WndColor *lut, int dim) {
@@ -4481,6 +4496,7 @@ static void WndImageFillVal(WndFrame f, int x, int y, int val) {
 	int larg,haut; unsigned char *pixels; int k;
 
 	if(!(f->image.surf)) return;
+#ifndef WXWIDGETS
 	if((pixels = (f->image.surf)->pixels) == 0) return;
 	larg = (f->image.surf)->width; if((x < 0) || (x >= larg)) return;
 	haut = (f->image.surf)->height; if((y < 0) || (y >= haut)) return;
@@ -4491,6 +4507,7 @@ static void WndImageFillVal(WndFrame f, int x, int y, int val) {
 #endif
 	if(k < (larg * haut)) *(pixels + k) = (val & 0XFF);
 	else printf("(%s) pixel (%d, %d) @%d/%d\n",__func__,x,y,k,larg * haut);
+#endif
 }
 /* ========================================================================== */
 static void WndImageFill8bits(WndFrame f, int x, int y, WndCol8bits *c) {
@@ -4610,6 +4627,7 @@ void WndIconePixel(WndFrame f, int x, int y, WndIcnPxl pixel) {
 void WndImageShow(WndFrame f) {
 	unsigned char *pixels;
 
+#ifndef WXWIDGETS
 	if(WndModeNone) return;
 	if(!(f->image.surf)) return;
 	if(WndPS) {
@@ -4686,6 +4704,7 @@ void WndImageShow(WndFrame f) {
 	//	QDFlushPortBuffer(GetQDGlobalsThePort(),NULL);
 	#endif
 	//	PortChanged(f->w); a priori inutile
+#endif
 #endif
 }
 /* ========================================================================== */

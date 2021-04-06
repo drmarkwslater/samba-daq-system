@@ -17,8 +17,8 @@ set(CMAKE_CXX_STANDARD 17)
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wfatal-errors -Wshadow -pedantic")
 
 # - Set some defines
-#add_compile_definitions(X11 UNIX)
-add_compile_definitions(ForOpiumGL UNIX)
+#add_compile_definitions(ForOpiumGL UNIX)
+add_compile_definitions(WXWIDGETS UNIX)
 
 # - Find wxWidgets
 set(wxWidgets_CONFIGURATION mswu)

@@ -1,0 +1,38 @@
+AdcCali#00 {
+#
+# gains avec ORTEC ou CANBERRA (93 Ohms):
+# pas de cavalier     : 1.63
+# cavalier sur 1      : 2.05
+# cavalier sur 2      : 2.73
+# cavaliers sur 1 et 2: 4.18
+#
+# gains avec CREMAT (50 Ohms):
+# pas de cavalier     : 1.78
+# cavalier sur 1      : 2.30
+# cavalier sur 2      : 3.20
+# cavalier sur 1 et 2 : 5.37
+#
+# ===========================================
+# gains avec cavalier sur 1 et 2, sur entree 1 uniquement:
+#
+    gain = (4.18, 1.63, 1.63, 1.63 ) 
+#
+# ===========================================
+# 16 prochaines valeurs: a ne pas modifier...
+    gain-v1 = 1
+    gain-v2 = 1
+    gain-v3 = 1
+    gain-v4 = 1
+    power-v1 = on
+    power-v2 = on
+    power-v3 = on
+    power-v4 = on
+    dth-v1 = non
+    dth-v2 = non
+    dth-v3 = non
+    dth-v4 = non
+    random-v1 = non
+    random-v2 = non
+    random-v3 = non
+    random-v4 = non
+}
