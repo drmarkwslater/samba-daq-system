@@ -1,0 +1,753 @@
+"": 
+"#evts maxi": 
+"+": 
+"-": 
+"-- Axe des X --": "--- X  axis ---"
+"-- Axe des Y --": "--- Y  axis ---"
+"----- Axe des X -----": "------- X axis ------"
+"----- Axe des Y -----": "------- Y axis ------"
+"; et si nb.evt >": "; & if nb.evt>"
+"A": 
+"A partir de quel numero de parametre": 
+"ADC": 
+"Abandonner les modifications": "Give up changes"
+"Abcisse maximum": 
+"Abcisse minimum": 
+"Abscisse maxi": 
+"Abscisse mini": 
+"Acces direct": "Direct access"
+"Acces libre": "Free access"
+"Action.1.max.parm": 
+"Action.1.max.type": 
+"Action.1.min.parm": 
+"Action.1.min.type": 
+"Action.2.max.parm": 
+"Action.2.max.type": 
+"Action.2.min.parm": 
+"Action.2.min.type": 
+"Action.3.max.parm": 
+"Action.3.max.type": 
+"Action.3.min.parm": 
+"Action.3.min.type": 
+"Active.1": 
+"Active.2": 
+"Active.3": 
+"Activite": "Activity"
+"Adresse": Address
+"Affichage": "Display"
+"Affichage selection": "Display selection"
+"Affichage voie": "Display Channel"
+"Affichage.donnees": 
+"Affichage.etat": 
+"Affichage.evt": 
+"Affichage.interv": 
+"Affichage.ldb": 
+"Affichage.modes": 
+"Affichage.reseau": 
+"Affichage.seuils": 
+"Affichage.taux.graph": 
+"Affichage.taux.panel": 
+"Affichage.trigger": 
+"Affichages": "Displays"
+"Afficher": "Display"
+"Afficher le spectre": 
+"Ajouter": "Add"
+"Ajustement seuil (ADU)": "Set threshold (ADU)"
+"Ampl. x Tps montee": 
+"Amplitude": 
+"Amplitude arrivee (V)": "First amplitude (V)"
+"Amplitude depart (V)": "Last amplitude (V)"
+"Amplitude maxi": 
+"Amplitude mini": 
+"Analyse": "Analysis"
+"Annuler": "Cancel"
+"Appel Samba": "Samba call"
+"Appliquer": "Apply"
+"Archivage": Archiving
+"Arret": "Stopped"
+"Attente (s)": "Wait (s)"
+"Attente D3 finale (ms)": "Last D3 wait (ms)"
+"Attente avant D3 finale (ms)": "Wait before last D3 (ms)"
+"Attente mini apres regen (s)": "Min wait after regen (s)"
+"Attente sequence (ms)": "Sequence delay (ms)"
+"Attente utilisateur (ms)": "User wait (ms)"
+"AttenteModul": 
+"Attentes FIFO vide": "Empty FIFO waits"
+"Au vol": "On the fly"
+"Automate": "PLC"
+"Automates": "PLCs"
+"Automatique": Automatic
+"Autoriser affichage": "Allow display"
+"Autre voie ": "Channel    "
+"AvecIP": 
+"Axe X": "X axis"
+"Axe Y": "Y axis"
+"Axe Z": "Z axis"
+"Axe des X": "X axis"
+"Axe des Y": "Y axis"
+"Axe.X.limites": 
+"Axe.X.max": 
+"Axe.X.min": 
+"Axe.X.type": 
+"Axe.Y.limites": 
+"Axe.Y.max": 
+"Axe.Y.min": 
+"Axe.Y.type": 
+"B": 
+"Bin maximum": 
+"Bin minimum": 
+"BitTrigger": 
+"Bolo.max": 
+"Bolo.num": 
+"Bolo.voie": 
+"Bruit max": 
+"Bruit maximum": 
+"Bruit minimum": 
+"C": 
+"Cablage": "Cabling"
+"Cablage triggers": "Cabling trigger"
+"Cablages": "Cables"
+"Cahier.manip": 
+"Cahier.type": 
+"Calcul": "Processing"
+"Calcule resolution": "Resolution computing"
+"Calculer": "Compute"
+"Changer detecteur": "Change a detector"
+"Chargement BB avant run": 
+"Charger": "Load"
+"Cluzel#1": 
+"Codage brutes": 
+"Commandes": "Commands"
+"Commentaire": Comment
+"Compensation": "Compensation"
+"Compensation.attente": 
+"Compenser": "Compensate"
+"Complements": "More"
+"Conditions de lecture": "Readout conditions"
+"Config": "Config"
+"Consignes Detecteurs": "Detector biases"
+"Contenu Fifo": "Fifo contents"
+"Contenu tampons": "Buffers contents"
+"Couleur bleue": "Blue percent"
+"Couleur rouge": "Red percent"
+"Couleur verte": "Green percent"
+"Courbe": Curve
+"Courbes R(T)": "R(T) plots"
+"Courbes V(I)": "V(I) plots"
+"Creer": "Create"
+"Creer fenetre": "Create plot"
+"D": 
+"D'apres la fenetre": "From the plot"
+"Date preferentielle (aammjj, 0 si derniere)": 
+"Deblocage": "Unlock"
+"Debug": 
+"Debut base (% pretrig)": "Base begin (% pretrig)"
+"Debut longue (millisec.)": 
+"Debut rapide (millisec.)": 
+"Decalage (millisec.)": 
+"Declenchement": "Trigger"
+"Definition": 
+"Definition des modeles": "Models definition"
+"Definition evenements": "Event definitions"
+"Definition materiel": "Hardware definitions"
+"Definitions": 
+"Delai maxi (nb.interv.)": 
+"Delai mini entre evenements (ms)": "Minimum event delay (ms)"
+"Demarrage": "Starting"
+"Demarrer": " Start  "
+"Demarrer     d": "Start        d"
+"Denomination": "Name"
+"DepileOpt": 
+"Deplacement numeriseur": "Move one digitiser"
+"Depuis le fichier": "From the file"
+"Depuis quel fichier": "From which file"
+"Dernier point valide": "Last valid point"
+"Derniere adresse": "Last address"
+"Descente1 (millisec.)": 
+"Descente2 (millisec.)": 
+"Description du materiel": "Hardware description"
+"Destination": 
+"Detec.entretien.periode": 
+"Detec.reglages.v8": 
+"Detecteur": "Detector"
+"Detecteur a utiliser": "Detector to use"
+"Detecteur abandonne": "Detector given up"
+"Detecteurs": "Detectors"
+"Diagnostic electronique": "Electronics diags"
+"Dim. lissage base": 
+"Dim. template (points)": 
+"Dim. traitement": 
+"Dimension du suivi": "Followup length"
+"Dimension n-tuples": "Ntuple array size"
+"Display": 
+"Disque sauvegarde": "Archive disk"
+"Diviseur.0": 
+"Diviseur.1": 
+"Donnees": "Data"
+"Donnees presentees": "Displayed data"
+"Donnees.duree": 
+"Donnees.evts": 
+"Donnees.tampon": 
+"Donnees.unite.chgt": 
+"Donnees.unite.keV": 
+"Dumper": "Dump"
+"Dupliquer fenetre": "Duplicate window"
+"Duree (millisec.)": 
+"Duree (ms)": 
+"Duree affichee (ms)": 
+"Duree longue (millisec.)": 
+"Duree maximum (mn)": 
+"Duree mini (ms)": 
+"Duree partition (mn)": 
+"Duree rapide (millisec.)": 
+"Duree tampons (ms)": 
+"E": 
+"Echantillonage": Sampling
+"Echelle.1": 
+"Echelle.2": 
+"Echelle.3": 
+"Ecran": "Screen"
+"Ecriture": "Write"
+"Ecriture registres ICA": 
+"Editer": "Edit"
+"Editer fenetre": "Edit window"
+"Editer les traces": 
+"Edition fichier": "Edit file"
+"Effacer": "Clear"
+"Effacer courante": "Clear current"
+"Enchainement auto": "Auto mode"
+"Enregistrer": "Save/file"
+"Envoyer commande": "Send command"
+"Etat": "Status"
+"EtatFinal": 
+"Evenement": Event
+"Evenement No..": "Event No.."
+"Evenement moyen bolo": "Mean event bolo"
+"Evenement moyen voie": "Mean event channel"
+"Evenements": "Events"
+"Evt unite": "Unit event"
+"EvtMoyen": 
+"FIFO.dim": 
+"FIFOEmpty": 
+"Facteur decision": 
+"Facteur2": 
+"Fenetrage": "Windowing"
+"Fenetre (millisec.)": "Window (ms)"
+"Fenetres": "Windows"
+"Fermer": Close
+"Fichier": "File"
+"Fichier CSV du materiel": "CSV-formatted file"
+"Fichier a creer": 
+"Fichier-Blocs": 
+"Fichier.VI": 
+"Fichier.affichage": 
+"Fichier.automates": 
+"Fichier.basique": 
+"Fichier.cablage": 
+"Fichier.calculs": 
+"Fichier.detecteurs": 
+"Fichier.dictionnaire": 
+"Fichier.evt-unite": 
+"Fichier.filtres": 
+"Fichier.finesses": 
+"Fichier.lecture": 
+"Fichier.modeles": 
+"Fichier.numeriseurs": 
+"Fichier.parametres": 
+"Fichier.regul.evt": 
+"Fichier.repartiteurs": 
+"Fichier.reseau": 
+"Fichier.sequences": 
+"Fichier.verifs": 
+"Fichiers": "Files"
+"Fignolages": "Expert settings"
+"Filtrage": "Filtering"
+"Filtrer": "Filter"
+"Filtres": "Filters"
+"Fin base (% pretrig)": 
+"Finesses": "Expert"
+"Fitter": "Fit"
+"Fonctions basiques": "Basic functions"
+"Frequence max (0:auto)": 
+"G": 
+"Gain logiciel": "Software gain"
+"Gardiens": 
+"Gaussien": "Gaussian"
+"Generaux": "General"
+"Gestion": "Settings"
+"Graphique.synchro": 
+"Graphiques utilisateur": "User plots"
+"Graphiques.hauteur": 
+"Graphiques.largeur": 
+"H": 
+"Hardware": 
+"Hauteur graphique": 
+"Histo.2D": 
+"Histo.2D.max": 
+"Histo.2D.min": 
+"Histo.ampl": 
+"Histo.ampl.bin": 
+"Histo.ampl.inf": 
+"Histo.ampl.max": 
+"Histo.ampl.min": 
+"Histo.ampl.sup": 
+"Histo.montee": 
+"Histo.montee.bin": 
+"Histo.montee.inf": 
+"Histo.montee.max": 
+"Histo.montee.min": 
+"Histo.montee.sup": 
+"Histo.voie": 
+"Histogrammes": "Histograms"
+"Histos bruit": "Noise histos"
+"Histos evenements": "Event histos"
+"ICA.00": 
+"ICA.04": 
+"ICA.08": 
+"ICA.0C": 
+"ICA.10": 
+"ICA.14": 
+"ICA.18": 
+"ICA.1C": 
+"ICA.20": 
+"ICA.24": 
+"ICA.28": 
+"ICA.2C": 
+"ICA.30": 
+"ICA.34": 
+"ICA.38": 
+"ICA.3C": 
+"ICA.40": 
+"IP.port": 
+"IdentBB": 
+"Identificateur": 
+"Identification": 
+"Impr.detecteurs": 
+"Impression voie": "Print channel"
+"Impressions": "Prints"
+"Imprime resolution": 
+"Imprime.configs": 
+"Increment si bruit (ADU)": 
+"Infos": "Infos"
+"Initialisation": "Initialisation"
+"Inserer": "Insert"
+"Inserer dans V(I)": "Insert in V(I)"
+"Integrales": 
+"Interv.ajuste": 
+"Interv.duree": 
+"Interv.evt": 
+"Interv.incr": 
+"Interv.min": 
+"Interv.nb": 
+"Interv.sequence": 
+"Interv.user": 
+"Intitule": 
+"Inversion polarisation": "Flip polarisations"
+"Jusqu'a quel numero de parametre": 
+"K": 
+"Lancer": "Launch"
+"Lancer  regeneration": "Start   regeneration"
+"Largeur bin": 
+"Largeur graphique": 
+"Le detecteur #": 
+"Lect.BN.status": 
+"Lect.BO.redemande": 
+"Lect.D3.wait": 
+"Lect.DMA": 
+"Lect.FIFO.max": 
+"Lect.FIFO.periode": 
+"Lect.FIFO.tache": 
+"Lect.FIFO.wait": 
+"Lect.auto-synchro": 
+"Lect.buffer": 
+"Lect.calib.nom.1": 
+"Lect.calib.nom.2": 
+"Lect.charge.bolos": 
+"Lect.delai.mini": 
+"Lect.duree.limite": 
+"Lect.duree.maxi": 
+"Lect.duree.raz.NTD": 
+"Lect.duree.raz.NbSi": 
+"Lect.duree.reprise": 
+"Lect.duree.tranche": 
+"Lect.ident-check": 
+"Lect.regen.nom.1": 
+"Lect.regen.nom.2": 
+"Lect.run.famille": 
+"Lect.secu.polar0": 
+"Lect.sequencement": 
+"Lect.source.acces": 
+"Lect.start.synchro": 
+"Lect.status-check": 
+"Lect.synchro.max": 
+"Lect.taux.periode": 
+"Lect.taux.seuil": 
+"Lecture": "Read"
+"Lecture CC": 
+"Lecture FIFO ICA": 
+"LectureSeule": 
+"Limites axes": "Axis limits"
+"Lineaire": "Linear"
+"Lire": "Read"
+"Lire description": "Read setup"
+"Liste evenements": "Event list"
+"Lister": "List"
+"Lister fenetres": "Windows list"
+"Longueur": Length
+"Longueur (s)": "Length (s)"
+"Longueur suivi filtrage": 
+"Longueur.fibres": 
+"Marge demodulation": 
+"Max affichage": 
+"Max evt moyen (ADU)": 
+"Max pic 1": 
+"Max pic 2": 
+"Max pic 3": 
+"Mediane": 
+"Memoriser": "To memory"
+"Memoriser  ": "To memory  "
+"Memoriser courante": "Save current"
+"Memoriser position": "Save position"
+"Menu complet": "Full menu"
+"Menu simplifie": "Partial menu"
+"Mesure de temps": "Time measure"
+"Min affichage": 
+"Min evt moyen (ADU)": 
+"Min pic 1": 
+"Min pic 2": 
+"Min pic 3": 
+"Mis a jour": Updated
+"Mise a jour": "Update"
+"Mise en route": "Startup"
+"Mise en service detecteurs": "Power on detectors"
+"Mode": 
+"Mode.auto": 
+"Mode.auvol": 
+"Modifier": "Modify"
+"Modulations lues sur FIFO": 
+"Montee (millisec.)": "Rise time (ms)"
+"Moyennage evt sauve": "Mean Event saved"
+"Moyenne": Mean
+"Moyenne signal": "Signal mean"
+"Nb mesures": 
+"Nb spectres": 
+"Nb spectres si glissant": 
+"Nb. max de n-tuples": 
+"Nb.1.max": 
+"Nb.1.min": 
+"Nb.2.max": 
+"Nb.2.min": 
+"Nb.3.max": 
+"Nb.3.min": 
+"NoModif": 
+"Nom de la voie": "Channel name"
+"Nom du bloc": "Bloc name"
+"Nom du bolo": "Detector name"
+"Nom du detecteur": "Detector name"
+"Nombre d'intervalles": "Intervals number"
+"Nombre de bins": "Bins number"
+"Nombre de coefficients": "Coefs number"
+"Nombre de mots a lire": "Words to read"
+"Nombre de points": "Point number"
+"Non": "No"
+"Nouveau": "New"
+"Nouveau numeriseur": "New digitiser"
+"Nouvelle": "New"
+"Nouvelle adresse": "New address"
+"Nouvelle valeur": "New value"
+"Numeriseur": "Digitiser"
+"Numeriseurs": "Digitisers"
+"Numero de run": "Run number"
+"OK": 
+"Operations particulieres": "Special operations"
+"Options": 
+"Organigramme": "Organigram"
+"Organiser": "Organise"
+"Origine des temps": "Time 0"
+"Oscillateur": 
+"Oui": "Yes"
+"P": 
+"Par voie": "Per channel"
+"Parabolique": "Parabolic"
+"Param.spectres": "Spectra parms"
+"Parametrer": "Parametrize"
+"Parametres": "Parameters"
+"Parametres generaux": "General parms"
+"Pattern": 
+"Pause": 
+"Pause sur evenement": 
+"Periode de calcul du taux (s)": 
+"Periode lecture FIFO (ms)": 
+"Periodes pattern": 
+"Personnaliser": Tune
+"Physique": Physics
+"Pics a suivre": 
+"Pics.1.max": 
+"Pics.1.min": 
+"Pics.2.max": 
+"Pics.2.min": 
+"Pics.3.max": 
+"Pics.3.min": 
+"Pics.dim": 
+"Pics.nb": 
+"Plafond": 
+"Plafond  seuil max": 
+"Plafond  seuil min": 
+"Plancher seuil max": 
+"Plancher seuil min": 
+"Point final": 
+"Point initial": 
+"Pointer une fois": 
+"Pointeurs tampons": 
+"Polarisations a 0 sur erreur": 
+"Position maxi": 
+"Pour donnees brutes": 
+"Pre-selection": 
+"Pre-trigger (%)": 
+"Precedent": "Previous"
+"Precedent  ": "Previous   "
+"Preferences": 
+"Premier point valide": 
+"Premiere adresse": 
+"Prgm.repartiteur": 
+"Prise de donnees": "Data taking"
+"Procedures": 
+"Procedures complexes": "Complex procedures"
+"Programme": "Program"
+"Provoquer une erreur": "Force an error"
+"Quitter": "Quit"
+"R": 
+"RAZ": 
+"RAZ FETs": 
+"RAZ histo": 
+"RAZ histos": 
+"Rafraichir": "Refresh"
+"Recharger  ": "From file  "
+"Rechercher": "Find"
+"Recommencer": "Restart"
+"Reconnaissance numeriseurs": "Digitiser scan"
+"Recuperer": "Recover"
+"Regeneration": 
+"Reglage Detecteur": "Detector bias"
+"Reglages": "Settings"
+"Regulation": 
+"Regulation evenements": "Event regulation"
+"Renommer": "Rename"
+"Rep": Dir
+"Repartiteurs": "Dispatchers"
+"Repert": Dir
+"Repertoires": Directories
+"Reprendre precedentes": "Revert to previous"
+"Reseau (a.b.c)": "Network (a.b.c)"
+"Reset": 
+"Reset CC et IBB": 
+"Reset FIFO": 
+"Resolution FWHM Fit (%max)": 
+"Resolution FWHM stats (%max)": 
+"Reste": "Lasts"
+"Resynchro auto": 
+"Retard.OPERA": 
+"Retirer": "Remove"
+"Retirer fenetre": "Remove window"
+"Retirer un point": "Remove point"
+"Retracer": "Plot again"
+"Revenir au programme": "Back to SAMBA"
+"Run": 
+"Run.conditions": 
+"Run.types": 
+"Runs": 
+"S": 
+"SAMBA classique": "Old SAMBA"
+"Sauvegarde": "Archiving"
+"Sauvegarde.Ntuple.dim": 
+"Sauvegarde.Ntuple.paw": 
+"Sauvegarde.auxi.duree": 
+"Sauvegarde.auxi.pretrig": 
+"Sauvegarde.evt": 
+"Sauvegarde.format": 
+"Sauvegarde.max": 
+"Sauvegarde.regen": 
+"Sauvegarde.stream": 
+"Sauver": "Save"
+"Sauver description": "Save description"
+"Sauver les modeles": "Save the models"
+"Sauver les modifications": "Save modifications"
+"Sauver sur le fichier": 
+"Selection de variables": "Select variables"
+"Sens deviation": 
+"Sequences": 
+"Setup manip": 
+"Seuil negatif": "Negative threshold"
+"Seuil positif": "Positive threshold"
+"Shell": 
+"Sigma": 
+"SimBB2": 
+"SimIPNL": 
+"SimNul": 
+"SimPNNR": 
+"Sinon, minimum": "Or, minimum"
+"Somme": 
+"Sommer": "Add"
+"Sous quel nom": "Name given"
+"Sous-adresse": "Sub-address"
+"Spectre a sauver": "Spectrum to save"
+"Spectres": "Spectra"
+"Spectres automatiques": "Automatic spectra"
+"Spectres.max": 
+"Statistiques": "Statistics"
+"Status CC": 
+"Stopper": "Stop"
+"Stopper ": "  Stop  "
+"Stopper      s": "Stop         s"
+"Suivant": "Next"
+"Suivant    ": "Next       "
+"Suivi raies": "Peak followup"
+"SuiviEtatEvts": 
+"SuiviTrmtEvts": 
+"Superposer": "Superimpose"
+"Supplements": 
+"Supprimer": "Remove"
+"Sur": "On"
+"Sur quel fichier": "On which file"
+"Suspendre": "Suspend"
+"Synchro (us)": 
+"Synchronisations maxi": 
+"Tableaux de commande": "Command boards"
+"Taux (Hz)": "Rate (Hz)
+"Taux maxi d'evenements (Hz)": "Maxi event rate (Hz)"
+"TauxEvts": 
+"Taux_attendu": "Expected_rate"
+"Temperature": 
+"Template": 
+"Temps de montee": "Rising time"
+"Temps final": "Final time"
+"Temps final (ms)": "Final time (ms)"
+"Temps final (s)": "Final time (s)"
+"Temps initial": "Initial time"
+"Temps initial (ms)": "Initial time (ms)"
+"Temps initial (s)": "Initial time(s)"
+"Temps mort (millisec.)": "Dead time (ms)
+"Terminer": "Finish"
+"Test du status": "Status check"
+"Test identification": "Ident check"
+"Titre": Title
+"Tout effacer": "Clear all"
+"Tps montee maxi": "Rise time max"
+"Tps montee mini": "Rise time min"
+"Trace": Track
+"Traitement au vol": 
+"Traitement trigger": 
+"Traitements": "Processings"
+"Trigger": 
+"Trigger.coherence": 
+"Trigger.demande": 
+"Trigger.pause": 
+"Trigger.postcontrole": 
+"Trigger.prgm": 
+"Trigger.type": 
+"Trmt.altivec": 
+"Trmt.archivage": 
+"Trmt.attente": 
+"Trmt.calcul": 
+"Trmt.datation": 
+"Trmt.evt.calage": 
+"Trmt.filtrees": 
+"Trmt.pattern": 
+"Trmt.regul.evt": 
+"Trmt.saute_evt": 
+"Trmt.suivi.max": 
+"Type de courbe": 
+"Type de tampon": 
+"Une synchro D2": "One D2-synchro"
+"Unite": Unit
+"V(I) auto": 
+"Valeur": Value
+"Valeur d'un ADU en keV": "ADU value (keV)"
+"Valeur maxi": 
+"Valeur maximum": 
+"Valeur mesuree": 
+"Valeur minimum": 
+"Valeurs brutes": 
+"Valeurs codees": 
+"Valeurs representees": "Displayed values"
+"Variable a modifier": 
+"Variation (V)": 
+"Verifie a": 
+"Verifier": "Verify"
+"Version": 
+"Vidage": "Empty"
+"Vidage histos": "Reset histos"
+"Visualiser courante": "Display current"
+"Voie": Channel
+"Voie par voie": "Channels"
+"Voie.max": 
+"Voie.status": 
+"Voies": Channels
+"Voies connues": "Known channels"
+"Voies.liste": 
+"a": 
+"ampl": 
+"amplitude": 
+"b": 
+"base": 
+"batch": 
+"c": 
+"capteur": sensor
+"cc": 
+"centre": 
+"chaleur": heat
+"chaleurA": 
+"chaleurB": 
+"chemin": path
+"comp": 
+"conf": 
+"corr": 
+"create": "creer"
+"d": 
+"d2": 
+"d3": 
+"dans la fenetre": "in the window"
+"de la variable": "of the variable"
+"detecteur": "detector"
+"dico": 
+"display": 
+"e": 
+"et maximum": "and maxi"
+"fichier": file
+"fontsize": 
+"gain": 
+"garde": 
+"init": 
+"langue": 
+"limites": 
+"lumiere": 
+"max": 
+"max si manu": 
+"min si manu": 
+"mn, si nb.evt <": "mn, if nb.evt <"
+"noir": 
+"o": 
+"pTauxEvts": 
+"pci": 
+"pente": 
+"polar": 
+"quitter": "quit"
+"s": 
+"s'appelle": "is called"
+"secs sur": 
+"sigma": 
+"signal": 
+"starter": 
+"type": 
+"unix": 
+"x": 
+"Format": 
+"NoModif": 
+"Reset": 
+"Run de": 
+"avec source": 
+"de": 
+"t (ms)": 
+"t0 (s)": 
+"taux actuel (Hz)": "current rate (Hz)"
+"taux global (Hz)": "global  rate (Hz)"
