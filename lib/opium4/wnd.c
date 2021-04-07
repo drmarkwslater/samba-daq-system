@@ -3631,28 +3631,10 @@ char WndColorSetByName(WndColor *c, char *nom) {
 }
 /* ========================================================================== */
 char WndColorSetByRGB(WndColor *c, WndColorLevel r, WndColorLevel g, WndColorLevel b) {
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return 0;
+#ifdef WXWIDGETS
+	c->red = r; c->green = g; c->blue = b;
 #endif
 #ifdef OPENGL
-	c->red = r; c->green = g; c->blue = b;
-#endif
-#ifdef X11
-	WndScreen d;
-
-	if(WndModeNone) return(1);
-	d = WndCurSvr->d;
-	c->red = r; c->green = g; c->blue = b;
-	c->flags = DoRed | DoGreen | DoBlue;
-	if(XAllocColor(d,DefaultColormap(d,DefaultScreen(d)),c)) return(1);
-	else return(0);
-#endif
-
-#ifdef WIN32
-	*c = RGB(r>>8, g>>8, b>>8);
-#endif
-#ifdef QUICKDRAW
 	c->red = r; c->green = g; c->blue = b;
 #endif
 	return (1);
