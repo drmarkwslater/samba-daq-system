@@ -3773,32 +3773,12 @@ char WndContextBgndRGB(WndFrame f, WndContextPtr gc,
 	if((c = WndColorGetFromRGB(r,g,b)) == (WndColor *)ERREUR) return(0);
 	if(gc == 0) gc = WND_STD;
 #ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return 0;
-#endif
-#ifdef OPENGL
-	gc->background = c;
-#endif
-#ifdef X11
-	{
-		WndScreen d;
-		if(f) d = (f->s)->d; else d = WndCurSvr->d;
-		XSetBackground((f->s)->d,gc,c->pixel);
-	}
-#endif
-#ifdef WIN32
-	{ HBRUSH hBrushOld;
-	SetClassLong(f->w, GCL_HBRBACKGROUND, (long) (hBrushOld = CreateSolidBrush(*c)));
-	DeleteObject(hBrushOld); }
-#endif
-#ifdef QUICKDRAW
-//	if(gc->background) {
-//		if(f) qual = f->qualite; else qual = WndQual;
-//		if(gc->background != WndColorBgnd[qual]) WndColorFree(gc->background);
-//	}
 	gc->background = c;
 #endif
 
+#ifdef OPENGL
+	gc->background = c;
+#endif
 	return(1);
 }
 /* ========================================================================== */
