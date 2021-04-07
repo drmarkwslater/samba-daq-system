@@ -15,7 +15,11 @@
 //#include <string.h>
 /* ca pour sysctlbyname */
 #include <sys/types.h>
+#ifdef HAVE_SYS_SYSCTL_H
 #include <sys/sysctl.h>
+#else
+#include <linux/sysctl.h>
+#endif
 
 #ifndef CODE_WARRIOR_VSN
 #include <sys/types.h>

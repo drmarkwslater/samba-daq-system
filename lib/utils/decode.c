@@ -9,7 +9,11 @@
 #include <sys/fcntl.h> /* pour Clavier* */
 /* ca pour sysctlbyname */
 #include <sys/types.h>
+#ifdef HAVE_SYS_SYSCTL_H
 #include <sys/sysctl.h>
+#else
+#include <linux/sysctl.h>
+#endif
 /* et ca pour stat */
 #ifdef CODE_WARRIOR_VSN
 #include <Types.h>
@@ -988,7 +992,7 @@ void ItemVarUsePrefix(ItemVar var, char *original, char *traduit, int lngr) {
 	while(trad->nom) {
 		l = strlen(trad->nom);
 		if(!strncmp(original,trad->nom,l)) {
-			strlcat(strncpy(traduit,trad->valeur,lngr),original+l,lngr);
+			strncat(strncpy(traduit,trad->valeur,lngr),original+l,lngr);
 			fait = 1; break;
 		}
 		trad++;
@@ -1008,8 +1012,8 @@ void ItemVarUse(ItemVar var, char *original, char *traduit, int lngr) {
 			m = n - l;
 			for(k=0; k<m; k++) {
 				if(!strncmp(original+k,trad->nom,l)) {
-					if(k) strlcat(strcat(strncpy(traduit,original,k),trad->valeur),original+k+l,lngr);
-					else strlcat(strncpy(traduit,trad->valeur,lngr),original+l,lngr);
+					if(k) strncat(strcat(strncpy(traduit,original,k),trad->valeur),original+k+l,lngr);
+					else strncat(strncpy(traduit,trad->valeur,lngr),original+l,lngr);
 					fait = 1; break;
 				}
 			}

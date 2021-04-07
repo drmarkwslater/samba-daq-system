@@ -1026,7 +1026,7 @@ char ArchiveBrutes(char termine) {
 	if(fait) ArchEcrites[STRM]++;
 	diff = (int)(ArchStreamSauve - avant) - fait;
 	if(diff) printf("         ! +%8d donnees brutes jetees x %d voies\n",diff,nb);
-	printf("          soit %lld octets (%.1f MB) ecrits au total\n",fin,(float)fin/(1024.0*1024.0));
+	//printf("          soit %lld octets (%.1f MB) ecrits au total\n",fin,(float)fin/(1024.0*1024.0));
 
 	temps_lecture = TempsTotalLect - n0;
 	ArchNbLus += temps_lecture;
