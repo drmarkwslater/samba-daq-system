@@ -3663,20 +3663,10 @@ WndContextPtr WndContextCreateFromVal(WndFrame f, WndContextVal *gcval) {
 /* ========================================================================== */
 void WndContextCopy(WndFrame f, WndContextPtr gc_src, WndContextPtr gc_dest) {
 	if(WndModeNone) return;
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
+#ifdef WXWIDGETS
+	memcpy(gc_dest,gc_src,sizeof(WndContextVal));
 #endif
 #ifdef OPENGL
-	memcpy(gc_dest,gc_src,sizeof(WndContextVal));
-#endif
-#ifdef X11
-	if(f) XCopyGC((f->s)->d,gc_src,WndGCMask,gc_dest); /* man ne donne pas le bon ordre! */
-#endif
-#ifdef QUICKDRAW
-	memcpy(gc_dest,gc_src,sizeof(WndContextVal));
-#endif
-#ifdef WIN32
 	memcpy(gc_dest,gc_src,sizeof(WndContextVal));
 #endif
 	return;
