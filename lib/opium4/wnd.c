@@ -1458,37 +1458,16 @@ void WndRepere(WndFrame f, int x0, int y0, int xm, int ym) {
 }
 /* ========================================================================== */
 void WndTitle(WndFrame f, char *titre) {
-#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
-#ifdef X11
-	WndScreen d;
-#endif
-#ifdef QUICKDRAW
-	char chaine[256];
-#endif
 	WndIdent w;
 
 	if(f == WND_AT_END) return;
 	if(WndModeNone) return;
 	w = f->w;
+#ifdef WXWIDGETS
+	WndTitleWx(w, titre);
+#endif
 #ifdef OPENGL
 	glfwSetWindowTitle(w,titre);
-#endif
-#ifdef X11
-	d = (f->s)->d;
-	XStoreName(d,w,titre);
-	XSetIconName(d,w,titre);
-#endif
-#ifdef QUICKDRAW
-	chaine[0] = strlen(titre);
-	strcpy(chaine+1,titre);
-	if(!WndCodeHtml) SetWTitle(w,(unsigned char *)chaine);
-	/* verifier largeur de fenetre avec w.titleWidth */
-#endif
-#ifdef WIN32
-	SetWindowText(w,titre);
 #endif
 }
 /* ========================================================================== */
