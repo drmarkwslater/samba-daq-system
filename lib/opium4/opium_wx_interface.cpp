@@ -126,4 +126,11 @@ void WndEventNewWx(SambaWnd *w, SambaEventWx type, int x, int y, int v, int h)
     //OpiumManageWx(cdr_initial, w, type, x, y, v, h);
 }
 
+struct wxCursor *WndCreateStdCursorWx()
+{
+    wxCursor *cur_ptr = new wxCursor;
+    *cur_ptr = *wxSTANDARD_CURSOR;
+    return cur_ptr;
+}
+
 #endif // WXWIDGETS

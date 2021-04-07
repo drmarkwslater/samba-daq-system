@@ -27,4 +27,5 @@ EXTERNC void WndDrawLineWx(struct SambaWnd *w, int x0, int y0, int x1, int y1, s
 EXTERNC void WndMoveWx(struct SambaWnd *w, int x, int y);
 EXTERNC void WndClearWx(struct SambaWnd *w);
 EXTERNC void WndShowTheTopWx(struct SambaWnd *w);
+EXTERNC struct wxCursor *WndCreateStdCursorWx();
 #endif

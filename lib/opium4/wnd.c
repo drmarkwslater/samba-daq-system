@@ -1768,38 +1768,23 @@ void WndBorders(WndFrame f) {
 /* ========================================================================== */
 WndCursor WndCreateStdCursor(int num) {
 	WndCursor curseur;
-
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return NULL;
+#ifdef WXWIDGETS
+	return WndCreateStdCursorWx();
 #endif
 #ifdef OPENGL
 	return(glfwCreateStandardCursor(num));
-#endif
-#ifdef X11
-	WndScreen d; WndColor *fgnd,*bgnd;
-
-	if(WndModeNone) return((WndCursor)0);
-	d = WndCurSvr->d;
-	curseur = XCreateFontCursor(d,num);
-	fgnd = WndColorHilite[WndQual];
-	bgnd = WndColorBlack;
-	XRecolorCursor(d,curseur,fgnd,bgnd);
-#endif
-#ifdef WIN32
-	if(WndModeNone) return((WndCursor)0);
-	curseur = LoadCursor(NULL, (LPSTR)num);
-#endif
-#ifdef QUICKDRAW
-	curseur = 0;
 #endif
 	return(curseur);
 }
 /* ========================================================================== */
 WndCursor WndCreateUserCursor(int larg, int haut, unsigned char *map) {
 	WndCursor curseur;
-
+	
 	if(WndModeNone) return((WndCursor)0);
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return NULL;
+#endif
 #ifdef X11
 	Pixmap source,masque;
 	WndScreen d; WndColor *fgnd,*bgnd;
@@ -3652,7 +3637,7 @@ WndColor *WndColorGetFromName(char *nom) {
 /* ========================================================================== */
 WndColor *WndColorGetFromRGB(WndColorLevel r, WndColorLevel g, WndColorLevel b) {
 	WndColor *c;
-	
+
 	WndColor nouvelle; int k,l;
 	if(WndModeNone) return((WndColor *)ERREUR);
 #ifdef WXWIDGETS
