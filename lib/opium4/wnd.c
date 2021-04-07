@@ -2204,21 +2204,11 @@ static char WndWriteOnlyDel(WndFrame f) {
 /* ========================================================================== */
 void WndMove(WndFrame f, int x, int y) {
 	if(WndModeNone || WndCodeHtml) return;
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
+#ifdef WXWIDGETS
+	WndMoveWx(f->w,x,y);
 #endif
 #ifdef OPENGL
 	glfwSetWindowPos(f->w,x,y);
-#endif
-#ifdef X11
-	XMoveWindow((f->s)->d,f->w,x,y);
-#endif
-#ifdef WIN32
-	SetWindowPos(f->w, 0, x, y, 0, 0, SWP_NOSIZE);
-#endif
-#ifdef QUICKDRAW
-	MoveWindow(f->w,x,y,false);
 #endif
 }
 /* ========================================================================== */
