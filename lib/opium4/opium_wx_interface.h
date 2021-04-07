@@ -16,8 +16,8 @@ EXTERNC int OpiumManageWx(struct Cadre *cdr_initial, struct SambaWnd* w, SambaEv
 #define EXTERNC
 #endif
 
-EXTERNC void InitWxWidgetsApp(struct SambaApp **app_ptr, int *scr_width, int *scr_height);
-EXTERNC void GetFontInfo(struct wxFont **font, short *width, short *ascent, short *descent, short *leading);
+EXTERNC void InitWxWidgetsApp(int *scr_width, int *scr_height);
+EXTERNC void GetFontInfo(short *width);
 EXTERNC void OpiumExecWx(struct Cadre *cdr);
 EXTERNC struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int height);
 EXTERNC void WndTitleWx(struct SambaWnd *w, char *title);

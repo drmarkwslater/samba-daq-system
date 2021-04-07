@@ -3673,17 +3673,8 @@ static char SambaInitOpium() {
 	WndSetFontName(SambaFontName);
 	WndSetFontSize(SambaFontSize);
 	if(FondNoir) WndSetBgndBlack(1);
-#ifdef X11
-	if(!strcmp(ServeurX11,".")) strcpy(ServeurX11,getenv("DISPLAY"));
-	if(!ModeBatch) printf("  Affichage X11 demande sur %s\n",ServeurX11);
-#endif
     if(ModeBatch) OpiumInit(WND_NONE);
 	else if(!OpiumInit(ServeurX11)) { printf("  ! Affichage impossible\n"); return(0); }
-#ifdef X11
-	// interessant, a ameliorer: WndNewRoot("SAMBA",0,0);
-	// il faut alors introduire et gerer des boutons de deplacement, agrandissement et fermeture
-	// sans compter l'affichage initial (effectif seulement sur evt refresh?) a mieux gerer
-#endif
 	ImpressionInit();
 	OrgaInit();
 	LogInit();
@@ -5332,10 +5323,11 @@ int main(int argc, char *argv[]) {
 		SambaInitBasique();
 	}
 	existe = SambaParms(argc,argv);
+	affiche = SambaInitOpium();
 #ifdef WXWIDGETS
 	return 1;
 #endif
-	affiche = SambaInitOpium();
+
 	if(affiche && !existe && !InstalleSamba) {
 		PanelBoutonText(pArgs,PNL_CANCEL,"No Future");
 //		while(OpiumExec(pArgs->cdr) != PNL_OK)

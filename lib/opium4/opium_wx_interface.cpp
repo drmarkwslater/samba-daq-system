@@ -13,7 +13,7 @@ struct Cadre *cdr_initial{nullptr};
 bool samba_running{false};
 bool in_paint_event{false};
 
-void InitWxWidgetsApp(struct SambaApp **app_ptr, int *scr_width, int *scr_height)
+void InitWxWidgetsApp(int *scr_width, int *scr_height)
 {
     theApp = new SambaApp;
     wxApp::SetInstance( theApp );
@@ -25,23 +25,17 @@ void InitWxWidgetsApp(struct SambaApp **app_ptr, int *scr_width, int *scr_height
 
     wxDisplay display;
     wxRect screen = display.GetClientArea();
-    *app_ptr = theApp;
     *scr_width = screen.width;
     *scr_height = screen.height;
 }
 
-void GetFontInfo(struct wxFont **font, short *width, short *ascent, short *descent, short *leading)
+void GetFontInfo(short *width)
 {
-    theFont = new wxFont(wxFontInfo(18).Family(wxFONTFAMILY_MODERN));
-    *font = theFont;
-
+    theFont = new wxFont(wxFontInfo(14).Family(wxFONTFAMILY_MODERN));
     wxMemoryDC temp_dc;
     temp_dc.SetFont(*theFont);
     wxFontMetrics fm{temp_dc.GetFontMetrics()};
     *width = fm.averageWidth;
-    *ascent = fm.ascent;
-    *descent = fm.descent;
-    *leading = fm.internalLeading;
 }
 
 struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int height)
@@ -129,7 +123,7 @@ void WndEventNewWx(SambaWnd *w, SambaEventWx type, int x, int y, int v, int h)
     if (!samba_running)
         return;
 
-    OpiumManageWx(cdr_initial, w, type, x, y, v, h);
+    //OpiumManageWx(cdr_initial, w, type, x, y, v, h);
 }
 
 #endif // WXWIDGETS

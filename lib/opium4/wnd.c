@@ -17,21 +17,8 @@
 extern char *__progname;
 typedef unsigned long long UInt64,uint64;
 
-#ifdef WIN32
-	#include <resource.h>
-	#include <math.h>
-	#ifdef WIN32_DEBUG
-		#using <System.dll>
-		#using <mscorlib.dll>
-		using namespace System;
-		using namespace System::Diagnostics;
-	#endif
-	#undef DEBUG
-	#include <ConsoleWin32.h>
-#else /* !WIN32 */
-	#ifndef __MWERKS__
-		#define STD_UNIX
-	#endif
+#ifndef __MWERKS__
+	#define STD_UNIX
 #endif
 
 #ifdef STD_UNIX
@@ -52,6 +39,8 @@ typedef unsigned long long UInt64,uint64;
 /* -------------------------- IMPLEMENTATION OpenGL ----------------------- */
 /* ------------------------------------------------------------------------ */
 #ifdef WXWIDGETS
+
+	#include <opium_wx_interface.h>
 
 	static void *WndFontPtr = NULL;
 	// GLUT_BITMAP_8_BY_13; // GLUT_BITMAP_9_BY_15 // == &glutBitmap8By13 ou &glutBitmap9By15
@@ -710,47 +699,12 @@ Bool WndInit(char *display) {
 	WndWaitMax = 150;  /* attente 2eme evt, max 150 ms */
 	WndMgrTimeOut = 10000;  /* attente WM en microsecondes */
 #endif
-#ifdef X11
+
+#ifdef WXWIDGETS
 	WndWaitMin =  15;  /* attente 2eme evt, min  15 ms */
 	WndWaitMax = 150;  /* attente 2eme evt, max 150 ms */
-	WndGCMask = GCFont | GCForeground | GCBackground
-		| GCLineWidth | GCLineStyle | GCCapStyle | GCJoinStyle | GCArcMode;
-// #define X11_EVTS_DETAILLES
-#ifdef X11_EVTS_DETAILLES
-	WndEventMask = 
-		  ExposureMask
-		| FocusChangeMask         /* vaudrait p'tet mieux eviter... */
-		| StructureNotifyMask
-		| SubstructureNotifyMask  /* devrait permetrer de recuperer DestroyWindow, mais voila... */
-		| VisibilityChangeMask
-		| KeyPressMask
-		| KeyReleaseMask
-		| ButtonPressMask
-		| ButtonReleaseMask;
-	WndEventMask |= Button1MotionMask;
-	WndEventMask |= Button3MotionMask;
-#else
-	WndEventMask = 0x01FFFFFF;
 #endif
-#endif
-#ifdef WIN32
-	WndWaitMin =  15;  
-	WndWaitMax = 300;  
-	WndTitleBar = GetSystemMetrics(SM_CYSIZE);
-	WndBorderSize = 4;
-#endif
-#ifdef QUICKDRAW
-	#ifdef EN_SLEEP
-		WndWaitMin = 1000;  /* attente 2eme evt, min 1 seconde */
-		WndWaitMax = 1000;  /* attente 2eme evt, max 1 seconde */
-	#else
-		WndWaitMin =   17;  /* attente 2eme evt, min 1/59 seconde */
-		WndWaitMax =  150;  /* attente 2eme evt, max 1    seconde */
-	#endif
-	WndMgrTimeOut = 1;  /* attente WM en 1/60 secondes */
-	WndEventMask = everyEvent;
-	/* mDownMask + mUpMask + keyDownMask + updateMask; // + activMask + osMask; */
-#endif
+
 	WndNbWaits = WndWaitMax / WndWaitMin;
 
 	return(WndOpen(&WndDefSvr,display));
@@ -763,50 +717,6 @@ static void WndErrorColbac(int error, const char *description) {
 	ImprimePileAppels;
 }
 #endif
-#ifdef X11
-/* ========================================================================== */
-static int WndErrorProtocol(WndScreen d, XErrorEvent *e) {
-	char msg[80];
-
-	XGetErrorText(d,e->error_code,msg,80);
-	if((e->request_code > 0) && (e->request_code < 128))
-		WndPrint("X11: Une requete %s[%d] a renvoye \'%s\'\n",
-				 WndOpName[e->request_code-1],e->minor_code,msg);
-	else WndPrint("X11: Une requete %d.%d a renvoye \'%s\'\n",
-		e->request_code,e->minor_code,msg);
-	WndEssais--;
-	return(1);
-}
-/* ========================================================================== */
-static int WndErrorFatal(WndScreen d) {
-	WndPrint("Petit probleme de connexion... irrecuperable! Display D:%08X\n",(hexa)d);
-	ImprimePileAppels;
-//	WndOpen(WndCurSvr,WndDisplayInUse);
-//	if (WndPremiere) WndRaise(WndPremiere);
-	return(0);
-}
-#endif
-#ifdef QUICKDRAW
-/* ========================================================================== */
-static void WndSioux() {
-#ifdef AVEC_SIOUX
-	if(!WndSiouxDone) {
-		SIOUXSettings.leftpixel = (pixval)WndLogX;
-		SIOUXSettings.toppixel = (pixval)WndLogY;
-		SIOUXSettings.rows = (pixval)WndLogLines;
-		SIOUXSettings.columns = (pixval)WndLogCols;
-		SIOUXSettings.standalone = false;
-//	surtout pas: SIOUXSettings.initializeTB = false;
-//		SIOUXSettings.setupmenus = false;
-		SIOUXSettings.autocloseonquit = true;
-		SIOUXSettings.asktosaveonclose = WndLogSave;
-		SIOUXSettings.userwindowtitle = WndLogName;
-//		SIOUXSetTitle("\p%s - Standard Output",info.processName);
-		WndSiouxDone = 1;
-	}
-#endif
-}
-#endif
 /* ========================================================================== */
 void WndJournalTitle(char *texte) {
 #ifdef AVEC_SIOUX
@@ -817,35 +727,6 @@ void WndJournalTitle(char *texte) {
 	SIOUXSetTitle(titre);
 #endif
 }
-#ifdef WIN32
-/* ========================================================================== */
-TEXTMETRIC WndGetTextMetrics(HFONT hFont) {
-	TEXTMETRIC metric;
-	WNDCLASS WndC; HWND w; HDC hdc;
-	char name[] = "<null>";
-
-	WndC.style = CS_HREDRAW | CS_VREDRAW;
-	WndC.lpfnWndProc = DefWindowProc;//WndProc;
-	WndC.cbClsExtra = 0;
-	WndC.cbWndExtra = 0;
-	WndC.lpszMenuName = 0;
-	WndC.lpszClassName = name;
-	WndC.hInstance = 0;
-	WndC.hIcon = LoadIcon(0, IDI_APPLICATION);
-	WndC.hCursor = LoadCursor(0, IDC_ARROW);
-	WndC.hbrBackground = CreateSolidBrush(RGB(0,0,0));
-	RegisterClass(&WndC);
-
-	w = CreateWindow(name, name, WS_OVERLAPPEDWINDOW, 0, 0, 100, 100, 0, 0, 0, 0);
-	hdc = GetDC(w);
-	SelectObject(hdc, hFont);
-	GetTextMetrics(hdc, &metric);
-	ReleaseDC(w, hdc);
-	DestroyWindow(w);
-
-	return metric;
-}
-#endif
 /* ========================================================================== */
 Bool WndOpen(WndServer *s, char *display) {
 /* Initialise la structure <s> d'apres le serveur <display> */
@@ -853,18 +734,6 @@ Bool WndOpen(WndServer *s, char *display) {
 #ifdef MODE_VT100
 	char *term,*termcap,*getenv();
 	char descr[1024];
-#endif
-#ifdef X11
-	char nom_fonte[MAXFILENAME]; WndFontInfo fnorm; WndScreen d;
-#endif
-#ifdef QUICKDRAW
-	int i;
-	char nom_fonte[MAXFILENAME]; WndFontInfo fnorm;
-	WndIdent w; Rect r;
-/*	void SystemTask(void *); */
-#ifdef MENU_BARRE_MAC
-	MenuHandle menu;
-#endif
 #endif
 
 	/* retourne 0 si erreur */
@@ -954,192 +823,17 @@ Bool WndOpen(WndServer *s, char *display) {
 	WndEventPileHaut = WndEventPileBas = 0;
 #endif
 
-#ifdef X11
-	s->d = d = XOpenDisplay(display);
-	printf("(%s) Display a utiliser D:%08X (%s)\n",__func__,(hexa)d,display);
-	if(!d) return(NUL);
-	XSetErrorHandler(WndErrorProtocol);
-	XSetIOErrorHandler(WndErrorFatal);
-	/*	WndPrint("(WndOpen) XSbitmap_pad=%d, depth: %d, bits/pixel=%d\n",d->bitmap_pad,
-	       (d->pixmap_format)->depth,(d->pixmap_format)->bits_per_pixel); */
-	WndRoot = RootWindow(d,DefaultScreen(d));
-	s->larg = DisplayWidth(d,DefaultScreen(d));
-	s->haut = DisplayHeight(d,DefaultScreen(d));
-//	XSelectInput(d,WndRoot,SubstructureNotifyMask); // semble ne servir a rien
-//	XSelectInput(d,WndRoot,WndEventMask);
-	XSelectInput(d,WndRoot,0x01FFFFFF);
-// pas bon: #define ESSAI_1
-#ifdef ESSAI_1
-	WndIdent w;
-	w = XCreateSimpleWindow(d,WndRoot,0,0,s->larg,s->haut,2,BlackPixel(d,DefaultScreen(d)),WhitePixel(d,DefaultScreen(d)));
-	// WndColorText[WndQual]->pixel,WndColorBgnd[WndQual]->pixel);
-	XMapWindow(d,w);
-	WndRoot = w;
-	//	XSelectInput(d,w,WndEventMask | SubstructureNotifyMask);
-	//	XSelectInput(d,w,SubstructureNotifyMask);
-	XSelectInput(d,WndRoot,0x01FFFFFF);
-#endif /* ESSAI_1 */
-	/* liste avec: xlsfonts -d ":0.0" | grep "courier-medium-r" */
-	sprintf(nom_fonte,WndFontName,WndFontSize);
-	if(!(fnorm = XLoadQueryFont(s->d,nom_fonte))) {
-		WndPrint("(%s) Pas de fonte de type \"%s\"\n",__func__,nom_fonte);
-		fnorm = XLoadQueryFont(s->d,"*courier*-r-*"); // fonte minimale
-	}
-	(s->fonte).width = XTextWidth(fnorm,"M",1);
-	(s->fonte).id = fnorm->fid;
-	(s->fonte).ascent = fnorm->ascent;
-	(s->fonte).descent = fnorm->descent;
-	(s->fonte).leading = WND_INTERLIGNE;
-
-	WndColorBlack = (WndColor *)malloc(sizeof(WndColor));
-	WndColorWhite = (WndColor *)malloc(sizeof(WndColor));
-	WndColorBlack->pixel = BlackPixel(d,DefaultScreen(d));
-	WndColorWhite->pixel = WhitePixel(d,DefaultScreen(d));
-#endif /* X11 */
-
-
-#ifdef WIN32
-	char name[] = "<null>";
-	s->d = 0;
-	s->larg = GetSystemMetrics(SM_CXSCREEN);
-	s->haut = GetSystemMetrics(SM_CYSCREEN);
-#ifdef WIN32_BACKGROUND
-	WNDCLASS WndC; HMENU hMenu;
-
-	hMenu = CreateMenu();
-	WndC.style = CS_HREDRAW | CS_VREDRAW;
-	WndC.lpfnWndProc = WndProc;
-	WndC.cbClsExtra = 0;
-	WndC.cbWndExtra = 0;
-	WndC.lpszMenuName = 0;
-	WndC.lpszClassName = name;
-	WndC.hInstance = 0;
-	WndC.hIcon = LoadIcon(0, IDI_WINLOGO);
-	WndC.hCursor = LoadCursor(0, IDC_ARROW);
-	WndC.hbrBackground = (HBRUSH)GetStockObject(GRAY_BRUSH);
-	RegisterClass(&WndC);
-	WndRoot = CreateWindow(name, name, WS_OVERLAPPEDWINDOW | WS_MAXIMIZE | WS_SYSMENU, 0, 0, s->larg, s->haut, WndRoot, hMenu, 0, 0);
-	ShowWindow(WndRoot, SHOW_OPENWINDOW);
-	UpdateWindow(WndRoot);
-#else
-	WndRoot = 0;
-#endif
-	
-	static LOGFONT lf;
-    GetObject(GetStockObject(ANSI_FIXED_FONT), sizeof(LOGFONT), &lf);
-    lf.lfItalic = 0; 
-	lf.lfHeight = WndFontSize;
-	lf.lfQuality = PROOF_QUALITY;
-    lf.lfWeight = FW_NORMAL; 
-	(s->fonte).id = CreateFont(lf.lfHeight, lf.lfWidth, 
-        lf.lfEscapement, lf.lfOrientation, lf.lfWeight, 
-        lf.lfItalic, lf.lfUnderline, lf.lfStrikeOut, lf.lfCharSet, 
-        lf.lfOutPrecision, lf.lfClipPrecision, lf.lfQuality, 
-        lf.lfPitchAndFamily, lf.lfFaceName);
-	TEXTMETRIC metrics = WndGetTextMetrics((s->fonte).id);
-	(s->fonte).width = metrics.tmMaxCharWidth;
-	(s->fonte).ascent = metrics.tmAscent;
-	(s->fonte).descent = metrics.tmDescent;
-	(s->fonte).leading = metrics.tmInternalLeading + metrics.tmExternalLeading;
+#ifdef WXWIDGETS
+	InitWxWidgetsApp(&(s->larg), &(s->haut));
+	GetFontInfo(&(s->fonte.width));
+	(s->fonte).leading = 1;
+	(s->fonte).ascent = (s->fonte).width + 2;
+	(s->fonte).descent = (((s->fonte).width + 1) / 2) - (s->fonte).leading;
+	printf("  Caracteres: %d x %d [%d+%d+%d]\n",(s->fonte).width,(s->fonte).ascent+(s->fonte).descent+(s->fonte).leading,(s->fonte).ascent,(s->fonte).descent,(s->fonte).leading);
 	WndColorBlack  = WndColorGetFromRGB(0x0000,0x0000,0x0000);  /* noir  */
 	WndColorWhite  = WndColorGetFromRGB(0xFFFF,0xFFFF,0xFFFF);  /* blanc */
-#endif /* WIN32 */
-
-#ifdef QUICKDRAW
-	WndSioux();
-#ifdef CARBON
-	GetQDGlobalsScreenBits(&(s->d));
-#else
-	/* Version 1: s->d = &qd; avec s->d : *QDGlobals */
-	s->d = qd.screenBits;
-	InitGraf(&qd.thePort);
-	InitFonts();
-	InitWindows();
-#endif /* CARBON */
-
-#ifdef MENU_BARRE_MAC
-#ifndef CARBON
-	InitMenus(); /* ca semble tres bien marcher sans, cependant */
 #endif
-	/* InitDialogs(nil); */
-	WndMenuStandard = GetMenuBar();
-	menu = GetMenuHandle(MENU_FICHIER);
-#ifdef CW5
-	i = ITEM_QUITTER; do DisableItem(menu,(pixval)i); while(--i);
-	EnableItem(menu,ITEM_FERMER);
-	EnableItem(menu,ITEM_QUITTER);  /* requete JM */
-	/*++ InsertMenuItem(menu,"\pBarre de <Imenus/B",ITEM_QUITTER); */
-	InsertMenuItem(menu,"\p<IBarre de menus",ITEM_QUITTER);
-	menu = GetMenuHandle(MENU_EDITER);
-	i = ITEM_SELECTALL; do DisableItem(menu,(pixval)i); while(--i);
-#else
-	if(menu) {
-		i = ITEM_QUITTER; do DisableMenuItem(menu,i); while(--i);
-		EnableMenuItem(menu,ITEM_FERMER);
-		EnableMenuItem(menu,ITEM_QUITTER);  /* requete JM */
-		/*++ InsertMenuItem(menu,"\pBarre de <Imenus/B",ITEM_QUITTER); */
-		InsertMenuItem(menu,"\p<IBarre de menus",ITEM_QUITTER);
-		InsertMenuItem(menu,"\pTerminer",ITEM_QUITTER + 1);
-	} else {
-		// WndPrint("0.- Menu MENU_FICHIER (#%d) non defini\n",MENU_FICHIER);
-		menu = GetMenuHandle(MENU_FICHIER);
-		if(menu) {
-			i = ITEM_QUITTER; do DisableMenuItem(menu,i); while(--i);
-			EnableMenuItem(menu,ITEM_FERMER);
-			EnableMenuItem(menu,ITEM_QUITTER);  /* requete JM */
-			/*++ InsertMenuItem(menu,"\pBarre de <Imenus/B",ITEM_QUITTER); */
-			InsertMenuItem(menu,"\p<IBarre de menus",ITEM_QUITTER);
-			InsertMenuItem(menu,"\pTerminer",ITEM_QUITTER + 1);
-		} // else WndPrint("1.- Menu MENU_FICHIER (#%d) non defini\n",MENU_FICHIER);
-	}
-
-	menu = GetMenuHandle(MENU_EDITER);
-	if(menu) {
-		i = ITEM_SELECTALL; do DisableMenuItem(menu,i); while(--i);
-	} else // WndPrint("2.- Menu MENU_EDITER (#%d) non defini\n",MENU_EDITER);
-#endif /* CW5 */
-#endif /* MENU_BARRE_MAC */
-	InitCursor();       /* pour avoir la fleche standard */
-
-	/* Version 1: r = qd.screenBits.bounds; */
-	r = (s->d).bounds;
-	s->larg = r.right - r.left;
-	s->haut = r.bottom - r.top;
-
-/*	trop tard:	WndSioux(r.right - 520,45); */
-	WndRefreshed = 0;
-#ifdef TIMER_PAR_EVT
-#ifndef TIMER_UNIQUE
-	WndTimerUsed = 0;
-#endif
-#endif
-	/*	WndScheduler = TimerCreate(SystemTask,0);
-	TimerStart(WndScheduler,10*TIMER_MILLISEC); */
-
-	r.left = (pixval)s->larg * 40 / 100; r.top = (pixval)s->haut * 40 / 100; 
-	r.right = r.left + ((pixval)s->larg * 20 / 100); r.bottom = r.top + ((pixval)s->haut * 20 / 100);
-	w = NewCWindow(nil,&r,"\p\0",false,zoomDocProc,WND_INFRONT,true,WndNum++);
-	SetPort(WNDPORT(w));
-	// GetFNum("\pCourier",&((s->fonte).id));
-	nom_fonte[0] = (char)strlen(WndFontName);
-	strcpy(nom_fonte+1,WndFontName);
-	GetFNum((unsigned char *)nom_fonte,&((s->fonte).id));
-	TextSize((pixval)WndFontSize);
-	WND_UTILISE_FONTE(w,(s->fonte).id);
 	
-	(s->fonte).width = TextWidth("M",0,1);
-	GetFontInfo(&fnorm);
-/*	(s->fonte).width = fnorm.widMax; */
-	(s->fonte).ascent = fnorm.ascent;
-	(s->fonte).descent = fnorm.descent;
-	(s->fonte).leading = fnorm.leading;
-
-	WndColorBlack  = WndColorGetFromRGB(0x0000,0x0000,0x0000);  /* noir  */
-	WndColorWhite  = WndColorGetFromRGB(0xFFFF,0xFFFF,0xFFFF);  /* blanc */
-	// PRINT_COLOR(WndColorBlack);
-	// PRINT_COLOR(WndColorWhite);
-#endif /* QUICKDRAW */
-
 	strcpy(WndPrevRoutine,"le debut");
 	WndPrevArg = WND_AT_END;
 
@@ -1193,14 +887,8 @@ Bool WndOpen(WndServer *s, char *display) {
 
 	WndQual = WndQualDefaut;
 	// PRINT_COLOR(WndColorText[WndQual]);
-
-#ifdef WIN32
-	s->decal = (s->fonte).leading;
-	s->lig = (s->fonte).ascent + (s->fonte).descent;
-#else
 	s->decal = (s->fonte).descent + (s->fonte).leading;
 	s->lig = (s->fonte).ascent + s->decal;
-#endif
 	s->col = (s->fonte).width;
 
 	for(qual=0; qual<WND_NBQUAL; qual++) {
