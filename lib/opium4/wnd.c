@@ -3754,33 +3754,12 @@ char WndContextFgndRGB(WndFrame f, WndContextPtr gc,
 	if(WndModeNone) return(1);
 	if((c = WndColorGetFromRGB(r,g,b)) == (WndColor *)ERREUR) return(0);
 	if(gc == 0) gc = WND_STD;
+
 #ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return 0;
+	gc->foreground = c;
 #endif
 #ifdef OPENGL
 	gc->foreground = c;
-#endif
-#ifdef X11
-	{
-		WndScreen d;
-		if(f) d = (f->s)->d; else d = WndCurSvr->d;
-		XSetForeground(d,gc,c->pixel);
-		WndColorFree(c); /* ???? */
-	}
-#endif
-#ifdef WIN32
-//	if(gc->foreground) {
-//		if(gc->foreground != *WndColorText[f->qualite]) WndColorFree(&gc->foreground);
-//	}
-	gc->foreground = *c;
-#endif
-#ifdef QUICKDRAW
-//	if(gc->foreground) {
-//		if(gc->foreground != WndColorText[f->qualite]) WndColorFree(gc->foreground);
-//	}
-	gc->foreground = c;
-	// PRINT_GC(gc); PRINT_COLOR(gc->background); PRINT_COLOR(gc->foreground);
 #endif
 
 	return(1);
