@@ -3704,24 +3704,14 @@ WndContextPtr WndContextCreate(WndFrame f) {
 WndContextPtr WndContextSupportCreate(WndFrame f, int qual) {
 	/* Cree ab nihilo un contexte graphique utilisable par <f> */
 	WndServer *s; WndContextVal *gcval; WndContextPtr gc;
-#ifdef X11
-	WndContextVal val; WndScreen d; WndIdent w;
-#endif
-
 	if(WndModeNone) return((WndContextPtr)1);
-#ifdef X11
-	if(!f) return(0);
-	gcval = &val;
-#endif
-#ifdef WIN32
-	gcval = gc = (WndContextPtr)malloc(sizeof(WndContextVal));
-#endif
 #ifdef OPENGL
 	gcval = gc = (WndContextPtr)malloc(sizeof(WndContextVal));
 #endif
-#ifdef QUICKDRAW
+#ifdef WXWIDGETS
 	gcval = gc = (WndContextPtr)malloc(sizeof(WndContextVal));
 #endif
+
 	if(!gcval) return(0);
 
 	if(f) { s = f->s; gcval->font = (s->fonte).id; }
@@ -3733,29 +3723,12 @@ WndContextPtr WndContextSupportCreate(WndFrame f, int qual) {
 	gcval->background = WndColorBgnd[qual];
 	gcval->line_style = 0 /* LineSolid */ ;
 #endif
-#ifdef X11
-	gcval->foreground = WndColorText[qual]->pixel;
-	gcval->background = WndColorBgnd[qual]->pixel;
-	gcval->line_style = LineSolid;
-	gcval->cap_style = CapRound;
-	gcval->join_style = JoinRound;
-	gcval->arc_mode = ArcPieSlice;
 
-	d = s->d; w = f->w;
-	gc = XCreateGC(d,w,WndGCMask,gcval);
-#endif
-#ifdef WIN32
-	gcval->foreground = *WndColorText[qual];
-	gcval->background = *WndColorBgnd[qual];
-	gcval->line_style = 0 /* LineSolid */ ;
-#endif
-#ifdef QUICKDRAW
+#ifdef WXWIDGETS
 	gcval->foreground = WndColorText[qual];
 	gcval->background = WndColorBgnd[qual];
-	// PRINT_GC(ptr); PRINT_COLOR(ptr->foreground); PRINT_COLOR(ptr->background);
 	gcval->line_style = 0 /* LineSolid */ ;
 #endif
-
 	return(gc);
 }
 /* ========================================================================== */

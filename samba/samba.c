@@ -3909,7 +3909,7 @@ static void SambaNomFichiers() {
 }
 /* ========================================================================== */
 int SambaLitSimu() {
-	int nb_erreurs; FILE *f;
+	int nb_erreurs = 0; FILE *f;
 	int j,simu,voie;
 
 	if((f = fopen(FichierPrefSimu,"r"))) {
@@ -5324,9 +5324,6 @@ int main(int argc, char *argv[]) {
 	}
 	existe = SambaParms(argc,argv);
 	affiche = SambaInitOpium();
-#ifdef WXWIDGETS
-	return 1;
-#endif
 
 	if(affiche && !existe && !InstalleSamba) {
 		PanelBoutonText(pArgs,PNL_CANCEL,"No Future");
@@ -5337,7 +5334,6 @@ int main(int argc, char *argv[]) {
 	}
 	if(!affiche) ModeBatch = 1;
 	
-	printf("^^^^^^^^^^^^^^^^^^^^^ HELLO\n");
 	if(!InstalleSamba) SambaVerifieProcess();
 	SambaPresentation = 0;
 	if(!ModeBatch) {
@@ -5436,6 +5432,9 @@ int main(int argc, char *argv[]) {
 			MenuBarreExec();
 		#else
 			// OpiumDebug(OPIUM_DEBUG_OPIUM,1);
+			#ifdef WXWIDGETS
+			return 1;
+			#endif
 			OpiumExec(mSambaBarre->cdr);
 		#endif
 
