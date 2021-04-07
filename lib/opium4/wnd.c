@@ -422,7 +422,10 @@ static void WndItemMajuscules(unsigned char *texte) {
 /* ========================================================================== */
 static void WndDrawLine(WndFrame f, WndContextPtr gc, int x0, int y0, int x1, int y1) {
 	WndIdent w;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 	if(gc == 0) gc = WND_TEXT;
 	if(WndPS) {
 		WndColor c;
@@ -491,10 +494,11 @@ static void WndDrawLine(WndFrame f, WndContextPtr gc, int x0, int y0, int x1, in
 /* ========================================================================== */
 static void WndDrawString(WndFrame f, WndContextPtr gc, int x, int y, char *texte, size_t l) {
 	WndIdent w; WndColor c;
-#ifdef QUICKDRAW
-	Rect r;
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
 #endif
-    
+
 	if(!texte[0]) return;
 	if(gc == 0) gc = WND_TEXT;
 	if(WndPS) {
@@ -1016,6 +1020,10 @@ static void WndContextValSetColors(WndContextVal *gcval, WndColor *fond, WndColo
 }
 /* ========================================================================== */
 void WndExit() {
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	glfwTerminate();
 #endif
@@ -1289,6 +1297,12 @@ WndFrame WndCreate(int type, int qualite, int posx, int posy, int sizx, int sizy
 	WndFrame f;
 	int qual,num;
 	int lig,col,colmax;
+
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return NULL;
+#endif
+
 #ifdef X11
 	WndScreen d;
 #endif
@@ -1542,6 +1556,10 @@ void WndRepere(WndFrame f, int x0, int y0, int xm, int ym) {
 }
 /* ========================================================================== */
 void WndTitle(WndFrame f, char *titre) {
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef X11
 	WndScreen d;
 #endif
@@ -1677,7 +1695,10 @@ char WndBasicRGB(WndFrame f, int fr, int fg, int fb, int tr, int tg, int tb) {
 /* ========================================================================== */
 char WndRefreshBegin(WndFrame f) {
 	char devra_terminer;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return 0;
+#endif
 #ifdef OPENGL
 	devra_terminer = !(f->en_cours);
 	if(devra_terminer) {
@@ -1693,6 +1714,10 @@ char WndRefreshBegin(WndFrame f) {
 }
 /* ========================================================================== */
 void WndRefreshEnd(WndFrame f) {
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	if((f->en_cours)) {
 		// printf("(%s)     Fin de modification de F=%08llX\n",__func__,(uint64)f);
@@ -1704,6 +1729,10 @@ void WndRefreshEnd(WndFrame f) {
 /* ========================================================================== */
 void WndControls(WndFrame f) {
 	if(WndModeNone || (f == WND_AT_END) || WndCodeHtml) return;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	int sizx,sizy;
 	glfwGetWindowSize(f->w,&sizx,&sizy);
@@ -1718,6 +1747,10 @@ void WndBorders(WndFrame f) {
 	int sizx,sizy;
 
 	if(WndModeNone || (f == WND_AT_END) || WndCodeHtml) return;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	char doit_terminer;
 	doit_terminer = WndRefreshBegin(f);
@@ -1735,6 +1768,11 @@ void WndBorders(WndFrame f) {
 /* ========================================================================== */
 WndCursor WndCreateStdCursor(int num) {
 	WndCursor curseur;
+
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return NULL;
+#endif
 #ifdef OPENGL
 	return(glfwCreateStandardCursor(num));
 #endif
@@ -1788,6 +1826,10 @@ void WndAssignCursor(WndFrame f, WndCursor curseur) {
 
 	if(WndModeNone) return;
 	w = f->w;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	glfwSwapBuffers(w);
 	glfwSetCursor(w,curseur);
@@ -1803,6 +1845,10 @@ void WndAssignCursor(WndFrame f, WndCursor curseur) {
 }
 /* ========================================================================== */
 void WndExtraInit(WndFrame f, int max) {
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	if(max >= 0) {
 		if(f->extras) {
@@ -1830,6 +1876,10 @@ static void WndExtraExec(WndFrame f, char action, WndContextPtr gc, int i, int j
 }
 /* ========================================================================== */
 void WndExtraAdd(WndFrame f, char action, WndContextPtr gc, int i, int j, int k, int l, void *info) {
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	if(!(f->extras)) return;
 	if(f->extra_nb >= f->extra_max) return;
@@ -1866,6 +1916,10 @@ void WndExtraDisplay(WndFrame f) {
 }
 /* ========================================================================== */
 void WndResize(WndFrame f) {
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	// glfwSetWindowSize(f->w,f->h + WND_ASCINT_WIDZ,f->v + WND_ASCINT_WIDZ); provoque un rebouclage
 #endif
@@ -2008,6 +2062,10 @@ static char WndUnstack(WndFrame f) {
 }
 /* ========================================================================== */
 void WndRaise(WndFrame f) {
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef X11
 	WndScreen d;
 #endif
@@ -2072,6 +2130,10 @@ void WndPutAtTop(WndFrame f) {
 /* ========================================================================== */
 void WndShowTheTop() {
 	WndFrame f; WndIdent w;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef X11
 	WndScreen d; XWindowAttributes etat;
 	short essai_tente;
@@ -2255,6 +2317,10 @@ static char WndWriteOnlyDel(WndFrame f) {
 /* ========================================================================== */
 void WndMove(WndFrame f, int x, int y) {
 	if(WndModeNone || WndCodeHtml) return;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	glfwSetWindowPos(f->w,x,y);
 #endif
@@ -2270,6 +2336,10 @@ void WndMove(WndFrame f, int x, int y) {
 }
 /* ========================================================================== */
 void WndClear(WndFrame f) {
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef DEBUG2
 	WndPrint("Suppression frame @%08X: serveur @%08X, window @%08X\n",f,f->s,f->w);
 #endif
@@ -2467,6 +2537,10 @@ static short WndEventUse(WndUserRequest *u) {
 /* ========================================================================== */
 static short WndEventBuild(WndEvent *e, WndUserRequest *u) {
 	int l;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return 0;
+#endif
 #ifdef OPENGL
 	char souris; unsigned long c;
 #endif
@@ -3094,6 +3168,10 @@ static short WndEventBuild(WndEvent *e, WndUserRequest *u) {
 }
 /* ========================================================================== */
 static int WndEventNext(WndEvent *e) {
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return 0;
+#endif
 #ifdef OPENGL
 	StructWndEventEltPile *elt;
 
@@ -3127,7 +3205,10 @@ static int WndEventNext(WndEvent *e) {
 /* ========================================================================== */
 static char WndEventMouse(WndUserRequest *u, int *posx, int *posy, int *evt_recu, WndEvent *e) {
 	char souris_pressee = 0;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return 0;
+#endif
 #ifdef OPENGL
 	souris_pressee = 1;
 	if((*evt_recu = WndEventNext(e))) {
@@ -3361,7 +3442,10 @@ char WndUpdateFlushed(WndUserRequest *u) {
 int WndEventReady(WndUserRequest *u) {
 	WndEvent e;
 	int rc;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return 0;
+#endif
 	if(WndModeNone) return(0);
 	if(WndRequestNext != WND_NOREQUEST) { WndEventUse(u); rc = 1; }
 	else {
@@ -3402,7 +3486,10 @@ int WndEventReady(WndUserRequest *u) {
 int WndEventWait(int evt, WndUserRequest *u) {
 	WndEvent e;
 	int rc;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return 0;
+#endif
 	if(WndModeNone) return(0);
 #ifdef OPENGL
 	rc = 0;
@@ -3565,6 +3652,10 @@ WndColor *WndColorGetFromName(char *nom) {
 /* ========================================================================== */
 WndColor *WndColorGetFromRGB(WndColorLevel r, WndColorLevel g, WndColorLevel b) {
 	WndColor *c;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return c;
+#endif
 #ifdef X11
 	WndScreen d;
 #else
@@ -3629,6 +3720,10 @@ void WndColorFree(WndColor *c) {
 }
 /* ========================================================================== */
 char WndColorSetByName(WndColor *c, char *nom) {
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return 0;
+#endif
 #ifdef OPENGL
 	char code[5];
 
@@ -3672,6 +3767,10 @@ char WndColorSetByName(WndColor *c, char *nom) {
 }
 /* ========================================================================== */
 char WndColorSetByRGB(WndColor *c, WndColorLevel r, WndColorLevel g, WndColorLevel b) {
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return 0;
+#endif
 #ifdef OPENGL
 	c->red = r; c->green = g; c->blue = b;
 #endif
@@ -3735,7 +3834,10 @@ WndContextPtr WndContextSupportCreate(WndFrame f, int qual) {
 WndContextPtr WndContextCreateFromVal(WndFrame f, WndContextVal *gcval) {
 /* Cree un contexte graphique a partir de valeurs deja memorisees */
 	WndContextPtr gc;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return gc;
+#endif
 	if(WndModeNone) return((WndContextPtr)1);
 #ifdef OPENGL
 	gc = (WndContextPtr)malloc(sizeof(WndContextVal));
@@ -3759,6 +3861,10 @@ WndContextPtr WndContextCreateFromVal(WndFrame f, WndContextVal *gcval) {
 /* ========================================================================== */
 void WndContextCopy(WndFrame f, WndContextPtr gc_src, WndContextPtr gc_dest) {
 	if(WndModeNone) return;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	memcpy(gc_dest,gc_src,sizeof(WndContextVal));
 #endif
@@ -3776,6 +3882,10 @@ void WndContextCopy(WndFrame f, WndContextPtr gc_src, WndContextPtr gc_dest) {
 /* ========================================================================== */
 void WndContextFree(WndFrame f, WndContextPtr gc) {
 	if(WndModeNone) return;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	if(gc) free(gc);
 #endif
@@ -3803,7 +3913,10 @@ char WndContextFgndName(WndFrame f, WndContextPtr gc, char *nom) {
 	if(nom[0] == '\0') c = WndColorText[f->qualite]; else c = WndColorGetFromName(nom);
 	if(c == (WndColor *)ERREUR) return(0);
 	if(gc == 0) gc = WND_STD;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return 0;
+#endif
 #ifdef OPENGL
 	gc->foreground = c;
 #endif
@@ -3839,7 +3952,10 @@ char WndContextFgndRGB(WndFrame f, WndContextPtr gc,
 	if(WndModeNone) return(1);
 	if((c = WndColorGetFromRGB(r,g,b)) == (WndColor *)ERREUR) return(0);
 	if(gc == 0) gc = WND_STD;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return 0;
+#endif
 #ifdef OPENGL
 	gc->foreground = c;
 #endif
@@ -3875,7 +3991,10 @@ char WndContextBgndRGB(WndFrame f, WndContextPtr gc,
 	if(WndModeNone) return(1);
 	if((c = WndColorGetFromRGB(r,g,b)) == (WndColor *)ERREUR) return(0);
 	if(gc == 0) gc = WND_STD;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return 0;
+#endif
 #ifdef OPENGL
 	gc->background = c;
 #endif
@@ -3906,6 +4025,10 @@ char WndContextFgndColor(WndFrame f, WndContextPtr gc, WndColor *c) {
 	/* ATTENTION: la couleur n'est PAS desallouee ni desallouable */
 	if(WndModeNone) return(1);
 	if(gc == 0) gc = WND_STD;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return 0;
+#endif
 #ifdef OPENGL
 	gc->foreground = c;
 #endif
@@ -3929,6 +4052,10 @@ char WndContextBgndColor(WndFrame f, WndContextPtr gc, WndColor *c) {
 	/* ATTENTION: la couleur n'est PAS desallouee ni desallouable */
 	if(WndModeNone) return(1);
 	if(gc == 0) gc = WND_STD;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return 0;
+#endif
 #ifdef OPENGL
 	gc->background = c;
 #endif
@@ -3956,7 +4083,10 @@ void WndContextLine(WndFrame f, WndContextPtr gc, unsigned int type, unsigned in
 #ifdef X11
 	int trace; int l; WndScreen d;
 #endif
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 	if(WndModeNone) return;
 	if(WndPS) {
 		fprintf(WndPS,"%d setlinewidth\n",width);
@@ -4030,6 +4160,10 @@ static void WndImageCree(WndFrame f, int larg, int haut, WndColor *lut, int dim)
 
 	// f->image.dx = f->image.dy = 0; par defaut a la creation de f. Peut avoir ete modifie par WndImageOffset
 	surface = larg * haut;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef WXWIDGETS
 
 #elif defined X11
@@ -4157,6 +4291,10 @@ static void WndImageFillVal(WndFrame f, int x, int y, int val) {
 	int larg,haut; unsigned char *pixels; int k;
 
 	if(!(f->image.surf)) return;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifndef WXWIDGETS
 	if((pixels = (f->image.surf)->pixels) == 0) return;
 	larg = (f->image.surf)->width; if((x < 0) || (x >= larg)) return;
@@ -4172,6 +4310,10 @@ static void WndImageFillVal(WndFrame f, int x, int y, int val) {
 }
 /* ========================================================================== */
 static void WndImageFill8bits(WndFrame f, int x, int y, WndCol8bits *c) {
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	int larg,haut; unsigned char *pixels; int k,n;
 	if(!(f->image.surf)) return;
@@ -4208,6 +4350,10 @@ static void WndImageDrawColor(WndFrame f, int x, int y, WndColor *c) {
 #endif
 /* ========================================================================== */
 void WndImagePixel(WndFrame f, int x, int y, int val) {
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 	if(WndModeNone) return;
 	if(val < 0) val = 0; else if(val >= f->image.nbcolors) val = f->image.nbcolors - 1;
 	if(WndPS) WndImageFillVal(f,x - f->image.dx,y - f->image.dy,val);
@@ -4225,6 +4371,10 @@ void WndImagePixel(WndFrame f, int x, int y, int val) {
 }
 /* ========================================================================== */
 void WndIconeInit(WndFrame f,WndIcone icone) {
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	WndImageInit(f,(int)icone->larg,(int)icone->haut,0,0);
 	if(f->image.surf) {
@@ -4251,7 +4401,10 @@ void WndIconeInit(WndFrame f,WndIcone icone) {
 /* ========================================================================== */
 void WndIconePixel(WndFrame f, int x, int y, WndIcnPxl pixel) {
 	WndCol8bits c8; WndColor *c;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 	if(WndModeNone) return;
 	if(WndPS) {
 		if((pixel->m)) { c8.r = pixel->r; c8.g = pixel->g; c8.b = pixel->b; }
@@ -4287,7 +4440,10 @@ void WndIconePixel(WndFrame f, int x, int y, WndIcnPxl pixel) {
 /* ========================================================================== */
 void WndImageShow(WndFrame f) {
 	unsigned char *pixels;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifndef WXWIDGETS
 	if(WndModeNone) return;
 	if(!(f->image.surf)) return;
@@ -4841,6 +4997,10 @@ void WndLine(WndFrame f, WndContextPtr gc, int x, int y, int l, int h) {
 /* ========================================================================== */
 void WndPoly(WndFrame f, WndContextPtr gc, WndPoint *p, int nb, int type) {
 	WndIdent w;
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef X11
 	WndScreen d; WndServer *s;
 	int x1,y1,x2,y2;
@@ -4998,7 +5158,10 @@ void WndPoly(WndFrame f, WndContextPtr gc, WndPoint *p, int nb, int type) {
 /* ========================================================================== */
 void WndRectangle(WndFrame f, WndContextPtr gc, int x, int y, int l, int h) {
 	WndIdent w;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 	if(WndModeNone) return;
 	w = f->w;
 	if(gc == 0) gc = WND_TEXT;
@@ -5055,7 +5218,10 @@ void WndArc(WndFrame f, WndContextPtr gc, int x, int y, int l, int h,
 	if(WndModeNone) return;
 	w = f->w; s = f->s;
 	if(gc == 0) gc = WND_TEXT;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	int sizx,sizy; char doit_terminer;
 	int i,pts_tot,pts_nb; double alpha,delta,fin;
@@ -5138,7 +5304,10 @@ void WndOvale(WndFrame f, WndContextPtr gc, int x, int y, int l, int h) {
 #ifdef QUICKDRAW
 	Rect r;
 #endif
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 	if(WndModeNone) return;
 	w = f->w;
 	s = f->s;
@@ -5226,7 +5395,10 @@ void WndFillFgnd(WndFrame f, WndContextPtr gc, int x, int y, int l, int h) {
 	if(WndModeNone) return;
 	if(!f) return;
 	if(gc == 0) gc = WND_TEXT;
-	
+	#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	WndPaint(f,x,y,l,h,gc->foreground,0);
 #endif
@@ -5261,7 +5433,10 @@ void WndFillBgnd(WndFrame f, WndContextPtr gc, int x, int y, int l, int h) {
 #else
 	if(!(gc->background)) return;
 #endif
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	int sizx,sizy; double xd,yd,xf,yf; char doit_terminer;
 	WndIdent w; w = f->w;
@@ -5313,7 +5488,10 @@ void WndPaint(WndFrame f, int x, int y, int l, int h, WndColor *c, int org) {
 	} else */
 		XClearArea(d,f->w,f->x0 + x,f->y0 + y,l,h,0); // utilise le bgnd de <f>
 #endif
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	int sizx,sizy; double xd,yd,xf,yf; char doit_terminer;
 	WndIdent w; w = f->w;
@@ -5358,7 +5536,10 @@ void WndPaint(WndFrame f, int x, int y, int l, int h, WndColor *c, int org) {
 void WndBlank(WndFrame f) {
 
 	if(WndModeNone) return;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	char doit_terminer;
 	doit_terminer = WndRefreshBegin(f);
@@ -5386,7 +5567,10 @@ void WndBlank(WndFrame f) {
 void WndErase(WndFrame f, int x, int y, int l, int h) {
 
 	if(WndModeNone) return;
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 //	WndRectangle(f,WND_CLEAR,x,y,l,h);
 	WndPaint(f,x,y,l,h,WndColorGrey[WND_Q_ECRAN],0);
@@ -5628,7 +5812,10 @@ static void WndCursorDraw(WndFrame f, WndContextPtr gc) {
 	WndDrawLine(f,gc,x,y-1,x+(s->col),y-1);
 	WndDrawLine(f,gc,x,y,x+(s->col),y);
 #endif
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 #ifdef OPENGL
 	char doit_terminer;
 	
@@ -5720,7 +5907,10 @@ void WndButton(WndFrame f, WndContextPtr gc, int lig, int col, int dim, char *te
 #else
 	size_t l; int dx;
 #endif
-
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
+#endif
 	if(WndModeNone) return;
 	if(!f) return;
 	s = f->s;
@@ -5766,6 +5956,10 @@ void WndClearText(WndFrame f, WndContextPtr gc, int lig, int col, int lngr) {
 	if(gc == 0) gc = WND_STD;
 #ifdef DEBUG3
 	WndPrint("Fenetre #%08X: effacement a (%d, %d) + (%d, %d)\n",f->w,x,y,l,s->lig);
+#endif
+#ifdef WXWIDGETS
+	printf("WND FUNCTION:   %d\n", __LINE__);
+	return;
 #endif
 #ifdef OPENGL
 	int sizx,sizy; double xd,yd,xf,yf; char doit_terminer;

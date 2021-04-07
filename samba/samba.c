@@ -5432,9 +5432,6 @@ int main(int argc, char *argv[]) {
 			MenuBarreExec();
 		#else
 			// OpiumDebug(OPIUM_DEBUG_OPIUM,1);
-			#ifdef WXWIDGETS
-			return 1;
-			#endif
 			OpiumExec(mSambaBarre->cdr);
 		#endif
 

@@ -23,6 +23,10 @@ typedef unsigned long long UInt64;
 #define Accord1S(var) var,(var>1)?"S":""
 #define Accord2S(var) var,(var>1)?"S":"",(var>1)?"S":""
 
+#ifdef WXWIDGETS
+void OpiumExecWx(struct Cadre *cdr);
+#endif
+
 #define CHANGE_CURSEUR
 
 typedef enum {
@@ -1689,6 +1693,10 @@ int OpiumRun(Cadre cdr_initial, int mode) {
 	u.type = -1; /* rapport au cas WND_PRESS */
 	nbloop = 0; precedent = u.type;
 	code_a_rendre = 0;
+#ifdef WXWIDGETS
+	OpiumExecWx(cdr_initial);
+	return code_a_rendre;
+#endif
 	while(OpiumNbExec && cdr_ouverts) {
 		if(u.type == precedent) nbloop++; else nbloop = 1;
 		precedent = u.type;
