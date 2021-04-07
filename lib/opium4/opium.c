@@ -1766,6 +1766,49 @@ void OpiumPhotoSauve() {
 	OpiumAfficheMessage();
 }
 /* ========================================================================== */
+int OpiumManageWx(Cadre *cdr, struct SambaWnd *w, char type, int x, int y, int v, int h)
+{
+	WndUserRequest u;
+	u.w = w;
+	u.code = 0;
+
+	switch (type)
+	{
+		case 0: //SMBWX_PAINT
+			u.type = WND_EXPOSE;
+			break;
+
+		case 1: //SMBWX_CONFIG
+			u.type = WND_CONFIG;
+			u.x = x;
+			u.y = y;
+			u.v = w;
+			u.h = h;
+			break;
+
+		case 2: //SMBWX_MOUSE_LEFT_DOWN
+			u.type = WND_PRESS;
+			u.x = x;
+			u.y = y;
+			u.code = (unsigned int)WND_MSELEFT;
+			break;
+
+		case 3: //SMBWX_MOUSE_LEFT_UP
+			u.type = WND_RELEASE;
+			u.x = x;
+			u.y = y;
+			u.code = (unsigned int)WND_MSELEFT;
+			break;
+
+		case 4: //SMBWX_FOCUS
+			u.type = WND_IN_USE;
+			break;
+	}
+
+	int cdr_ouverts = 0;
+	OpiumManage(*cdr, &u, &cdr_ouverts);
+}
+/* ========================================================================== */
 int OpiumManage(Cadre cdr_initial, WndUserRequest *u, int *cdr_ouverts) {
 	Cadre cdr,pointe; WndFrame f; WndIdent wid;
 	int evt,key,zoom,x,y,i;

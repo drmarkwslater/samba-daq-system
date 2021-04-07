@@ -122,8 +122,7 @@ void WndEventNewWx(SambaWnd *w, SambaEventWx type, int x, int y, int v, int h)
 {
     if (!samba_running)
         return;
-
-    //OpiumManageWx(cdr_initial, w, type, x, y, v, h);
+    OpiumManageWx(cdr_initial, w, type, x, y, v, h);
 }
 
 struct wxCursor *WndCreateStdCursorWx()
