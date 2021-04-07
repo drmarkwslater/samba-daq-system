@@ -3698,28 +3698,15 @@ WndContextPtr WndContextSupportCreate(WndFrame f, int qual) {
 WndContextPtr WndContextCreateFromVal(WndFrame f, WndContextVal *gcval) {
 /* Cree un contexte graphique a partir de valeurs deja memorisees */
 	WndContextPtr gc;
-#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return gc;
-#endif
 	if(WndModeNone) return((WndContextPtr)1);
 #ifdef OPENGL
 	gc = (WndContextPtr)malloc(sizeof(WndContextVal));
 	if(gc) memcpy(gc,gcval,sizeof(WndContextVal));
 #endif
-#ifdef X11
-	if(!f) return(0);
-	gc = XCreateGC((f->s)->d,f->w,WndGCMask,gcval);
-#endif
-#ifdef WIN32
+#ifdef WXWIDGETS
 	gc = (WndContextPtr)malloc(sizeof(WndContextVal));
 	if(gc) memcpy(gc,gcval,sizeof(WndContextVal));
 #endif
-#ifdef QUICKDRAW
-	gc = (WndContextPtr)malloc(sizeof(WndContextVal));
-	if(gc) memcpy(gc,gcval,sizeof(WndContextVal));
-#endif
-
 	return(gc);
 }
 /* ========================================================================== */
