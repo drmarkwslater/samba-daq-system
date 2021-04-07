@@ -3674,26 +3674,13 @@ void WndContextCopy(WndFrame f, WndContextPtr gc_src, WndContextPtr gc_dest) {
 /* ========================================================================== */
 void WndContextFree(WndFrame f, WndContextPtr gc) {
 	if(WndModeNone) return;
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
 #ifdef OPENGL
 	if(gc) free(gc);
 #endif
-#ifdef X11
-	if(gc) {
-		WndScreen d;
-		if(f) d = (f->s)->d; else d = WndCurSvr->d;
-		XFreeGC(d,gc);
-	}
-#endif
-#ifdef WIN32
+#ifdef WXWIDGETS
 	if(gc) free(gc);
 #endif
-#ifdef QUICKDRAW
-	if(gc) free(gc);
-#endif
+
 }
 /* ========================================================================== */
 char WndContextFgndName(WndFrame f, WndContextPtr gc, char *nom) {
