@@ -1298,24 +1298,7 @@ WndFrame WndCreate(int type, int qualite, int posx, int posy, int sizx, int sizy
 	int qual,num;
 	int lig,col,colmax;
 
-#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return NULL;
-#endif
-
-#ifdef X11
-	WndScreen d;
-#endif
-#ifdef QUICKDRAW
-	Rect r;
-#endif
-// #define DEBUG
-// #define DEBUG3
-
 	f = (WndFrame)malloc(sizeof(struct WndFrameStruct));
-#ifdef DEBUG
-	WndPrint("Serveur @%08X, Frame @%08X creee\n",(hexa)WndCurSvr,(hexa)f);
-#endif /* DEBUG */
 	if(!f) return(0);
 	if(WndModeNone) w = 0;
 	else if(WndCodeHtml) w = (WndIdent)((void *)(int64)WndOpened + 1);
@@ -1365,90 +1348,17 @@ WndFrame WndCreate(int type, int qualite, int posx, int posy, int sizx, int sizy
 			glfwTerminate();
 		}
 	#endif /* OPENGL */
-
-	#ifdef X11
-		d = WndCurSvr->d;
-		if(type == WND_FEN_BRD) w = XCreateSimpleWindow(d,WndRoot,
-			posx,posy,sizx + WND_ASCINT_WIDZ,sizy + WND_ASCINT_WIDZ,2,
-			WndColorBlack->pixel,WndColorGrey[WndQual]->pixel);
-		else if(type == WND_FEN_STD) w = XCreateSimpleWindow(d,WndRoot,
-			posx,posy,sizx + WND_ASCINT_WIDZ,sizy + WND_ASCINT_WIDZ,2,
-			WndColorText[WndQual]->pixel,WndColorBgnd[WndQual]->pixel);
-		else w = XCreateSimpleWindow(d,WndRoot,
-			posx,posy,sizx + WND_ASCINT_WIDZ,sizy + WND_ASCINT_WIDZ,2,
-			WndColorText[WndQual]->pixel,WndColorSub[WndQual]->pixel);
-		WndNum++;
-	#ifdef DEBUG
-		WndPrint("Fenetre %d x %d creee en (%d, %d) @%08X\n",sizx,sizy,posx,posy,w);
-	#endif /* DEBUG */
-		XMapWindow(d,w);
-		// XSelectInput(d,w,WndEventMask);
-		XSelectInput(d,w,0x01FFFFFF);
-	#endif /* X11 */
-
-	#ifdef WIN32
-		WNDCLASS WndC; /* TODO type	*/
-		char name[] = "<null>";
-
-		WndC.style = CS_HREDRAW | CS_VREDRAW;
-		WndC.lpfnWndProc = WndProc;
-		WndC.cbClsExtra = 0;
-		WndC.cbWndExtra = 0;
-		WndC.lpszMenuName = 0;
-		WndC.lpszClassName = name;
-		WndC.hInstance = 0;
-		WndC.hIcon = LoadIcon(0, IDI_APPLICATION);
-		WndC.hCursor = LoadCursor(0, IDC_ARROW);
-		WndC.hbrBackground = NULL;//CreateSolidBrush(*WndColorBgnd);
-
-		RegisterClass(&WndC);
-
-		if(sizx < GetSystemMetrics(SM_CXMIN)) sizx = GetSystemMetrics(SM_CXMIN);
-
-		if((type == WND_FEN_STD) || (type == WND_FEN_BRD))
-		#ifdef WIN32_BACKGROUND
-			w = CreateWindow(name, name, WS_OVERLAPPEDWINDOW, posx, posy, sizx + WND_ASCINT_WIDZ, sizy + WND_ASCINT_WIDZ + WndTitleBar, WndRoot, 0, 0, 0);
-		#else
-			w = CreateWindow(name, name, WS_OVERLAPPEDWINDOW, posx, posy, sizx + WND_ASCINT_WIDZ, sizy + WND_ASCINT_WIDZ + WndTitleBar, WndRoot, 0, 0, 0);
-		#endif
-		else 
-			w = CreateWindow(name, name, 0, posx, posy, sizx + WND_ASCINT_WIDZ, sizy + WND_ASCINT_WIDZ + WndTitleBar, WndRoot, 0, 0, 0);
-
-		ShowWindow(w, SHOW_OPENWINDOW);
-		UpdateWindow(w);
-	#endif /* WIN32 */
-
-	#ifdef QUICKDRAW
-		r.left = posx; r.top = posy;
-		r.right = r.left + sizx + WND_ASCINT_WIDZ; r.bottom = r.top + sizy + WND_ASCINT_WIDZ;
-	#ifdef DEBUG3
-		WndPrint("Fenetre %d x %d demandee en (%d, %d)\n",sizx,sizy,r.left,r.top);
-	#endif
-			if((type == WND_FEN_STD) || (type == WND_FEN_BRD))
-				w = NewCWindow(nil,&r,"\p\0",false,zoomDocProc,WND_INFRONT,true,WndNum++);
-			else w = NewCWindow(nil,&r,"\p\0",false,plainDBox,WND_INFRONT,true,WndNum++);
-	/*		else w = NewCWindow(nil,&r,"\p\0",false,movableDBoxProc,WND_INFRONT,true,WndNum++); */
-		#ifdef DEBUG3
-			WndPrint("Fenetre %d x %d creee en (%d, %d) @%08X\n",sizx,sizy,r.left,r.top,w);
-		#endif
-			SetPort(WNDPORT(w));
-			TextSize((pixval)WndFontSize);
-			WND_UTILISE_FONTE(w,(WndCurSvr->fonte).id);
-			if(type == WND_FEN_BRD) {
-				RGBBackColor(WndColorBoard[WndQual]);
-				RGBForeColor(WndColorBlack);
-			} else {
-				RGBForeColor(WndColorText[WndQual]);
-				if(type == WND_FEN_STD) RGBBackColor(WndColorBgnd[WndQual]);
-				else RGBBackColor(WndColorSub[WndQual]);
-			}
-			ShowWindow(w); /* SelectWindow(w); Pas obligatoire */
-	#endif /* QUICKDRAW */
+	#ifdef WXWIDGETS
+		w = WndCreateWx(posx, posy, sizx+WND_ASCINT_WIDZ,sizy+WND_ASCINT_WIDZ);
+		if(w) {
+			WndNum++;
+		} else {
+			fprintf( stderr, "Failed to open WxWidgets window.\n" );
+			getchar();
+		}
+	#endif /* WXWIDGETS */
 	}
 
-#ifdef DEBUG3
-	printf("(%s) Fenetre creee: W=%08llX pour F=%08llX\n",__func__,(UInt64)w,(UInt64)f);
-#endif
 	f->w = w;
 	f->s = WndCurSvr;
 	f->x = posx;
@@ -1476,9 +1386,6 @@ WndFrame WndCreate(int type, int qualite, int posx, int posy, int sizx, int sizy
 	#endif
 #endif
 	f->dessous = WND_NOT_IN_STACK; /* valeur differente <=> mise dans la pile */
-#ifdef DEBUG
-	WndStep("Creation contextes frame F:%08X",f);
-#endif
 	f->nb_gc = WND_GC_BASE;
 	for(qual=0; qual<WND_NBQUAL; qual++) {
 		if(!(f->gc[qual].coul = Malloc(f->nb_gc,WndContextPtr))) return(0);
@@ -1487,11 +1394,6 @@ WndFrame WndCreate(int type, int qualite, int posx, int posy, int sizx, int sizy
 			// printf("(%s) GC[%d] ",__func__,num); PRINT_GC(f->gc[qual].coul[num]);
 		}
 	}
-
-#ifdef DEBUG
-	WndPrint("Fenetre rendue: F:%08X\n",f);
-	WndStep("Fin de la creation");
-#endif
 	if(WndPremiere == 0) WndPremiere = f;
 	WndOpened++;
 	return(f);
