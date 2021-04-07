@@ -3652,37 +3652,15 @@ WndColor *WndColorGetFromName(char *nom) {
 /* ========================================================================== */
 WndColor *WndColorGetFromRGB(WndColorLevel r, WndColorLevel g, WndColorLevel b) {
 	WndColor *c;
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return c;
-#endif
-#ifdef X11
-	WndScreen d;
-#else
+	
 	WndColor nouvelle; int k,l;
-#endif
-
 	if(WndModeNone) return((WndColor *)ERREUR);
-#ifdef X11
-	c = (WndColor *)malloc(sizeof(WndColor));
-	if(!c) return((WndColor *)ERREUR);
-	d = WndCurSvr->d;
-	c->red = r; c->green = g; c->blue = b;
-	c->flags = DoRed | DoGreen | DoBlue;
-	if(XAllocColor(d,DefaultColormap(d,DefaultScreen(d)),c)) return(c);
-	else return((WndColor *)ERREUR);
-#endif
-
-#ifdef WIN32
-	nouvelle = RGB(r>>8, g>>8, b>>8);
-#endif
-#ifdef QUICKDRAW
+#ifdef WXWIDGETS
 	nouvelle.red = r; nouvelle.green = g; nouvelle.blue = b;
 #endif
 #ifdef OPENGL
 	nouvelle.red = r; nouvelle.green = g; nouvelle.blue = b;
 #endif
-#ifndef X11
 	l = -1;
 	for(k=0; k<WndColorNb; k++) {
 		if(WndColorStock[k].active) {
@@ -3700,7 +3678,6 @@ WndColor *WndColorGetFromRGB(WndColorLevel r, WndColorLevel g, WndColorLevel b) 
 	}
 	c = &(WndColorStock[k].c);
 	return(c);
-#endif
 }
 /* ========================================================================== */
 void WndColorFree(WndColor *c) {
