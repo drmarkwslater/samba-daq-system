@@ -16,25 +16,27 @@ set(CMAKE_CXX_STANDARD 17)
 # - make sure we have a clean build
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wfatal-errors -Wshadow -pedantic")
 
-# - Set some defines
-#add_compile_definitions(ForOpiumGL UNIX)
-add_compile_definitions(WXWIDGETS UNIX)
+# - check some OS dependent stuff
+INCLUDE (CheckIncludeFiles)
+CHECK_INCLUDE_FILES("sys/sysctl.h" HAVE_SYS_SYSCTL_H)
 
-# - Find wxWidgets
-set(wxWidgets_CONFIGURATION mswu)
-find_package(wxWidgets COMPONENTS core base REQUIRED)
-include(${wxWidgets_USE_FILE})
+if (WXWIDGETS)
+  add_compile_definitions(WXWIDGETS UNIX)
 
-# - Find OpenGL
-find_package(GLUT  REQUIRED)
-#find_package(glfw REQUIRED)
-
-
-add_library(glfw3 STATIC IMPORTED)
-set_target_properties(glfw3 PROPERTIES
-  IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libglfw3.a"
-)
-find_library(COREVIDEO_LIBRARY CoreVideo)
+  # - Find wxWidgets
+  set(wxWidgets_CONFIGURATION mswu)
+  find_package(wxWidgets COMPONENTS core base REQUIRED)
+  include(${wxWidgets_USE_FILE})
+else()
+  # - Find OpenGL
+  add_compile_definitions(ForOpiumGL UNIX)
+  find_package(GLUT  REQUIRED)
+  add_library(glfw3 STATIC IMPORTED)
+  set_target_properties(glfw3 PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libglfw3.a"
+  )
+  find_library(COREVIDEO_LIBRARY CoreVideo)
+endif()
 
 # - Add the main library and other subdirectories to the build
 add_subdirectory(lib)

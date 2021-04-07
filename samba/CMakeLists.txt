@@ -37,9 +37,10 @@ target_include_directories(samba
   PUBLIC ${CMAKE_CURRENT_LIST_DIR}/salsa
   )
 
-include_directories(${GLUT_INCLUDE_DIR})
-link_directories(${OPENGL_LIBRARY_DIRS})
-
-#target_link_libraries(samba PRIVATE opium4 utils FFT fltr tcp notsvr db m X11 db curl ${wxWidgets_LIBRARIES})
-#target_link_libraries(samba PRIVATE opium4 utils FFT fltr tcp notsvr db m db curl ${OPENGL_LIBRARIES} ${wxWidgets_LIBRARIES})
-target_link_libraries(samba PRIVATE opium4 utils FFT fltr tcp notsvr db m db curl glfw3 ${COREVIDEO_LIBRARY} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES} ${wxWidgets_LIBRARIES})
+if (WXWIDGETS)
+  target_link_libraries(samba PRIVATE opium4 utils FFT fltr tcp notsvr db m db curl ${wxWidgets_LIBRARIES})
+else()
+  include_directories(${GLUT_INCLUDE_DIR})
+  link_directories(${OPENGL_LIBRARY_DIRS})
+  target_link_libraries(samba PRIVATE opium4 utils FFT fltr tcp notsvr db m db curl glfw3 ${COREVIDEO_LIBRARY} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+endif()
