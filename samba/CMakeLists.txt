@@ -38,9 +38,11 @@ target_include_directories(samba
   )
 
 if (WXWIDGETS)
-  target_link_libraries(samba PRIVATE opium4 utils FFT fltr tcp notsvr db m db curl ${wxWidgets_LIBRARIES})
+  target_link_libraries(samba PRIVATE opium4 utils FFT fltr tcp notsvr db m db curl 
+                        ${wxWidgets_LIBRARIES})
 else()
   include_directories(${GLUT_INCLUDE_DIR})
   link_directories(${OPENGL_LIBRARY_DIRS})
-  target_link_libraries(samba PRIVATE opium4 utils FFT fltr tcp notsvr db m db curl glfw3 ${COREVIDEO_LIBRARY} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+  target_link_libraries(samba PRIVATE opium4 utils FFT fltr tcp notsvr db m db curl glfw3 
+                        ${COREVIDEO_LIBRARY} ${IOKIT_LIBRARY} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 endif()

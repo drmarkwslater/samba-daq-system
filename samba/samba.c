@@ -5332,8 +5332,9 @@ int main(int argc, char *argv[]) {
 		SambaInitBasique();
 	}
 	existe = SambaParms(argc,argv);
+#ifdef WXWIDGETS
 	return 1;
-
+#endif
 	affiche = SambaInitOpium();
 	if(affiche && !existe && !InstalleSamba) {
 		PanelBoutonText(pArgs,PNL_CANCEL,"No Future");

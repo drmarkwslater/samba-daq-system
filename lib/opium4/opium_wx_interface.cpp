@@ -1,3 +1,5 @@
+#ifdef WXWIDGETS
+
 #include <opium_wx_interface.h>
 #include <samba_app.hpp>
 #include <wx/display.h>
@@ -129,3 +131,5 @@ void WndEventNewWx(SambaWnd *w, SambaEventWx type, int x, int y, int v, int h)
 
     OpiumManageWx(cdr_initial, w, type, x, y, v, h);
 }
+
+#endif // WXWIDGETS

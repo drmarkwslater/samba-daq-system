@@ -19,6 +19,9 @@ set(CMAKE_CXX_STANDARD 17)
 # - check some OS dependent stuff
 INCLUDE (CheckIncludeFiles)
 CHECK_INCLUDE_FILES("sys/sysctl.h" HAVE_SYS_SYSCTL_H)
+if (HAVE_SYS_SYSCTL_H)
+  add_compile_definitions(HAVE_SYS_SYSCTL_H)
+endif()
 
 if (WXWIDGETS)
   add_compile_definitions(WXWIDGETS UNIX)
@@ -31,11 +34,13 @@ else()
   # - Find OpenGL
   add_compile_definitions(ForOpiumGL UNIX)
   find_package(GLUT  REQUIRED)
+  find_package(OPENGL  REQUIRED)
   add_library(glfw3 STATIC IMPORTED)
   set_target_properties(glfw3 PROPERTIES
     IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libglfw3.a"
   )
   find_library(COREVIDEO_LIBRARY CoreVideo)
+  find_library(IOKIT_LIBRARY IOKit)
 endif()
 
 # - Add the main library and other subdirectories to the build

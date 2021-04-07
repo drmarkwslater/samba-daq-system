@@ -1,3 +1,5 @@
+#ifdef WXWIDGETS
+
 #include <samba_app.hpp>
 #include <samba_wnd.hpp>
 
@@ -15,3 +17,4 @@ SambaWnd *SambaApp::WndCreate(int x, int y, unsigned int width, unsigned int hei
 }
 
 
+#endif

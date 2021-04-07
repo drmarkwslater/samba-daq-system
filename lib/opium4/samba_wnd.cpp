@@ -1,3 +1,5 @@
+#ifdef WXWIDGETS
+
 #include <samba_wnd.hpp>
 #include <samba_app.hpp>
 #include <opium_wx_interface.h>
@@ -59,3 +61,5 @@ bool SambaWnd::isPainting()
 {
     return is_painting;
 }
+
+#endif //WXWIDGETS
