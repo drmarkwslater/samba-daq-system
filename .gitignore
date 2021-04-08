@@ -4,7 +4,7 @@
 
 # files created on build from XCode
 Acquis/ModelsList
-Acquis/SambaArgs
+#Acquis/SambaArgs
 Acquis/TangoArgs
 Acquis/executables/AutresVersions/
 Acquis/executables/Gasol.app/Contents/Resources/SambaMem
