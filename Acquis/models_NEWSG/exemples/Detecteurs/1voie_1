@@ -1,0 +1,14 @@
+#
+=1voie_1/1voie @a2: ok (HS/ok/faux)
+	parms detecteur = {
+		masse = 320 	# masse du detecteur (g)
+		mode = standard 	# mode de sauvegarde
+		voisins = () 	# detecteurs a sauver aussi en mode 'voisins'
+		entretien = neant 	# nom du fichier d'entretien periodique
+	}
+#
+#	---------- Parametrage de la voie signal ----------
+#
+	parms signal = {
+		sensibilite = 1 	# nV/keV
+	}

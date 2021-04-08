@@ -1,0 +1,10 @@
+#
+Repartiteurs = (
+	{ NOSTOS := designation = "Carte NOSTOS", famille = Cluzel, niveau = 255, interface = PCI, version = 0.2, delai_msg = 3000, horloge_MHz = 2.5, diviseur0 = 2, diviseur1 = 1, masque = 0x3fff, max_numer = 1, bloc_numer = non, status = non },
+	{ Opera := designation = "Boite OPERA", famille = OPERA, niveau = 1, interface = IP, version = 2.8, delai_msg = 10000, horloge_MHz = 125, diviseur0 = 5, diviseur1 = 18, masque = 0xffff, max_numer = 1, bloc_numer = oui, status = non },
+	{ CALI := designation = "Boite CALI", famille = CALI, niveau = 1, interface = IP, version = 1.0, delai_msg = 10000, horloge_MHz = 100, diviseur0 = 1, diviseur1 = 100, masque = 0xffff, max_numer = 1, bloc_numer = oui, status = non },
+	{ RP-C := designation = "Red Pitaya", famille = CALI, niveau = 2, interface = IP, version = 1.0, delai_msg = 10000, horloge_MHz = 125, diviseur0 = 1, diviseur1 = 100, masque = 0xffff, max_numer = 1, bloc_numer = oui, status = non },
+	{ RP-U := designation = "Red Pitaya", famille = CALI, niveau = 3, interface = IP, version = 1.0, delai_msg = 10000, horloge_MHz = 125, diviseur0 = 1, diviseur1 = 100, masque = 0xffff, max_numer = 1, bloc_numer = oui, status = non },
+	{ PortUSB := designation = "Port USB", famille = Media, niveau = 1, interface = USB, version = 1, delai_msg = 0, horloge_MHz = 1, diviseur0 = 1, diviseur1 = 1, masque = 0xffff, max_numer = 1, bloc_numer = oui, status = non },
+	{ 6251 := designation = NI-6251, famille = NI, niveau = 1, interface = NI, version = 6251, delai_msg = 0, horloge_MHz = 1, diviseur0 = 1, diviseur1 = 1, masque = 0xffff, max_numer = 1, bloc_numer = oui, status = non }
+)

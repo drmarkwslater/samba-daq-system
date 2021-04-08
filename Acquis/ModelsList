@@ -1,0 +1,7 @@
+#
+Detecteurs = ../models_NEWSG/detectors
+Numeriseurs = ../models_NEWSG/digitizers
+Cablages = ../models_NEWSG/cablings
+Repartiteurs = ../models_NEWSG/dispatchers
+Support = ../models_NEWSG/chassis
+Environnement = ../models_NEWSG/Environment

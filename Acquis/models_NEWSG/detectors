@@ -1,0 +1,21 @@
+#
+Physique = (
+	{ charge := duree-ms = 1000, temps-mort-ms = -1, fenetre-ms = 1, delai-ms = -1, dimtemplate = 64, montee-ms = 0.02, descente1-ms = 0.14, descente2-ms = 0.2, facteur2 = 1 },
+	{ light := duree-ms = 1000, temps-mort-ms = -1, fenetre-ms = 1, delai-ms = -1, dimtemplate = 64, montee-ms = 0.02, descente1-ms = 0.14, descente2-ms = 0.2, facteur2 = 1 }
+)
+Voies = (
+	{ ball := physique = charge, temps-mort-ms = -1, pretrigger_% = 25, base.debut_% = 25, base.fin_% = 75, montee.debut_% = 10, montee.fin_% = 90, coincidence-ms = 20 },
+	{ corrector := physique = charge, temps-mort-ms = -1, pretrigger_% = 25, base.debut_% = 25, base.fin_% = 75, montee.debut_% = 10, montee.fin_% = 90, coincidence-ms = 20 },
+	{ north := physique = charge, temps-mort-ms = -1, pretrigger_% = 25, base.debut_% = 25, base.fin_% = 75, montee.debut_% = 10, montee.fin_% = 90, coincidence-ms = 20 },
+	{ south := physique = charge, temps-mort-ms = -1, pretrigger_% = 25, base.debut_% = 25, base.fin_% = 75, montee.debut_% = 10, montee.fin_% = 90, coincidence-ms = 20 },
+	{ UVlight := physique = light, temps-mort-ms = -1, pretrigger_% = 25, base.debut_% = 25, base.fin_% = 75, montee.debut_% = 10, montee.fin_% = 90, coincidence-ms = 20 }
+)
+Detecteurs = (
+	{ simple-ball := capteurs = ball, reglages = (), associes = () },
+	{ full-rod := capteurs = (ball, corrector), reglages = (), associes = () },
+	{ ball-uv := capteurs = (ball, UVlight), reglages = (), associes = () },
+	{ 2-akhinos := capteurs = (north, south), reglages = (), associes = () },
+	{ 3-akhinos := capteurs = (north, south, ball), reglages = (), associes = () },
+	{ 2-akh-lsr := capteurs = (north, south, UVlight), reglages = (), associes = () },
+	{ 3-akh-lsr := capteurs = (north, south, ball, UVlight), reglages = (), associes = () }
+)

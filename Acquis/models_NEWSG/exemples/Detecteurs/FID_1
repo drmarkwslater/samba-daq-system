@@ -1,0 +1,88 @@
+#
+=FID_1/FID @a1: ok (HS/ok/faux)
+	parms detecteur = {
+		masse = 320 	# masse du detecteur (g)
+		mode = standard 	# mode de sauvegarde
+		voisins = () 	# detecteurs a sauver aussi en mode 'voisins'
+		entretien = neant 	# nom du fichier d'entretien periodique
+	}
+#
+#	---------- Parametrage de la voie chalA ----------
+#
+	parms chalA = {
+		sensibilite = 1 	# nV/keV
+	}
+	reglages chalA = {
+		ampl-chalA=0.000
+		comp-chalA=1.900
+		corr-chalA=76.190
+		gain-chalA=1
+		d2-chalA=100
+		d3-chalA=1000
+		Rly1+=ouvert
+		Rly1-=ouvert
+		Rly2+=ouvert
+		Rly2-=ouvert
+		Raz-chalA=
+	}
+#
+#	---------- Parametrage de la voie chalB ----------
+#
+	parms chalB = {
+		sensibilite = 1 	# nV/keV
+	}
+	reglages chalB = {
+		ampl-chalB=1.000
+		comp-chalB=4.189
+		corr-chalB=1.690
+		gain-chalB=0.9
+		d2-chalB=100
+		d3-chalB=1000
+		Rly1=ouvert
+		Rly2=ouvert
+		Raz-chalB=libre
+	}
+#
+#	---------- Parametrage de la voie ionisA ----------
+#
+	parms ionisA = {
+		sensibilite = 1 	# nV/keV
+	}
+	reglages ionisA = {
+		polar-A=0.000
+		gain-A=1
+		polar-fet-A=0.000
+	}
+#
+#	---------- Parametrage de la voie ionisB ----------
+#
+	parms ionisB = {
+		sensibilite = 1 	# nV/keV
+	}
+	reglages ionisB = {
+		polar-B=0.000
+		gain-B=1
+		polar-fet-B=0.000
+	}
+#
+#	---------- Parametrage de la voie ionisC ----------
+#
+	parms ionisC = {
+		sensibilite = 1 	# nV/keV
+	}
+	reglages ionisC = {
+		polar-C=0.000
+		gain-C=1
+		polar-fet-C=0.000
+	}
+#
+#	---------- Parametrage de la voie ionisD ----------
+#
+	parms ionisD = {
+		sensibilite = 1 	# nV/keV
+	}
+	reglages ionisD = {
+		polar-D=0.000
+		gain-D=1
+		polar-fet-D=0.000
+	}

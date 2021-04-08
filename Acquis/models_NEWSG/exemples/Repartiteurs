@@ -1,0 +1,81 @@
+modeles @../modeles_EDW/repartiteurs
+#
+#
+=SCv2 {
+	adresse = 1
+	etat = HS
+	maintenance = 
+	numerisation = BB
+	ident = ( )
+	d2 = 100
+	d3 = 1000
+	init = (
+		{ 0x7f := 0, 0xa  },
+		{ 0x7f := 0x1, 0x3c  },
+		{ 0x7f := 0x2, 0x64  },
+		{ 0x7f := 0x3, 0x3e8  }
+	)
+	start = ()
+}
+#
+=Opera {
+	adresse = 192.168.0.4
+	etat = valide
+	maintenance = /Users/archeops/acq/Opera/chargement_standard
+	numerisation = standard
+	envoi = stream
+	numeriseurs = "BB2-3#14"
+	ident = ( 0x220e, 0x320e, 0x420e, 0x520e, 0x120e, 0 )
+	d0 = 21
+	d2d3 = 100000
+	retard = 36
+	mode = EDW_BB2
+	horloge = interne
+	synchro = interne
+}
+#
+=Opera {
+	adresse = 192.168.0.14
+	etat = valide
+	maintenance = /Users/archeops/acq/Opera/chargement_standard
+	numerisation = standard
+	envoi = stream
+	numeriseurs = "BB1-Rly#32"
+	ident = ( 0x8020, 0x6, 0, 0 )
+	d0 = 21
+	d2d3 = 100000
+	retard = 12
+	mode = EDW_BB1
+	horloge = interne
+	synchro = interne
+}
+#
+=Opera {
+	adresse = 192.168.0.15
+	etat = HS
+	maintenance = /Users/archeops/acq/Opera/chargement_standard
+	numerisation = standard
+	envoi = stream
+	numeriseurs = "Bouchon#01"
+	ident = ()
+	d0 = 21
+	d2d3 = 100000
+	retard = 23
+	mode = EDW_BB2
+	horloge = interne
+	synchro = interne
+}
+#
+=Opera {
+	adresse = 192.168.0.21
+	etat = HS
+	maintenance = /Volumes/acquis/acq/Opera/maintenance_standard
+	numerisation = standard
+	numeriseurs = "direct2#01"
+	d0 = 21
+	d2d3 = 100000
+	retard = 21
+	mode = EDW_BB1
+	horloge = externe
+	synchro = externe
+}

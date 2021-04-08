@@ -1,0 +1,16 @@
+Version = 2
+Cablages = (
+	{ input1 := detecteur = simple-ball, numeriseurs = (AdcCali),
+		capteurs = ( { ball := 1.1 } ),
+		reglages = ()
+	},
+	{ input4 := detecteur = simple-ball, numeriseurs = (AdcCali),
+		capteurs = ( { ball := 1.4 } ),
+		reglages = ()
+	},
+	{ input1_UV2 := detecteur = ball-uv, numeriseurs = (AdcCali),
+		capteurs = ( { ball := 1.1 }, { UVlight := 1.2 } ),
+		reglages = ()
+	},
+	{ direct := detecteur = simple-ball, numeriseurs = (), reglages = () }
+)

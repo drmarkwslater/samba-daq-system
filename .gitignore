@@ -3,14 +3,14 @@
 *~
 
 # files created on build from XCode
-Acquis/ModelsList
+#Acquis/ModelsList
 #Acquis/SambaArgs
 Acquis/TangoArgs
 Acquis/executables/AutresVersions/
 Acquis/executables/Gasol.app/Contents/Resources/SambaMem
 Acquis/executables/Gasol.app/Contents/_CodeSignature/
 Acquis/executables/Gigas.app/Contents/_CodeSignature/
-Acquis/models_NEWSG/
+#Acquis/models_NEWSG/
 Acquis/Top_for_news
 Prgm/bin64/rels/
 Prgm/binaires/
