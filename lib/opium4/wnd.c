@@ -494,27 +494,17 @@ static void WndDrawLine(WndFrame f, WndContextPtr gc, int x0, int y0, int x1, in
 /* ========================================================================== */
 static void WndDrawString(WndFrame f, WndContextPtr gc, int x, int y, char *texte, size_t l) {
 	WndIdent w; WndColor c;
-#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
 
 	if(!texte[0]) return;
 	if(gc == 0) gc = WND_TEXT;
 	if(WndPS) {
-	#ifdef X11
-		WndScreen d; WndContextVal gcval;
-		d = (f->s)->d;
-		XGetGCValues(d,gc,GCForeground,&gcval);
-		c.pixel = gcval.foreground;
-		XQueryColor(d,DefaultColormap(d,DefaultScreen(d)),&c);
-	#endif
 	#ifdef OPENGL
 		memcpy(&c,gc->foreground,sizeof(WndColor));
 	#endif
-	#ifdef QUICKDRAW
+	#ifdef WXWIDGETS
 		memcpy(&c,gc->foreground,sizeof(WndColor));
 	#endif
+
 		WndPScolorie(&c);
 		fprintf(WndPS,"%d %d moveto (%s) show\n",x,-y,texte);
 		WndPSstroked = 0;
@@ -522,21 +512,11 @@ static void WndDrawString(WndFrame f, WndContextPtr gc, int x, int y, char *text
 	}
 
 	w = f->w;
-#ifdef WIN32
-	PAINTSTRUCT paintst; HDC hDC; HFONT hFontOld;
 
-	hDC = BeginPaint(w, &paintst);
-	hFontOld = (HFONT) SelectObject(hDC, gc->font);
-	SetTextColor(hDC, (gc->foreground));
-	if(gc->background) SetBkColor(hDC, (gc->background));
-	else SetBkMode(hDC, TRANSPARENT);
-	//SetBkColor(hDC, *WndColorBgnd[f->qualite]);
-	TextOut(hDC, x, y - WndCurSvr->lig, texte, l);
-	SelectObject(hDC, hFontOld);
-	EndPaint(w, &paintst);
-	InvalidateRect(w, &(paintst.rcPaint), false);
+#ifdef WXWIDGETS
+	printf("WXWIDGETS:  %d %d %s\n", x, y, texte);
+	WndDrawStringWx(f->w, x, y, texte, -1, -1, -1, -1, -1, -1);
 #endif
-
 #ifdef OPENGL
 	int sizx,sizy; const char *t; double xd,yd,xf,y0,y1; char doit_terminer;
 
@@ -557,45 +537,10 @@ static void WndDrawString(WndFrame f, WndContextPtr gc, int x, int y, char *text
 	} else glColor3us(0xFFFF,0xFFFF,0xFFFF);
 	glRasterPos2d(xd,yd); //- glScalef(2.0,2.0,2.0);
 	printf("OPENGL:  %d %d %s\n", x, y, texte);
+	//printf("OPENGL RASTER:  %d %d\n", sizx, sizy);
 	t = texte; while(*t) glutBitmapCharacter(WndFontPtr,*t++); // glutBitmapCharacter(WndFontPtr,*t++);
 	if(doit_terminer) WndRefreshEnd(f);
 #endif
-
-#ifdef X11
-	// XFillRectangle(d,w,gc,x,y,WndColToPix(l),WndLigToPix(1)); mauvais
-	XDrawString((f->s)->d,w,gc,x,y,texte,l);
-#endif
-
-#ifdef QUICKDRAW
-	SetPort(WNDPORT(w));
-	// printf("(%s:%d) gc@%08X\n",__func__,__LINE__,(hexa)gc);
-	WND_UTILISE_FONTE(w,gc->font);
-	if(gc->background) {
-	#ifdef FOND_MODIFIE
-		GetBackColor(&c);
-		if(gc->background != c) {
-			RGBBackColor(gc->background);
-			r.left = x; r.bottom = y + WndCurSvr->decal; /* + s->decal */
-			r.right = r.left + WndColToPix(l); r.top = r.bottom - WndLigToPix(1);
-			EraseRect(&r);
-		}
-	#else
-		r.left = (pixval)x; r.bottom = (pixval)(y + WndCurSvr->decal); /* + s->decal */
-		r.right = r.left + (pixval)WndColToPix(l); r.top = r.bottom - (pixval)WndLigToPix(1);
-		RGBForeColor(gc->background);
-		PaintRect(&r);
-	#endif
-	}
-	//+ printf("(%s(%s)) gc->foreground=%08X\n",__func__,texte,(unsigned int)(gc->foreground));
-	if(((unsigned long)gc->foreground > 0x10000) && (gc->foreground != (WndColor *)ERREUR)) RGBForeColor(gc->foreground);
-	else printf("(%s(%s[%ld],%d,%d)) gc->foreground=%08X\n",__func__,texte,l,x,y,(unsigned int)(gc->foreground));
-		printf("QUICKDRAW:  %d %d %s\n", x, y, texte);
-
-	MoveTo((pixval)x,(pixval)y); DrawText(texte,0,(pixval)l);
-#ifdef FOND_MODIFIE
-	if(gc->background) { if(gc->background != c) RGBBackColor(c); }
-#endif
-#endif /* QUICKDRAW */
 }
 
 #ifdef WIN32
@@ -825,15 +770,20 @@ Bool WndOpen(WndServer *s, char *display) {
 	WndColorWhite  = WndColorGetFromRGB(0xFFFF,0xFFFF,0xFFFF);  /* blanc */
 
 	WndEventPileHaut = WndEventPileBas = 0;
+
+	s->decal = (s->fonte).descent + (s->fonte).leading;
+	s->lig = (s->fonte).ascent + s->decal;
+	s->col = (s->fonte).width;
 #endif
 
 #ifdef WXWIDGETS
 	InitWxWidgetsApp(&(s->larg), &(s->haut));
-	GetFontInfo(&(s->fonte.width));
+	GetFontInfo(&(s->fonte.width),&(s->fonte.ascent), &(s->fonte.descent), &(s->fonte.leading));
 	(s->fonte).leading = 1;
-	(s->fonte).ascent = (s->fonte).width + 2;
-	(s->fonte).descent = (((s->fonte).width + 1) / 2) - (s->fonte).leading;
 	printf("  Caracteres: %d x %d [%d+%d+%d]\n",(s->fonte).width,(s->fonte).ascent+(s->fonte).descent+(s->fonte).leading,(s->fonte).ascent,(s->fonte).descent,(s->fonte).leading);
+    s->lig = (s->fonte).ascent + (s->fonte).descent + (s->fonte).leading;
+	s->decal = s->lig;
+	s->col = (s->fonte).width;
 	WndColorBlack  = WndColorGetFromRGB(0x0000,0x0000,0x0000);  /* noir  */
 	WndColorWhite  = WndColorGetFromRGB(0xFFFF,0xFFFF,0xFFFF);  /* blanc */
 #endif
@@ -891,9 +841,6 @@ Bool WndOpen(WndServer *s, char *display) {
 
 	WndQual = WndQualDefaut;
 	// PRINT_COLOR(WndColorText[WndQual]);
-	s->decal = (s->fonte).descent + (s->fonte).leading;
-	s->lig = (s->fonte).ascent + s->decal;
-	s->col = (s->fonte).width;
 
 	for(qual=0; qual<WND_NBQUAL; qual++) {
 		if(WndColorLite[qual]   == (WndColor *)ERREUR) WndColorLite[qual]   = WndColorBgnd[qual];
@@ -1322,6 +1269,7 @@ WndFrame WndCreate(int type, int qualite, int posx, int posy, int sizx, int sizy
 		w = 0;
 
 	} else {
+		printf("WINDOW SIZE:  %d, %d\n", sizx+WND_ASCINT_WIDZ,sizy+WND_ASCINT_WIDZ);
 	#ifdef OPENGL
 		w = glfwCreateWindow(sizx+WND_ASCINT_WIDZ,sizy+WND_ASCINT_WIDZ,"...",NULL,NULL);
 		if(w) {
@@ -1576,10 +1524,6 @@ char WndBasicRGB(WndFrame f, int fr, int fg, int fb, int tr, int tg, int tb) {
 /* ========================================================================== */
 char WndRefreshBegin(WndFrame f) {
 	char devra_terminer;
-#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return 0;
-#endif
 #ifdef OPENGL
 	devra_terminer = !(f->en_cours);
 	if(devra_terminer) {

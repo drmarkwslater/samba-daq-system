@@ -34,7 +34,7 @@ else()
   # - Find OpenGL
   add_compile_definitions(ForOpiumGL UNIX)
   find_package(GLUT  REQUIRED)
-  find_package(OPENGL  REQUIRED)
+  find_package(OpenGL  REQUIRED)
   add_library(glfw3 STATIC IMPORTED)
   set_target_properties(glfw3 PROPERTIES
     IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libglfw3.a"

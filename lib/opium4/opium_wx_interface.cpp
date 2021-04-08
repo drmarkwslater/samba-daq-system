@@ -29,13 +29,16 @@ void InitWxWidgetsApp(int *scr_width, int *scr_height)
     *scr_height = screen.height;
 }
 
-void GetFontInfo(short *width)
+void GetFontInfo(short *width, short *ascent, short *descent, short *leading)
 {
     theFont = new wxFont(wxFontInfo(14).Family(wxFONTFAMILY_MODERN));
     wxMemoryDC temp_dc;
     temp_dc.SetFont(*theFont);
     wxFontMetrics fm{temp_dc.GetFontMetrics()};
     *width = fm.averageWidth;
+    *ascent = fm.ascent;
+    *descent = fm.descent;
+    *leading = fm.internalLeading;
 }
 
 struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int height)
