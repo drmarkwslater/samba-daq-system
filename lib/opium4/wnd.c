@@ -599,7 +599,7 @@ void WndLog(int x, int y, int ligs, int cols, char *nom) {
 /* ========================================================================== */
 void WndSetFontName(char *chaine) { strcpy(WndFontName,chaine); }
 /* ========================================================================== */
-void WndSetFontSize(int taille) { printf("FONT SIZE:    %d\n", taille); WndFontSize = taille; }
+void WndSetFontSize(int taille) { WndFontSize = taille; }
 /* ========================================================================== */
 void WndSetBgndBlack(char noir) { WndQualDefaut = noir? WND_Q_ECRAN: WND_Q_PAPIER; }
 /* ========================================================================== */
@@ -1269,7 +1269,6 @@ WndFrame WndCreate(int type, int qualite, int posx, int posy, int sizx, int sizy
 		w = 0;
 
 	} else {
-		printf("WINDOW SIZE:  %d, %d\n", sizx+WND_ASCINT_WIDZ,sizy+WND_ASCINT_WIDZ);
 	#ifdef OPENGL
 		w = glfwCreateWindow(sizx+WND_ASCINT_WIDZ,sizy+WND_ASCINT_WIDZ,"...",NULL,NULL);
 		if(w) {
@@ -5218,10 +5217,13 @@ void WndPaint(WndFrame f, int x, int y, int l, int h, WndColor *c, int org) {
 void WndBlank(WndFrame f) {
 
 	if(WndModeNone) return;
+
 #ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
+	//WndErase(f, 0, 0, f->h, f->v);
+	WndDrawRectWx(f->w, 0, 0, f->h, f->v, 0, 0, 0);
+
 #endif
+
 #ifdef OPENGL
 	char doit_terminer;
 	doit_terminer = WndRefreshBegin(f);
@@ -5231,59 +5233,18 @@ void WndBlank(WndFrame f) {
 	if(doit_terminer) WndRefreshEnd(f);
 #endif
 
-#ifdef X11
-	XClearWindow((f->s)->d,f->w);
-#endif
-
-#ifdef WIN32
-	WndErase(f, 0, 0, f->h + WndBorderSize, f->v+WndBorderSize);
-#endif
-
-#ifdef QUICKDRAW
-	Rect r; CGrafPtr p;
-	p = WNDPORT(f->w); SetPort(p); GetPortBounds(p,&r);
-	EraseRect(&r);
-#endif
 }
 /* ========================================================================== */
 void WndErase(WndFrame f, int x, int y, int l, int h) {
 
 	if(WndModeNone) return;
 #ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
+	WndDrawRectWx(f->w, x, y, l, h, WndColorGrey[WND_Q_ECRAN]->red, WndColorGrey[WND_Q_ECRAN]->green, WndColorGrey[WND_Q_ECRAN]->blue);
 #endif
+
 #ifdef OPENGL
 //	WndRectangle(f,WND_CLEAR,x,y,l,h);
 	WndPaint(f,x,y,l,h,WndColorGrey[WND_Q_ECRAN],0);
-#endif
-
-#ifdef X11
-	XClearArea((f->s)->d,f->w,f->x0 + x,f->y0 + y,l,h,0);
-#endif
-
-#ifdef WIN32
-	PAINTSTRUCT paintst; HDC hDC; HPEN hPen, hPenOld; HBRUSH hBrush, hBrushOld;
-
-	hDC = BeginPaint(f->w, &paintst);
-	//WndColor c = GetBkColor(hDC);
-	hPenOld = (HPEN) SelectObject(hDC, hPen = CreatePen(PS_NULL, 0, 0));
-	hBrushOld = (HBRUSH) SelectObject(hDC, hBrush = CreateSolidBrush(*WndColorBgnd[f->qualite]));
-	Rectangle(hDC, f->x0 + x, f->y0 + y, f->x0 + x+l, f->y0 + y+h);
-	SelectObject(hDC, hPenOld);
-	SelectObject(hDC, hBrushOld);
-	EndPaint(f->w, &paintst);
-	InvalidateRect(f->w, &(paintst.rcPaint), false);
-	DeleteObject(hPen);
-	DeleteObject(hBrush);
-#endif
-
-#ifdef QUICKDRAW
-	Rect r;
-	SetPort(WNDPORT(f->w));
-	r.left = f->x0 + x; r.top = f->y0 + y;
-	r.right = r.left + l; r.bottom = r.top + h;
-	EraseRect(&r);
 #endif
 }
 /* ========================================================================== */

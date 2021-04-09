@@ -81,7 +81,7 @@ void WndDrawRectWx(struct SambaWnd *w, int x, int y, int width, int height, shor
     }
     else
     {
-        dc->SetBrush(wxBrush{wxColour{100, (unsigned char)g, (unsigned char)b}});
+        dc->SetBrush(wxBrush{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}});
         dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}}));
     }
 
