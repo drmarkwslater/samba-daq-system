@@ -487,7 +487,27 @@ static void WndDrawString(WndFrame f, WndContextPtr gc, int x, int y, char *text
 	w = f->w;
 
 #ifdef WXWIDGETS
-	WndDrawStringWx(f->w, x, y, texte, -1, -1, -1, -1, -1, -1);
+	unsigned short fr = 65535;
+	unsigned short fg = 65535;
+	unsigned short fb = 65535;
+	unsigned short br = 0;
+	unsigned short bg = 0;
+	unsigned short bb = 0;
+	if(gc) {
+		if(gc->background) {
+			br = gc->background->red;
+			bg = gc->background->green;
+			bb = gc->background->blue;
+		}
+	
+		if(gc->foreground) {
+			fr = gc->foreground->red;
+			fg = gc->foreground->green;
+			fb = gc->foreground->blue;
+		}
+	}
+
+	WndDrawStringWx(f->w, x, y, texte, fr, fg, fb, br, bg, bb);
 #endif
 #ifdef OPENGL
 	int sizx,sizy; const char *t; double xd,yd,xf,y0,y1; char doit_terminer;
@@ -505,10 +525,18 @@ static void WndDrawString(WndFrame f, WndContextPtr gc, int x, int y, char *text
 			glColor3us((gc->background)->red,(gc->background)->green,(gc->background)->blue);
 			glRectd(xd,y0,xf,y1);
 		}
-		if(gc->foreground) glColor3us((gc->foreground)->red,(gc->foreground)->green,(gc->foreground)->blue);
-	} else glColor3us(0xFFFF,0xFFFF,0xFFFF);
+		if(gc->foreground) 
+		{
+			printf("OPENGL:  %d %d %s %d %d %d\n", x, y, texte, (gc->foreground)->red, (gc->foreground)->green ,(gc->foreground)->blue);
+
+			glColor3us((gc->foreground)->red,(gc->foreground)->green,(gc->foreground)->blue);
+		}
+	} else {
+		printf("OPENGL:  %d %d %s WHITE\n", x, y, texte);
+		glColor3us(0xFFFF,0xFFFF,0xFFFF);
+	}
 	glRasterPos2d(xd,yd); //- glScalef(2.0,2.0,2.0);
-	printf("OPENGL:  %d %d %s\n", x, y, texte);
+	
 	//printf("OPENGL RASTER:  %d %d\n", sizx, sizy);
 	t = texte; while(*t) glutBitmapCharacter(WndFontPtr,*t++); // glutBitmapCharacter(WndFontPtr,*t++);
 	if(doit_terminer) WndRefreshEnd(f);
@@ -920,19 +948,11 @@ static void WndContextValInit(WndServer *s, WndContextVal *gcval, WndColor *fond
 }
 /* ========================================================================== */
 static void WndContextValSetColors(WndContextVal *gcval, WndColor *fond, WndColor *text) {
-#ifdef X11
-	if(fond) gcval->background = fond->pixel;
-	if(text) gcval->foreground = text->pixel;
-#endif
-#ifdef WIN32
-	if(fond) gcval->background = *fond;
-	if(text) gcval->foreground = *text;
-#endif
 #ifdef OPENGL
 	gcval->background = fond;
 	gcval->foreground = text;
 #endif
-#ifdef QUICKDRAW
+#ifdef WXWIDGETS
 	gcval->background = fond;
 	gcval->foreground = text;
 #endif
@@ -1909,53 +1929,16 @@ void WndPutAtTop(WndFrame f) {
 /* ========================================================================== */
 void WndShowTheTop() {
 	WndFrame f; WndIdent w;
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
-#ifdef X11
-	WndScreen d; XWindowAttributes etat;
-	short essai_tente;
+	if(WndModeNone) return;
+	if((f = WndTopFrame) == WND_AT_END) return;
+	if(!(w = f->w)) return;
+#ifdef WXWIDGETS
+	WndShowTheTopWx(w);
 #endif
 
-	if(WndModeNone) return;
-#ifdef DEBUG_STACK
-	WndPrint("(%s) TopFrame: F=%08llX\n",__func__,(uint64)WndTopFrame);
-#endif
-	if((f = WndTopFrame) == WND_AT_END) return;
-#ifdef DEBUG_STACK
-	WndPrint("(%s) TopIdent: W=%08llX\n",__func__,(uint64)(f->w));
-#endif
-	if(!(w = f->w)) return;
 #ifdef OPENGL
 	if(!WndCodeHtml) glfwShowWindow(w);
 #endif
-#ifdef X11
-	d = (f->s)->d;
-	XRaiseWindow(d,w);
-//	WndEssais = 3;
-//	while(WndEssais) {
-//		essai_tente = WndEssais;
-//		XSetInputFocus(d,w,RevertToNone,CurrentTime);  /* pour la remettre active? */
-//		if(WndEssais == essai_tente) break; /* erreur BadMatch si w pas viewable */
-//		else WndPrint("X11: sur XSetInputFocus(w=%08X) avec f=%08X\n",(hexa)w,(hexa)f);
-//	}
-	essai_tente = 8;
-	while(essai_tente--) {
-		XGetWindowAttributes(d,w,&etat);
-		if(etat.map_state == IsViewable) {
-			XSetInputFocus(d,w,RevertToParent,CurrentTime); break;
-		} else usleep(10000);
-	}
-
-#endif
-#ifdef WIN32
-	BringWindowToTop(w);
-#endif
-#ifdef QUICKDRAW
-	if(!WndCodeHtml) { SelectWindow(w); ShowWindow(w); }
-#endif
-
 }
 /* ========================================================================== */
 // void WndSendToTop(WndFrame f) { if(f) { WndPutAtTop(f); WndShowTheTop(); } }
@@ -5525,12 +5508,11 @@ void WndClearText(WndFrame f, WndContextPtr gc, int lig, int col, int lngr) {
 	y = (f->lig0 + lig) * s->lig;
 	l = lngr * s->col;
 	if(gc == 0) gc = WND_STD;
-#ifdef DEBUG3
-	WndPrint("Fenetre #%08X: effacement a (%d, %d) + (%d, %d)\n",f->w,x,y,l,s->lig);
-#endif
+
 #ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
+	if(gc->background) {
+		WndDrawRectWx(w, x, y, l, s->lig, (gc->background)->red,(gc->background)->green,(gc->background)->blue);
+	}
 #endif
 #ifdef OPENGL
 	int sizx,sizy; double xd,yd,xf,yf; char doit_terminer;
@@ -5548,41 +5530,6 @@ void WndClearText(WndFrame f, WndContextPtr gc, int lig, int col, int lngr) {
 		glRectd(xd,yd,xf,yf);
 		if(doit_terminer) WndRefreshEnd(f);
 	}
-#endif
-#ifdef X11
-	WndContextPtr gc_reverse; WndContextVal gcval,*ptr; unsigned long tempo;
-	// XClearArea(s->d,f->w,x,y,l,s->lig,0);
-	ptr = &gcval; /* pour recopier le code de WndContextCreate */
-	XGetGCValues(s->d,gc,WndGCMask,ptr);
-	tempo = ptr->background; ptr->background = ptr->foreground; ptr->foreground = tempo;
-	gc_reverse = XCreateGC(s->d,w,WndGCMask,ptr);
-	XFillRectangle(s->d,w,gc_reverse,x,y,l,s->lig);
-	XFreeGC(s->d,gc_reverse);
-#endif
-#ifdef WIN32
-	WndErase(f, x, y, l, s->lig);
-#endif
-#ifdef QUICKDRAW
-	Rect r;
-	SetPort(WNDPORT(w));
-	r.left = x; r.top = y;
-	r.right = r.left + l; r.bottom = r.top + s->lig;
-	if(gc->background) {
-	#ifdef FOND_MODIFIE
-		RGBColor c;
-		GetBackColor(&c);
-		if(gc->background != c) RGBBackColor(gc->background);
-		EraseRect(&r);
-		if(gc->background != c) RGBBackColor(c);
-	#else
-		RGBForeColor(gc->background);
-		#ifdef DEBUG3
-			WndPrint("(WndClearText) Fenetre (%d, %d) -> (%d, %d) peinte\n",
-				r.left,r.top,r.right,r.bottom);
-		#endif
-		PaintRect(&r);
-	#endif
-	} else EraseRect(&r);
 #endif
 }
 /* ========================================================================== */

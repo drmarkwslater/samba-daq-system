@@ -21,7 +21,8 @@ EXTERNC void GetFontInfo(short *width, short *ascent, short *descent, short *lea
 EXTERNC void OpiumExecWx(struct Cadre *cdr);
 EXTERNC struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int height);
 EXTERNC void WndTitleWx(struct SambaWnd *w, char *title);
-EXTERNC void WndDrawStringWx(struct SambaWnd *w, int x, int y, char *text, short fr, short fg, short fb, short br, short bg, short bb );
+EXTERNC void WndDrawStringWx(struct SambaWnd *w, int x, int y, char *text, unsigned short fr, unsigned short fg, unsigned short fb, 
+                            unsigned short br, unsigned short bg, unsigned short bb );
 EXTERNC void WndDrawRectWx(struct SambaWnd *w, int x, int y, int width, int height, short r, short g, short b);
 EXTERNC void WndDrawLineWx(struct SambaWnd *w, int x0, int y0, int x1, int y1, short r, short g, short b);
 EXTERNC void WndMoveWx(struct SambaWnd *w, int x, int y);

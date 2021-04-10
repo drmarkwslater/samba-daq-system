@@ -60,12 +60,13 @@ std::unique_ptr<wxDC> MakeDCPtr(SambaWnd *w)
         return std::make_unique<wxClientDC>(w);
 }
 
-void WndDrawStringWx(struct SambaWnd *w, int x, int y, char *text, short fr, short fg, short fb, short br, short bg, short bb )
+void WndDrawStringWx(struct SambaWnd *w, int x, int y, char *text, unsigned short fr, unsigned short fg, unsigned short fb, 
+                    unsigned short br, unsigned short bg, unsigned short bb )
 {
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
-
-    if (fr > -1) dc->SetTextForeground(wxColour{(unsigned char)fr, (unsigned char)fg, (unsigned char)fb});
-    if (br > -1) dc->SetTextBackground(wxColour{(unsigned char)br, (unsigned char)bg, (unsigned char)bb});
+    //std::cout << text << "  "  << fr << " " << fg << " "  << fg << std::endl;
+    dc->SetTextForeground(wxColour{(unsigned char)(255 * fr/65535), (unsigned char)(255 * fg/65535), (unsigned char)(255 * fb/65535)});
+    dc->SetTextBackground(wxColour{(unsigned char)(255 * br/65535), (unsigned char)(255 * bg/65535), (unsigned char)(255 * bb/65535)});
     dc->SetBackgroundMode(wxSOLID);
     dc->SetFont(*theFont);
     dc->DrawText(text, x, y);
