@@ -422,24 +422,13 @@ static void WndItemMajuscules(unsigned char *texte) {
 /* ========================================================================== */
 static void WndDrawLine(WndFrame f, WndContextPtr gc, int x0, int y0, int x1, int y1) {
 	WndIdent w;
-#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
 	if(gc == 0) gc = WND_TEXT;
 	if(WndPS) {
 		WndColor c;
-	#ifdef X11
-		WndScreen d; WndContextVal gcval;
-		d = (f->s)->d;
-		XGetGCValues(d,gc,GCForeground,&gcval);
-		c.pixel = gcval.foreground;
-		XQueryColor(d,DefaultColormap(d,DefaultScreen(d)),&c);
-	#endif
-	#ifdef OPENGL
+	#ifdef WXWIDGETS
 		memcpy(&c,gc->foreground,sizeof(WndColor));
 	#endif
-	#ifdef QUICKDRAW
+	#ifdef OPENGL
 		memcpy(&c,gc->foreground,sizeof(WndColor));
 	#endif
 		WndPScolorie(&c);
@@ -449,6 +438,13 @@ static void WndDrawLine(WndFrame f, WndContextPtr gc, int x0, int y0, int x1, in
 	}
 
 	w = f->w;
+
+#ifdef WXWIDGETS
+	if (gc->foreground)
+		WndDrawLineWx(w, x0, y0, x1, y1, (gc->foreground)->red, (gc->foreground)->green, (gc->foreground)->blue);
+	else
+		WndDrawLineWx(w, x0, y0, x1, y1, -1, -1, -1);
+#endif
 #ifdef OPENGL
 	int sizx,sizy; double xd,yd,xf,yf; char doit_terminer;
 
@@ -466,29 +462,6 @@ static void WndDrawLine(WndFrame f, WndContextPtr gc, int x0, int y0, int x1, in
 	glVertex2d(xd,yd); glVertex2d(xf,yf);
 	glEnd(); glFlush();
 	if(doit_terminer) WndRefreshEnd(f);
-#endif
-
-#ifdef WIN32
-	PAINTSTRUCT paintst; HDC hDC; HPEN hPen, hPenOld;
-
-	hDC = BeginPaint(w, &paintst);
-	hPenOld = (HPEN)SelectObject(hDC, hPen = CreatePen(gc->line_style, gc->line_width, (gc->foreground)));
-	MoveToEx(hDC, x0, y0, (LPPOINT) NULL);
-	LineTo(hDC, x1, y1);
-	SelectObject(hDC, hPenOld);
-	EndPaint(w, &paintst);
-	InvalidateRect(w, &(paintst.rcPaint), false);
-	DeleteObject(hPen);
-#endif
-
-#ifdef X11
-	XDrawLine((f->s)->d,f->w,gc,x0,y0,x1,y1);
-#endif
-
-#ifdef QUICKDRAW
-	SetPort(WNDPORT(w));
-	if(gc->foreground) RGBForeColor(gc->foreground);
-	MoveTo((pixval)x0,(pixval)y0); LineTo((pixval)x1,(pixval)y1);
 #endif
 }
 /* ========================================================================== */
@@ -514,7 +487,6 @@ static void WndDrawString(WndFrame f, WndContextPtr gc, int x, int y, char *text
 	w = f->w;
 
 #ifdef WXWIDGETS
-	printf("WXWIDGETS:  %d %d %s\n", x, y, texte);
 	WndDrawStringWx(f->w, x, y, texte, -1, -1, -1, -1, -1, -1);
 #endif
 #ifdef OPENGL
@@ -1553,17 +1525,15 @@ void WndRefreshEnd(WndFrame f) {
 /* ========================================================================== */
 void WndControls(WndFrame f) {
 	if(WndModeNone || (f == WND_AT_END) || WndCodeHtml) return;
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
+#ifdef WXWIDGETS
+	int sizx,sizy;
+	WndGetWindowSizeWx(f->w,&sizx,&sizy);
+	WndPaint(f,sizx-WND_ASCINT_WIDZ,sizy-WND_ASCINT_WIDZ,WND_ASCINT_WIDZ,WND_ASCINT_WIDZ,WndColorAscr[WND_Q_ECRAN],0);
 #endif
 #ifdef OPENGL
 	int sizx,sizy;
 	glfwGetWindowSize(f->w,&sizx,&sizy);
 	WndPaint(f,sizx-WND_ASCINT_WIDZ,sizy-WND_ASCINT_WIDZ,WND_ASCINT_WIDZ,WND_ASCINT_WIDZ,WndColorAscr[WND_Q_ECRAN],0);
-#endif
-#ifdef QUICKDRAW
-	DrawGrowIcon(f->w);
 #endif
 }
 /* ========================================================================== */
@@ -5154,24 +5124,8 @@ void WndPaint(WndFrame f, int x, int y, int l, int h, WndColor *c, int org) {
 
 	if(WndModeNone) return;
 
-#ifdef X11
-	/* trouver a peindre selon couleur definie par c
-	WndContextPtr gc_rect; WndContextVal gcval; WndScreen d;
-	d = (f->s)->d;
-	c->flags = DoRed | DoGreen | DoBlue;
-	if(XAllocColor(d,DefaultColormap(d,DefaultScreen(d)),c)) {
-		gcval->foreground = c->pixel;
-		XGetGCValues(d,gc,WndGCMask,&gcval);
-		gc_rect = XCreateGC(d,w,WndGCMask,&gcval);
-		XSetBackground(d,gc_rect,c->pixel);
-		XFillRectangle(d,f->w,gc_rect,f->x0 + x,f->y0 + y,l,h);
-		XFreeGC(s->d,gc_rect);
-	} else */
-		XClearArea(d,f->w,f->x0 + x,f->y0 + y,l,h,0); // utilise le bgnd de <f>
-#endif
 #ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
+	WndDrawRectWx(f->w, x, y, l, h, c->red, c->green, c->blue);
 #endif
 #ifdef OPENGL
 	int sizx,sizy; double xd,yd,xf,yf; char doit_terminer;
@@ -5187,31 +5141,6 @@ void WndPaint(WndFrame f, int x, int y, int l, int h, WndColor *c, int org) {
 	glRectd(xd,yd,xf,yf);
 	if(doit_terminer) WndRefreshEnd(f);
 #endif
-
-#ifdef WIN32
-	PAINTSTRUCT paintst; HDC hDC; HPEN hPen, hPenOld; HBRUSH hBrush, hBrushOld;
-	hDC = BeginPaint(f->w, &paintst);
-	if(WndModeNone) return;
-	hPenOld = (HPEN) SelectObject(hDC, hPen = CreatePen(PS_NULL, 0, 0));
-	hBrushOld = (HBRUSH) SelectObject(hDC, hBrush = CreateSolidBrush(*c));
-	//SelectObject(hDC, CreateSolidBrush(*WndColorBgnd[f->qualite]));
-	Rectangle(hDC, f->x0 + x, f->y0 + y, f->x0 + x + l, f->y0 + y + h);
-	SelectObject(hDC, hPenOld);
-	SelectObject(hDC, hBrushOld);
-	EndPaint(f->w, &paintst);
-	InvalidateRect(f->w, &(paintst.rcPaint), false);
-	DeleteObject(hPen);
-	DeleteObject(hBrush);
-#endif
-
-#ifdef QUICKDRAW
-	Rect r;
-	SetPort(WNDPORT(f->w));
-	r.left = f->x0 + x; r.top = f->y0 + y;
-	r.right = r.left + l; r.bottom = r.top + h;
-	RGBForeColor(c);
-	PaintRect(&r);
-#endif
 }
 /* ========================================================================== */
 void WndBlank(WndFrame f) {
@@ -5221,7 +5150,6 @@ void WndBlank(WndFrame f) {
 #ifdef WXWIDGETS
 	//WndErase(f, 0, 0, f->h, f->v);
 	WndDrawRectWx(f->w, 0, 0, f->h, f->v, 0, 0, 0);
-
 #endif
 
 #ifdef OPENGL

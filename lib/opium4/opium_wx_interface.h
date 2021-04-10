@@ -28,4 +28,5 @@ EXTERNC void WndMoveWx(struct SambaWnd *w, int x, int y);
 EXTERNC void WndClearWx(struct SambaWnd *w);
 EXTERNC void WndShowTheTopWx(struct SambaWnd *w);
 EXTERNC struct wxCursor *WndCreateStdCursorWx();
+EXTERNC void WndGetWindowSizeWx(struct SambaWnd *w, int *width, int *height);
 #endif

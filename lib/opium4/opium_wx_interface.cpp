@@ -135,4 +135,10 @@ struct wxCursor *WndCreateStdCursorWx()
     return cur_ptr;
 }
 
+void WndGetWindowSizeWx(struct SambaWnd *w, int *width, int *height)
+{
+    *width = w->GetClientSize().GetWidth();
+    *height = w->GetClientSize().GetHeight();
+}
+
 #endif // WXWIDGETS
