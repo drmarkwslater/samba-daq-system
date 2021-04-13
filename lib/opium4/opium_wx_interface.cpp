@@ -61,31 +61,25 @@ std::unique_ptr<wxDC> MakeDCPtr(SambaWnd *w)
 }
 
 void WndDrawStringWx(struct SambaWnd *w, int x, int y, char *text, unsigned short fr, unsigned short fg, unsigned short fb, 
-                    unsigned short br, unsigned short bg, unsigned short bb )
+                    unsigned short br, unsigned short bg, unsigned short bb, char draw_bg )
 {
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
     //std::cout << text << "  "  << fr << " " << fg << " "  << fg << std::endl;
     dc->SetTextForeground(wxColour{(unsigned char)(255 * fr/65535), (unsigned char)(255 * fg/65535), (unsigned char)(255 * fb/65535)});
     dc->SetTextBackground(wxColour{(unsigned char)(255 * br/65535), (unsigned char)(255 * bg/65535), (unsigned char)(255 * bb/65535)});
-    dc->SetBackgroundMode(wxSOLID);
+    if (draw_bg)
+        dc->SetBackgroundMode(wxSOLID);
+    else
+        dc->SetBackgroundMode(wxTRANSPARENT);
     dc->SetFont(*theFont);
     dc->DrawText(text, x, y);
 }
 
-void WndDrawRectWx(struct SambaWnd *w, int x, int y, int width, int height, short r, short g, short b)
+void WndDrawRectWx(struct SambaWnd *w, int x, int y, int width, int height, unsigned short r, unsigned short g, unsigned short b)
 {
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
-    if (r < 0)
-    {
-        dc->SetBrush(dc->GetBackground());
-        dc->SetPen(wxPen(dc->GetBackground().GetColour()));
-    }
-    else
-    {
-        dc->SetBrush(wxBrush{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}});
-        dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}}));
-    }
-
+    dc->SetBrush(wxBrush{wxColour{(unsigned char)(255 * r/65535), (unsigned char)(255 * g/65535), (unsigned char)(255 * b/65535)}});
+    dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)(255 * r/65535), (unsigned char)(255 * g/65535), (unsigned char)(255 * b/65535)}}));
     dc->DrawRectangle(x, y, width, height);
 }
 

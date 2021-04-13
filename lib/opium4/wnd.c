@@ -36,7 +36,7 @@ typedef unsigned long long UInt64,uint64;
 #include <wnd.h>
 
 /* ------------------------------------------------------------------------ */
-/* -------------------------- IMPLEMENTATION OpenGL ----------------------- */
+/* -------------------------- IMPLEMENTATION WxWidgets -------------------- */
 /* ------------------------------------------------------------------------ */
 #ifdef WXWIDGETS
 
@@ -440,10 +440,18 @@ static void WndDrawLine(WndFrame f, WndContextPtr gc, int x0, int y0, int x1, in
 	w = f->w;
 
 #ifdef WXWIDGETS
-	if (gc->foreground)
-		WndDrawLineWx(w, x0, y0, x1, y1, (gc->foreground)->red, (gc->foreground)->green, (gc->foreground)->blue);
-	else
-		WndDrawLineWx(w, x0, y0, x1, y1, -1, -1, -1);
+	unsigned short fr = 65535;
+	unsigned short fg = 65535;
+	unsigned short fb = 65535;
+	if(gc) {
+		if(gc->foreground) {
+			fr = gc->foreground->red;
+			fg = gc->foreground->green;
+			fb = gc->foreground->blue;
+		}
+	}
+
+	WndDrawLineWx(w, x0, y0, x1, y1, fr, fg, fb);
 #endif
 #ifdef OPENGL
 	int sizx,sizy; double xd,yd,xf,yf; char doit_terminer;
@@ -493,11 +501,13 @@ static void WndDrawString(WndFrame f, WndContextPtr gc, int x, int y, char *text
 	unsigned short br = 0;
 	unsigned short bg = 0;
 	unsigned short bb = 0;
+	char draw_bg = 0;
 	if(gc) {
 		if(gc->background) {
 			br = gc->background->red;
 			bg = gc->background->green;
 			bb = gc->background->blue;
+			draw_bg = 1;
 		}
 	
 		if(gc->foreground) {
@@ -506,8 +516,9 @@ static void WndDrawString(WndFrame f, WndContextPtr gc, int x, int y, char *text
 			fb = gc->foreground->blue;
 		}
 	}
+	//printf("WXWIDGETS:  %d %d %s %d %d %d\n", x, y, texte, fr, fg, fb);
 
-	WndDrawStringWx(f->w, x, y, texte, fr, fg, fb, br, bg, bb);
+	WndDrawStringWx(f->w, x, y, texte, fr, fg, fb, br, bg, bb, draw_bg);
 #endif
 #ifdef OPENGL
 	int sizx,sizy; const char *t; double xd,yd,xf,y0,y1; char doit_terminer;
@@ -527,12 +538,12 @@ static void WndDrawString(WndFrame f, WndContextPtr gc, int x, int y, char *text
 		}
 		if(gc->foreground) 
 		{
-			printf("OPENGL:  %d %d %s %d %d %d\n", x, y, texte, (gc->foreground)->red, (gc->foreground)->green ,(gc->foreground)->blue);
+			//printf("OPENGL:  %d %d %s %d %d %d\n", x, y, texte, (gc->foreground)->red, (gc->foreground)->green ,(gc->foreground)->blue);
 
 			glColor3us((gc->foreground)->red,(gc->foreground)->green,(gc->foreground)->blue);
 		}
 	} else {
-		printf("OPENGL:  %d %d %s WHITE\n", x, y, texte);
+		//printf("OPENGL:  %d %d %s WHITE\n", x, y, texte);
 		glColor3us(0xFFFF,0xFFFF,0xFFFF);
 	}
 	glRasterPos2d(xd,yd); //- glScalef(2.0,2.0,2.0);
@@ -3659,26 +3670,12 @@ char WndContextFgndColor(WndFrame f, WndContextPtr gc, WndColor *c) {
 	/* ATTENTION: la couleur n'est PAS desallouee ni desallouable */
 	if(WndModeNone) return(1);
 	if(gc == 0) gc = WND_STD;
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return 0;
+#ifdef WXWIDGETS
+	gc->foreground = c;
 #endif
 #ifdef OPENGL
 	gc->foreground = c;
 #endif
-#ifdef X11
-	{	WndScreen d;
-		if(f) d = (f->s)->d; else d = WndCurSvr->d;
-		XSetForeground(d,gc,c->pixel);
-	}
-#endif
-#ifdef WIN32
-	gc->foreground = *c;
-#endif
-#ifdef QUICKDRAW
-	gc->foreground = c;
-#endif
-	
 	return(1);
 }
 /* ========================================================================== */
@@ -3714,13 +3711,6 @@ void WndContextSetColors(WndFrame f, WndContextPtr gc, WndColor *fond, WndColor 
 }
 /* ========================================================================== */
 void WndContextLine(WndFrame f, WndContextPtr gc, unsigned int type, unsigned int width) {
-#ifdef X11
-	int trace; int l; WndScreen d;
-#endif
-#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
 	if(WndModeNone) return;
 	if(WndPS) {
 		fprintf(WndPS,"%d setlinewidth\n",width);
@@ -3728,16 +3718,11 @@ void WndContextLine(WndFrame f, WndContextPtr gc, unsigned int type, unsigned in
 		return;
 	}
 	if(gc == 0) gc = WND_STD;
-#ifdef X11
-	if(f) d = (f->s)->d; else d = WndCurSvr->d;
-	if(type == 0) trace = LineSolid; else trace = LineOnOffDash;
-	XSetLineAttributes(d,gc,width,trace,CapRound,JoinRound);
-	type--;
-	if(type < WND_MAXDASH) {
-		l = strlen(WndDashList[type]);
-		XSetDashes(d,gc,0,WndDashList[type],l);
-	}
+#ifdef WXWIDGETS
+	gc->line_style = (short)type;
+	gc->line_width = (short)width;
 #endif
+
 #ifdef QUICKDRAW_OR_OPENGL
 	gc->line_style = (short)type;
 	gc->line_width = (short)width;
@@ -4938,14 +4923,27 @@ void WndOvale(WndFrame f, WndContextPtr gc, int x, int y, int l, int h) {
 #ifdef QUICKDRAW
 	Rect r;
 #endif
-#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
+
 	if(WndModeNone) return;
 	w = f->w;
 	s = f->s;
 	if(gc == 0) gc = WND_TEXT;
+
+#ifdef WXWIDGETS
+	unsigned short fr = 65535;
+	unsigned short fg = 65535;
+	unsigned short fb = 65535;
+	if(gc) {
+		if(gc->foreground) {
+			fr = gc->foreground->red;
+			fg = gc->foreground->green;
+			fb = gc->foreground->blue;
+		}
+	}
+
+	WndDrawRectWx(f->w, f->x0 + x, f->y0 + y, l, h, fr, fg, fb);
+#endif
+
 #ifdef OPENGL
 	int sizx,sizy; char doit_terminer;
 
@@ -5029,48 +5027,40 @@ void WndFillFgnd(WndFrame f, WndContextPtr gc, int x, int y, int l, int h) {
 	if(WndModeNone) return;
 	if(!f) return;
 	if(gc == 0) gc = WND_TEXT;
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
+	
+#ifdef WXWIDGETS
+	WndPaint(f,x,y,l,h,gc->foreground,0);
 #endif
 #ifdef OPENGL
 	WndPaint(f,x,y,l,h,gc->foreground,0);
 #endif
 
-#ifdef X11
-	XFillRectangle((f->s)->d,f->w,gc,f->x0+x,f->y0+y,l,h);
-#endif
-
-#ifdef WIN32
-	WndPaint(f,x,y,l,h,&(gc->foreground),0);
-#endif
-
-#ifdef QUICKDRAW
-/*	Rect r; SetPort(WNDPORT(f->w));
-	r.left = f->x0 + x; r.top = f->y0 + y;
-	r.right = r.left + l; r.bottom = r.top + h;
-	RGBForeColor(gc->foreground);
-	PaintRect(&r); */
-//	RGBForeColor(WndColorText[f->qualite]);
-	WndPaint(f,x,y,l,h,gc->foreground,0);
-#endif
 }
 /* ========================================================================== */
 void WndFillBgnd(WndFrame f, WndContextPtr gc, int x, int y, int l, int h) {
 
 	if(WndModeNone) return;
 	if(!f) return;
-
 	if(gc == 0) gc = WND_STD;
-#ifdef X11
-	XFillRectangle((f->s)->d,f->w,gc,f->x0 + x,f->y0 + y,l,h);
-#else
 	if(!(gc->background)) return;
-#endif
+
+	//printf("WNDFILLBGND:  %d %d %d %d\n", x, y, l, h);
+
 #ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
+	unsigned short br = 0;
+	unsigned short bg = 0;
+	unsigned short bb = 0;
+	if(gc) {
+		if(gc->background) {
+			br = gc->background->red;
+			bg = gc->background->green;
+			bb = gc->background->blue;
+		}
+		WndDrawRectWx(f->w, f->x0 + x, f->y0 + y, l, h, br, bg, bb);
+	}
+
 #endif
+
 #ifdef OPENGL
 	int sizx,sizy; double xd,yd,xf,yf; char doit_terminer;
 	WndIdent w; w = f->w;
@@ -5088,27 +5078,13 @@ void WndFillBgnd(WndFrame f, WndContextPtr gc, int x, int y, int l, int h) {
 	}
 #endif
 
-#ifdef WIN32
-	WndPaint(f, x, y, l, h, &(gc->background),0);
-#endif
-	
-#ifdef QUICKDRAW
-	Rect r;
-	SetPort(WNDPORT(f->w));
-	RGBForeColor(gc->background);
-	r.left = f->x0 + x; r.top = f->y0 + y; 
-	r.right = r.left + l; r.bottom = r.top + h;
-	PaintRect(&r);
-	RGBForeColor(WndColorText[f->qualite]);
-#endif
 }
 /* ========================================================================== */
 void WndPaint(WndFrame f, int x, int y, int l, int h, WndColor *c, int org) {
 
 	if(WndModeNone) return;
-
 #ifdef WXWIDGETS
-	WndDrawRectWx(f->w, x, y, l, h, c->red, c->green, c->blue);
+	WndDrawRectWx(f->w, f->x0 + x, f->y0 + y, l, h, c->red, c->green, c->blue);
 #endif
 #ifdef OPENGL
 	int sizx,sizy; double xd,yd,xf,yf; char doit_terminer;
@@ -5461,18 +5437,12 @@ void WndButton(WndFrame f, WndContextPtr gc, int lig, int col, int dim, char *te
 #else
 	size_t l; int dx;
 #endif
-#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
+
 	if(WndModeNone) return;
 	if(!f) return;
 	s = f->s;
 	x = col * s->col;
 	y = lig * s->lig;
-#ifdef OPENGL
-//	y -= 2;
-#endif
 	if(gc == 0) gc = WND_TEXT;
 #ifdef AQUA
 	r.left = f->x0 + x; r.right = r.left + (dim * s->col) - 1;
@@ -5508,7 +5478,7 @@ void WndClearText(WndFrame f, WndContextPtr gc, int lig, int col, int lngr) {
 	y = (f->lig0 + lig) * s->lig;
 	l = lngr * s->col;
 	if(gc == 0) gc = WND_STD;
-
+	//printf("WNDCLEARTEXT:  %d %d %d %d\n", x, y, l, s->lig);
 #ifdef WXWIDGETS
 	if(gc->background) {
 		WndDrawRectWx(w, x, y, l, s->lig, (gc->background)->red,(gc->background)->green,(gc->background)->blue);
