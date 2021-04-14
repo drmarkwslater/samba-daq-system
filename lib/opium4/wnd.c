@@ -2099,10 +2099,7 @@ void WndMove(WndFrame f, int x, int y) {
 }
 /* ========================================================================== */
 void WndClear(WndFrame f) {
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
+
 #ifdef DEBUG2
 	WndPrint("Suppression frame @%08X: serveur @%08X, window @%08X\n",f,f->s,f->w);
 #endif
@@ -2131,15 +2128,8 @@ void WndClear(WndFrame f) {
 	#ifdef OPENGL
 		glfwDestroyWindow(f->w);
 	#endif
-	#ifdef X11
-		if(f->image.surf) XDestroyImage(f->image.surf);
-		XDestroyWindow((f->s)->d,f->w);
-	#endif
-	#ifdef WIN32
-		DestroyWindow(f->w);
-	#endif
-	#ifdef QUICKDRAW
-		DisposeWindow(f->w);
+	#ifdef WXWIDGETS
+		WndClearWx(f->w);
 	#endif
 	}
 
