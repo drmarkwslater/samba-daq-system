@@ -116,11 +116,11 @@ void OpiumExecWx(struct Cadre *cdr)
     wxEntryCleanup();
 }
 
-void WndEventNewWx(SambaWnd *w, SambaEventWx type, int x, int y, int v, int h)
+void WndEventNewWx(SambaWnd *w, SambaEventWx type, int x, int y, int h, int v)
 {
     if (!samba_running)
         return;
-    OpiumManageWx(cdr_initial, w, type, x, y, v, h);
+    OpiumManageWx(cdr_initial, w, type, x, y, h, v);
 }
 
 struct wxCursor *WndCreateStdCursorWx()

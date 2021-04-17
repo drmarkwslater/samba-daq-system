@@ -13,7 +13,7 @@ wxBEGIN_EVENT_TABLE(SambaWnd, wxFrame)
     EVT_SET_FOCUS(SambaWnd::OnFocus)
 wxEND_EVENT_TABLE()
 
-void WndEventNewWx(struct SambaWnd *w, enum SambaEventWx type, int x, int y, int v, int h);
+void WndEventNewWx(struct SambaWnd *w, enum SambaEventWx type, int x, int y, int h, int v);
 
 SambaWnd::SambaWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
         : wxFrame(NULL, wxID_ANY, title, pos, size)
@@ -24,14 +24,14 @@ SambaWnd::SambaWnd(const wxString& title, const wxPoint& pos, const wxSize& size
 void SambaWnd::OnSize(wxSizeEvent& /*event*/)
 {
     const wxPoint ps = GetScreenPosition();
-    const wxSize sz = GetSize();
+    const wxSize sz = GetClientSize();
     WndEventNewWx(this, SMBWX_CONFIG, ps.x, ps.y, sz.GetWidth(), sz.GetHeight());
 }
 
 void SambaWnd::OnMove(wxMoveEvent& /*event*/)
 {
     const wxPoint ps = GetScreenPosition();
-    const wxSize sz = GetSize();
+    const wxSize sz = GetClientSize();
     WndEventNewWx(this, SMBWX_CONFIG, ps.x, ps.y, sz.GetWidth(), sz.GetHeight());
 }
 

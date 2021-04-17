@@ -11,7 +11,7 @@ enum SambaEventWx {
 
 #ifdef __cplusplus
 #define EXTERNC extern "C"
-EXTERNC int OpiumManageWx(struct Cadre *cdr_initial, struct SambaWnd* w, SambaEventWx type, int x, int y, int v, int h);
+EXTERNC int OpiumManageWx(struct Cadre *cdr_initial, struct SambaWnd* w, SambaEventWx type, int x, int y, int h, int v);
 #else
 #define EXTERNC
 #endif

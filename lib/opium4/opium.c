@@ -1766,7 +1766,7 @@ void OpiumPhotoSauve() {
 	OpiumAfficheMessage();
 }
 /* ========================================================================== */
-int OpiumManageWx(Cadre *cdr, struct SambaWnd *w, char type, int x, int y, int v, int h)
+int OpiumManageWx(Cadre *cdr, struct SambaWnd *w, char type, int x, int y, int h, int v)
 {
 	WndUserRequest u;
 	u.w = w;
@@ -1782,7 +1782,7 @@ int OpiumManageWx(Cadre *cdr, struct SambaWnd *w, char type, int x, int y, int v
 			u.type = WND_CONFIG;
 			u.x = x;
 			u.y = y;
-			u.v = w;
+			u.v = v;
 			u.h = h;
 			break;
 
@@ -1939,7 +1939,10 @@ int OpiumManage(Cadre cdr_initial, WndUserRequest *u, int *cdr_ouverts) {
 		  case OPIUM_ONGLET:  OpiumSizeOnglet(cdr,1);  break;
 		}
 		if(DEBUG_OPIUM(1)) WndPrint("(WND_CONFIG) Dims definitives: [%d x %d]\n",cdr->dh,cdr->dv);
-		if(!cdr->displayed) break;
+
+		// MWS: Removed as led to odd display behaviour on Linux with WxWdigets
+		//if(!cdr->displayed) break;
+		
 		f->h = cdr->dh; f->v = cdr->dv;
 		WndResize(f);
 #ifndef X11
