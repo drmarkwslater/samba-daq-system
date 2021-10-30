@@ -3104,7 +3104,8 @@ void TrmtSurBuffer() {
 	float montee,duree;
 	HistoDeVoie vh;
 #endif
-
+	// the gettimeofday function runs slow on Linux (Fedora 33, 30/10/21) and so the buffer copy can't keep up
+	VerifTempsPasse= 0;
 	c0 = VerifConsoCpu? clock() : 0;
 	t0 = (VerifTempsPasse? DateMicroSecs(): 0); n0 = TempsTotalLect;
 	//+ printf("%8lld      debut traitement\n",t0-LectT0Run);
