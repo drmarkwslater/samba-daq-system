@@ -14,7 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
 
 # - make sure we have a clean build
-#set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wfatal-errors -Wshadow -pedantic")
+set(CMAKE_CXX_FLAGS "-g")
 
 # - check some OS dependent stuff
 INCLUDE (CheckIncludeFiles)
