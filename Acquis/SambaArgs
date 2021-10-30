@@ -15,7 +15,8 @@ K = . 			# Repertoire du catalogue   (relatif a la racine, ou absolu)
 D = db 			# Racine de la base de donnees des detecteurs (relatif a la racine, ou absolu)
 s = streams 		# Repertoire des donnees brutes [streams] (relatif a l'espace de sauvegarde)
 e = events 		# Repertoire des evenements sauvegardes   (relatif a l'espace de sauvegarde)
-run = 		 	# Fichier a relire
+# Commented out as on Linux/wxWidgets, it causes TgrRegulClock to be set to zero
+#run = 		 	# Fichier a relire
 #
 conf = FileList 	# Configuration generale (relatif au repertoire des preferences)
 mode = independant 	# Mode de fonctionnement de SAMBA (independant/satellite/maitre/distant/automatique)
