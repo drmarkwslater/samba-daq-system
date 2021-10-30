@@ -1,3 +1,14 @@
-#
-Detecteurs = ( { nb = 2, code = 1 } ) 	# Definition du support des detecteurs
-Digitiseurs = ( { nb = 2, code = 1 } ) 	# Definition du support des numeriseurs
+# [claps]
+Detecteurs = (
+	{ nb = 4, code = a, #
+ },
+	{ nb = 12, code = 1, #
+ },
+	{ nb = 4, code = z, #
+ }
+) 	# Definition du chassis des detecteurs
+Digitiseurs = (
+	{ nb = 4, code = noms, noms = hg/bg/hd/bd },
+	{ nb = 28, code = 1, #
+ }
+) 	# Definition du chassis des numeriseurs
