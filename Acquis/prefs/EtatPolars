@@ -1,0 +1,3 @@
+# [claps]
+polarisation = { normale := jour = , heure = , source = absente }
+relais = { ouverts := jour = , heure =  }

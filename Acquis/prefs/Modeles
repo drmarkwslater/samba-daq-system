@@ -1,0 +1,7 @@
+# [claps]
+Detecteurs = ../modeles_EDW/detecteurs
+Numeriseurs = ../modeles_EDW/numeriseurs
+Cablages = ../modeles_EDW/cablages
+Repartiteurs = ../modeles_EDW/repartiteurs
+Environnement = ../modeles_EDW/environnement
+Chassis = ../modeles_EDW/chassis

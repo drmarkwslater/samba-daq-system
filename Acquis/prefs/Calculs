@@ -1,0 +1,44 @@
+# [claps]
+# Spectres
+Donnees = brute 	# Type de donnees utilisees
+PseudoVoies = exclues 	# Prise en compte des pseudo voies (exclues/aussi)
+Invalidees = exclues 	# Prise en compte des voies invalidees au vol(exclues/aussi)
+Mode.auto = somme 	# Methode de calcul des spectres automatiques (somme/trigge/glissant)
+Spectres.max = 20 	# Nb spectres si somme ou glissant
+Spectres.larg = 200 	# Largeur de la fenetre d'affichage
+Spectres.haut = 150 	# Hauteur de la fenetre d'affichage
+#
+# Spectres multiples
+Physique = ()
+#
+# Spectres au vol
+Bolo.num = 0 	# Numero de detecteur a etudier
+Bolo.voie = 0 	# Numero de voie de ce detectur
+Longueur = 1024 	# Nombre de points de la FFT
+Mode.auvol = glissant 	# Methode de calcul de spectre au vol (manu/surv/auto/glissant)
+Axe.X.type = lineaire 	# Type d'axe pour les X (lineaire/log)
+Axe.X.limites = auto 	# Limitation de l'axe X (manu/auto)
+Axe.X.min = 0.1 	# Minimum sur l'axe des X, si limites manuelles
+Axe.X.max = 50 	# Maximum sur l'axe des X, si limites manuelles
+Axe.Y.type = log 	# Type d'axe pour les Y (lineaire/log)
+Axe.Y.limites = auto 	# Limitation de l'axe Y (manu/auto)
+Axe.Y.min = 1 	# Minimum sur l'axe des Y, si limites manuelles
+Axe.Y.max = 1000 	# Maximum sur l'axe des Y, si limites manuelles
+#
+# Suivi de pics
+Pics.dim = 1000 	# Dimension du suivi (echantillons)
+Pics.nb = 0 	# Nombre de pics a suivre
+Pics.1.min = 100 	# Minimum du pic #1 (ADU)
+Pics.1.max = 500 	# Maximum du pic #1 (ADU)
+Pics.2.min = 100 	# Minimum du pic #2 (ADU)
+Pics.2.max = 500 	# Maximum du pic #2 (ADU)
+Pics.3.min = 100 	# Minimum du pic #3 (ADU)
+Pics.3.max = 500 	# Maximum du pic #3 (ADU)
+#
+# Traitements speciaux
+# CSNSM: A=Retard de l'entree (echantillons), B=Demi ligne de base (echantillons),
+#        C=<base> - <max> (echantillons), D=<max> - <min> (echantillons)
+CSNSM.filtres = (
+	{ basique := A = 7, B = 64, C = 96, D = 32 },
+	{ meilleur := A = 10, B = 128, C = 96, D = 128 }
+)
