@@ -659,7 +659,7 @@ int OpiumReadDouble(char *texte, double *adrs) {
 /* ========================================================================== */
 int OpiumReadList(char *texte, char **liste, int *adrs, int lngr) {
 	int nb;
-
+	
 	PanelErase(OpiumPanelQuick);
 	if((nb = PanelAdd(OpiumPanelQuick,texte,PNL_LISTE,"%s",(void *)adrs,lngr-1)))
 		(OpiumPanelQuick->items[nb - 1]).fctn = (void *)liste;
@@ -2287,7 +2287,12 @@ void PanelUpdate(Panel panel, int maj) {
 	if(doit_terminer) WndRefreshEnd(f);
 }
 /* ========================================================================== */
-void PanelRefreshVars(Panel panel) { PanelUpdate(panel,1); }
+void PanelRefreshVars(Panel panel) { 
+#ifdef WXWIDGETS
+	// don't allow window updates outside the paint event
+	return;
+#endif
+	PanelUpdate(panel,1); }
 /* ========================================================================== */
 void PanelCursorOnVar(Panel panel, int item, int curs) {
 	if(!panel) return;

@@ -2705,10 +2705,11 @@ int MonitEvtAffiche(int lequel, void *qui, int affiche) {
 			} else { GraphDataUse(g,x,0); GraphDataUse(g,y,0); }
 		}
 		#endif /* MONIT_EVT_TRAITE */
-		// WXWIDGETS
+#ifndef WXWIDGETS
 		// don't call graphics commands outside of a refresh event
-		//if(g == gEvtSolo) OpiumDisplay(gEvtSolo->cdr);
-		//else { OpiumRefresh(gEvtPlanche->cdr); PanelRefreshVars(pLectEvtNum); PanelRefreshVars(pLectEvtQui);  }
+		if(g == gEvtSolo) OpiumDisplay(gEvtSolo->cdr);
+		else { OpiumRefresh(gEvtPlanche->cdr); PanelRefreshVars(pLectEvtNum); PanelRefreshVars(pLectEvtQui);  }
+#endif
 		MonitEvtAff = LectCntl.MonitEvtNum;
 	}
 	#ifdef REMETTRE_COMME_LECTDISPLAY
