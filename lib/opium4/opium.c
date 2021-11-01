@@ -24,7 +24,8 @@ typedef unsigned long long UInt64;
 #define Accord2S(var) var,(var>1)?"S":"",(var>1)?"S":""
 
 #ifdef WXWIDGETS
-void OpiumExecWx(struct Cadre *cdr);
+int OpiumExecWx(struct Cadre *cdr, struct SambaWnd *w);
+void OpiumStartRenderTimer();
 #endif
 
 #define CHANGE_CURSEUR
@@ -1694,8 +1695,7 @@ int OpiumRun(Cadre cdr_initial, int mode) {
 	nbloop = 0; precedent = u.type;
 	code_a_rendre = 0;
 #ifdef WXWIDGETS
-	OpiumExecWx(cdr_initial);
-	return code_a_rendre;
+	return OpiumExecWx(cdr_initial, cdr_initial->f->w);
 #endif
 	while(OpiumNbExec && cdr_ouverts) {
 		if(u.type == precedent) nbloop++; else nbloop = 1;
@@ -1806,7 +1806,7 @@ int OpiumManageWx(Cadre *cdr, struct SambaWnd *w, char type, int x, int y, int h
 	}
 
 	int cdr_ouverts = 0;
-	OpiumManage(*cdr, &u, &cdr_ouverts);
+	return OpiumManage(*cdr, &u, &cdr_ouverts);
 }
 /* ========================================================================== */
 int OpiumManage(Cadre cdr_initial, WndUserRequest *u, int *cdr_ouverts) {
