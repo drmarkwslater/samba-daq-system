@@ -1727,8 +1727,7 @@ void WndExtraDisplay(WndFrame f) {
 /* ========================================================================== */
 void WndResize(WndFrame f) {
 	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
+	//WndResizeWx(f->w, f->h + WND_ASCINT_WIDZ,f->v + WND_ASCINT_WIDZ);
 #endif
 #ifdef OPENGL
 	// glfwSetWindowSize(f->w,f->h + WND_ASCINT_WIDZ,f->v + WND_ASCINT_WIDZ); provoque un rebouclage
@@ -2922,7 +2921,7 @@ static short WndEventBuild(WndEvent *e, WndUserRequest *u) {
 /* ========================================================================== */
 static int WndEventNext(WndEvent *e) {
 	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
+	//printf("WND FUNCTION:   %d  %d %d\n", __LINE__, e->what, e->message);
 	return 0;
 #endif
 #ifdef OPENGL
@@ -3673,25 +3672,12 @@ char WndContextBgndColor(WndFrame f, WndContextPtr gc, WndColor *c) {
 	/* ATTENTION: la couleur n'est PAS desallouee ni desallouable */
 	if(WndModeNone) return(1);
 	if(gc == 0) gc = WND_STD;
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return 0;
+#ifdef WXWIDGETS
+	gc->background = c;
 #endif
 #ifdef OPENGL
 	gc->background = c;
 #endif
-#ifdef X11
-	WndScreen d;
-	if(f) d = (f->s)->d; else d = WndCurSvr->d;
-	XSetBackground(d,gc,c->pixel);
-#endif
-#ifdef WIN32
-	gc->background = *c;
-#endif
-#ifdef QUICKDRAW
-	gc->background = c;
-#endif
-
 	return(1);
 }
 /* ========================================================================== */
@@ -4606,42 +4592,19 @@ void WndLine(WndFrame f, WndContextPtr gc, int x, int y, int l, int h) {
 /* ========================================================================== */
 void WndPoly(WndFrame f, WndContextPtr gc, WndPoint *p, int nb, int type) {
 	WndIdent w;
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
-#ifdef X11
-	WndScreen d; WndServer *s;
-	int x1,y1,x2,y2;
-#endif
 	int k,e,dy,signe,line_width;
 	int i; WndPoint *q;
 
 	if(WndModeNone) return;
 	if(nb <= 0) return;
 	if(gc == 0) gc = WND_TEXT;
-#ifdef X11
-	s = f->s;
-	d = s->d;
-#endif
 	if(WndPS) {
 		WndColor c;
-#ifdef X11
-		WndContextVal gcval;
-		XGetGCValues(d,gc,GCForeground,&gcval);
-		line_width = gcval.line_width;
-		c.pixel = gcval.foreground;
-		XQueryColor(d,DefaultColormap(d,DefaultScreen(d)),&c);
-#endif
-#ifdef WIN32
+#ifdef WXWIDGETS
 		line_width = gc->line_width;
 		memcpy(&c,gc->foreground,sizeof(WndColor));
 #endif
 #ifdef OPENGL
-		line_width = gc->line_width;
-		memcpy(&c,gc->foreground,sizeof(WndColor));
-#endif
-#ifdef QUICKDRAW
 		line_width = gc->line_width;
 		memcpy(&c,gc->foreground,sizeof(WndColor));
 #endif
@@ -4664,51 +4627,55 @@ void WndPoly(WndFrame f, WndContextPtr gc, WndPoint *p, int nb, int type) {
 		return;
 	}
 	w = f->w;
-#ifdef X11
-	s = f->s;
-	if((f->x0 == 0) && (f->y0 == 0)) XDrawLines(d,w,gc,p,nb,type); /* !!! probleme du chgt de repere!!! */
-	else {
-		q = p; i = nb;
-		x1 = f->x0 + p->x;
-		y1 = f->y0 + p->y;
-		while(--i) {
-			q++;
-			if(type == WND_ABS) {
-				x2 = f->x0 + q->x;
-				y2 = f->y0 + q->y;
-			} else {
-				x2 = x1 + q->x;
-				y2 = y1 + q->y;
-			}
-			WndDrawLine(f,gc,x1,y1,x2,y2);
-			x1 = x2;
-			y1 = y2;
+
+#ifdef WXWIDGETS
+	static int line_buf_size = 0, *x_vals = 0, *y_vals = 0;
+	int sizx,sizy; double xd,yd; char doit_terminer;
+	short xc,yc;
+
+	unsigned short fr = 65535;
+	unsigned short fg = 65535;
+	unsigned short fb = 65535;
+	if(gc) {
+		if(gc->foreground) {
+			fr = gc->foreground->red;
+			fg = gc->foreground->green;
+			fb = gc->foreground->blue;
 		}
 	}
-#endif
+	//glLineWidth(gc->line_width);
+	if (nb > line_buf_size)
+	{
+		//printf("Updating line buffer arrays to handle %d points\n", nb);
+		if (x_vals)
+		{
+			free(x_vals);
+			free(y_vals);
+		}
+		x_vals = (int*) malloc(sizeof(int)*nb);
+		y_vals = (int*) malloc(sizeof(int)*nb);
+		line_buf_size = nb;
+	}
 
-#ifdef WIN32
-	PAINTSTRUCT paintst; HDC hDC; HPEN hPen, hPenOld;
+	q = p; i = nb;
+	x_vals[i-1] = f->x0 + q->x;
+	y_vals[i-1] = f->y0 + q->y;
 
-	hDC = BeginPaint(f->w, &paintst);
-	if(gc->foreground) hPenOld = (HPEN)SelectObject(hDC, hPen = CreatePen(gc->line_style, gc->line_width, (gc->foreground) ));
-	e = 1; signe = -1;
-	for(k=0; k<gc->line_width; k++) {
-		dy = signe * (e++ >> 1); signe = -signe;
-		if(type == WND_ABS) MoveToEx(hDC, f->x0 + p->x,f->y0 + p->y + dy, NULL);
-		else MoveToEx(hDC, p->x, p->y + dy, NULL);
-		q = p; i = nb;
-		while(--i) {
-			q++;
-			if(type == WND_ABS) LineTo(hDC, f->x0 + q->x, f->y0 + q->y + dy);
-			else LineTo(hDC, q->x + p->x, q->y + p->y);
+	if(type == WND_REL) { xc = q->x; yc = q->y; }
+	while(--i) {
+		q++;
+		if(type == WND_ABS) {
+			x_vals[i-1] = f->x0 + q->x;
+			y_vals[i-1] = f->y0 + q->y;
+		} else {
+			xc += q->x; yc += q->y;
+			x_vals[i-1] = xc;
+			y_vals[i-1] = yc;
 		}
 	}
-	//PolylineTo(hDC, p, nb);
-	if(gc->foreground) SelectObject(hDC, hPenOld);
-	EndPaint(f->w, &paintst);
-	InvalidateRect(f->w, &(paintst.rcPaint), false);
-	if(gc->foreground) DeleteObject(hPen);
+
+	WndDrawPolyWx(w, x_vals, y_vals, nb, fr, fg, fb);
+
 #endif
 
 #ifdef OPENGL
@@ -4742,24 +4709,6 @@ void WndPoly(WndFrame f, WndContextPtr gc, WndPoint *p, int nb, int type) {
 	}
 	glEnd(); glFlush();
 	if(doit_terminer) WndRefreshEnd(f);
-#endif
-
-#ifdef QUICKDRAW
-	SetPort(WNDPORT(w));
-	RGBForeColor(gc->foreground);
-	// printf("(%s) @%08X.line_width = %d\n",__func__,(hexa)gc,gc->line_width);
-	e = 1; signe = -1;
-	for(k=0; k<gc->line_width; k++) {
-		dy = signe * (e++ >> 1); signe = -signe;
-		MoveTo(f->x0 + p->x,f->y0 + p->y + dy);
-		q = p; i = nb;
-		while(--i) {
-			q++;
-			if(type == WND_ABS) LineTo(f->x0 + q->x,f->y0 + q->y + dy);
-			else Line(q->x,q->y);
-		}
-	}
-//	RGBForeColor(WndColorText[f->qualite]);
 #endif
 }
 /* ========================================================================== */
@@ -5333,7 +5282,8 @@ static void WndCursorDraw(WndFrame f, WndContextPtr gc) {
 	WndDrawLine(f,gc,x,y,x+(s->col),y);
 #endif
 #ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
+	WndDrawLine(f,gc,x,y-1,x+(s->col),y-1);
+	WndDrawLine(f,gc,x,y,x+(s->col),y);
 	return;
 #endif
 #ifdef OPENGL
