@@ -25,7 +25,7 @@ typedef unsigned long long UInt64;
 
 #ifdef WXWIDGETS
 int OpiumExecWx(struct Cadre *cdr, struct SambaWnd *w);
-void OpiumStartRenderTimer();
+void OpiumRefreshAllWindows();
 #endif
 
 #define CHANGE_CURSEUR

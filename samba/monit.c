@@ -21,6 +21,10 @@
 #include <objets_samba.h>
 #include <monit.h>
 
+#ifdef WXWIDGETS
+void OpiumRefreshAllWindows();
+#endif
+
 #define MONIT_FEN_TYPES "signal/histo/FFT/fonction/biplot/2D-histo/evenement/evtmoyen/pattern"
 static char *MonitFenTypeName[MONIT_NBTYPES+1] = {
 	"signal", "histo", "fft", "fonction", "biplot", "2d-histo", "evenement", "evt moyen", "pattern", "\0"
@@ -2706,9 +2710,11 @@ int MonitEvtAffiche(int lequel, void *qui, int affiche) {
 		}
 		#endif /* MONIT_EVT_TRAITE */
 #ifndef WXWIDGETS
-		// don't call graphics commands outside of a refresh event
 		if(g == gEvtSolo) OpiumDisplay(gEvtSolo->cdr);
 		else { OpiumRefresh(gEvtPlanche->cdr); PanelRefreshVars(pLectEvtNum); PanelRefreshVars(pLectEvtQui);  }
+#else
+		// Only tell the windows to refresh rather than actually calling graphics commands
+		OpiumRefreshAllWindows();
 #endif
 		MonitEvtAff = LectCntl.MonitEvtNum;
 	}

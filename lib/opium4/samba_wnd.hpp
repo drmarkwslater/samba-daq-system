@@ -8,7 +8,7 @@
 
 #include <string>
 
-class SambaWnd: public wxFrame
+class SambaWnd: public wxDialog
 {
 public:
     SambaWnd(const wxString& title, const wxPoint& pos, const wxSize& size);

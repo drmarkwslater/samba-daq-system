@@ -4,7 +4,7 @@
 #include <samba_app.hpp>
 #include <opium_wx_interface.h>
 
-wxBEGIN_EVENT_TABLE(SambaWnd, wxFrame)
+wxBEGIN_EVENT_TABLE(SambaWnd, wxDialog)
     EVT_SIZE(SambaWnd::OnSize)
     EVT_MOVE(SambaWnd::OnMove)
     EVT_PAINT(SambaWnd::OnPaint)
@@ -16,7 +16,7 @@ wxEND_EVENT_TABLE()
 void WndEventNewWx(struct SambaWnd *w, enum SambaEventWx type, int x, int y, int h, int v);
 
 SambaWnd::SambaWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
-        : wxFrame(NULL, wxID_ANY, title, pos, size)
+        : wxDialog(NULL, wxID_ANY, title, pos, size)
 {
     SetBackgroundStyle(wxBG_STYLE_CUSTOM);
 }
