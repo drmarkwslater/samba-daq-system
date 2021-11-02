@@ -745,13 +745,35 @@ void LectUdpStatus(int64 *recues, int64 *err, int64 *ovr) {
 	FILE *f;
 	
 	*recues = *err = *ovr = 0;
+#ifdef UNIX
+	strcpy(template,"Listing_XXXXXX");
+#else
 	strcpy(template,"Listing_XXXX");
+#endif
 	listing = mktemp(template);
 	if(listing) {
 		RepertoireCreeRacine(listing);
+	#ifdef UNIX
+		sprintf(commande,"netstat -us | grep -A 7 \"Udp:\" >%s",listing);
+	#else
 		sprintf(commande,"netstat -sp udp >%s",listing);
+	#endif
 		system(commande);
 		if((f = fopen(listing,"r"))) {
+		#ifdef UNIX
+			while(LigneSuivante(ligne,256,f)) {
+				if(!strncmp(ligne,"Udp:",4)) continue;
+				else {
+					r = ligne; l = strlen(ligne) - 1; if(ligne[l] == '\n') ligne[l] = '\0';
+					sscanf(ItemJusquA(' ',&r),"%lld",&val);
+					if(!strcmp(r,"packets received")) *recues = val;
+					else if(!strcmp(r,"packet receive errors")) *err += val;
+					else if(!strcmp(r,"packets to unknown port received")) *err += val;
+					//else if(!strcmp(r,"with bad checksum")) *err += val;
+					//else if(!strcmp(r,"dropped due to full socket buffers")) *ovr = val;
+				}
+			}
+		#else
 			while(LigneSuivante(ligne,256,f)) {
 				if(!strncmp(ligne,"udp:",4)) continue;
 				else {
@@ -764,6 +786,7 @@ void LectUdpStatus(int64 *recues, int64 *err, int64 *ovr) {
 					else if(!strcmp(r,"dropped due to full socket buffers")) *ovr = val;
 				}
 			}
+		#endif
 			fclose(f);
 		}
 		remove(listing);
@@ -892,7 +915,7 @@ static char LectFixeMode(LECT_MODE mode, char init) {
 		LectRunNormal = ((mode == LECT_DONNEES) && !LectMaintenance);
 		LectAcqCollective = (LectRunNormal && (LectAcqLanceur == LECT_STD) && (PartitLocale >= 0) && (SettingsPartition == SAMBA_PARTIT_STD));
 		LectStampSpecifique = 0;
-		
+
 		LectDemarreBolo = LectEntretien = 0;
 		if(LectRunNormal) {
 			// int bolo;
@@ -3173,7 +3196,7 @@ void LectTraiteStocke() {
 			}
 		}
 	}
-			
+
 	/* Pause ou arret eventuel */
 	gettimeofday(&LectDateRun,0);
 	if((ScriptDateLimite > 0) && (LectDateRun.tv_sec > ScriptDateLimite)) {
@@ -3789,7 +3812,9 @@ static void LectFenRefresh(TypeMonitFenetre *f) {
 		GraphAxisReset(g,GRF_YAXIS);
 	} else { if(doit_terminer) OpiumRefreshEnd(cdr); return; } /* f->type inconnu */
 	//- printf("(%s) Appel pour '%s' (cdr=%08X) apres %d synchroD2 lues\n",__func__,f->titre,(hexa)cdr,(int)SynchroD2lues);
+#ifndef WXWIDGETS
 	OpiumDisplay(cdr);
+#endif
 	if(doit_terminer) OpiumRefreshEnd(cdr);
 }
 /* ========================================================================== */
@@ -4415,7 +4440,6 @@ void LectDisplay() {
 		if(VerifTempsPasse) CpuTauxOccupe = (int)((temps_utilise  * 100) / temps_total);
 		else if(VerifConsoCpu) CpuTauxOccupe = (int)((cpu_utilise  * 100) / ((clock_t)temps_total * CpuActifs));
 	}
-	
 	if(LectStampsLus) {
 		PerteIP = ((float)LectStampPerdus * 100.0) / (float)LectStampsLus;
 		TempsMort = ((float)LectStampJetes * 100.0) / (float)LectStampsLus;
@@ -4424,6 +4448,7 @@ void LectDisplay() {
 	if(n > 0)
 		PerteEvts = (100.0 * (float)(PileUp + TrmtEvtJetes + TrmtNbEchecs + ArchEvtsPerdus)) / (float)n;
 	else PerteEvts = 0.0;
+#ifndef WXWIDGETS
 	if(OpiumDisplayed(bLecture)) {
 		doit_terminer = OpiumRefreshBegin(bLecture);
 		PanelRefreshVars(pLectEvtNum); // pour MonitT0 mais melange avec infos evt affiche - ou pas
@@ -4438,6 +4463,7 @@ void LectDisplay() {
 		PanelRefreshVars(pLectPileMax);
 		if(doit_terminer) OpiumRefreshEnd(bLecture);
 	}
+#endif
 	if(SambaSat && (EcritureMaitre >= 0)) {
 		unsigned char buffer[80]; int i,n;
 		i = 0;
@@ -4517,7 +4543,6 @@ monite:
 			if(trmt == TRMT_PRETRG) VoieTampon[voie].trmt[trmt].point_affiche = VoieTampon[voie].trmt[trmt].point_vu;
 		}
 	}
-			
 /*
 ==== Spectre de bruit au vol
 */
@@ -6442,6 +6467,7 @@ INLINE char SambaDeclenche(int voie, float reelle) {
 				if(!TrmtDejaDit) printf("Calcul pour amplitude %f sur %f µs au niveau %f\n",
 					*(VoieTampon[voie].adrs_amplitude),*(VoieTampon[voie].adrs_montee),*(VoieTampon[voie].adrs_niveau));
 				if(!TrmtDejaDit) CebExec(TrmtPrgm,1); else
+
 			#endif
 					CebExec(TrmtPrgm,0);
 			#ifdef DEBUG_PRGM
@@ -6941,7 +6967,7 @@ void LectDepileDonnees() {
 	}
 #endif /* DEBUG_FILL */
 #endif /* DEBUG_DEPILE */
-	
+
 	/*
 	 *  Remplissage des tampons primaires
 	 */
@@ -7562,6 +7588,205 @@ static void LecTraiteFromIt() {
 
 #pragma mark ---- Commandes executives ----
 #define MAX_ERREURS 0
+
+void LectExecThread(void *entretien_bolo_ptr, void *synchroD2traitees_ptr)
+{
+	int64 depuis_depile;
+	int bolo;
+	char entretien_bolo = (char) entretien_bolo_ptr;
+	int64 synchroD2traitees = (int64) synchroD2traitees_ptr;
+	int64 maintenant;
+	int avant = 0, secs;
+	char delai[DATE_MAX];
+	char pair = 0;
+	int loop_num = 0;
+
+	while(Acquis[AcquisLocale].etat.active) {
+		if(LectDepileSousIt) {
+		#ifdef CODE_WARRIOR_VSN
+			if(SynchroD2lues < LectNextTrmt) TimerMilliSleep(LectDepileWait/1000);
+		#else
+			if(SynchroD2lues < LectNextTrmt) usleep(LectDepileWait);
+		#endif
+			if(!LectModeStatus && !VoiesLocalesNb) SynchroD2lues++; /* ca nous fait des synchros a 10 ms tant que LectNextTrmt est bien gere */
+		} else {
+#ifdef A_TRAVAILLER
+			if(LectPid == -1) LectDepileDonnees();
+			else if(LectPid) {
+				int stat;
+				if(wait4(LectPid,&stat,WNOHANG,0) == LectPid) LectPid = 0;
+			}
+			if(!LectPid) {
+				--LectDepileNb;
+				LectPid = fork();
+				if(LectPid) { if(LectPid == -1) LectDepileDonnees(); else usleep(LectDepileWait); }
+				else if(!LectDepileEnCours) { LectDepileDonnees(); _exit(0); }
+			}
+#else
+			LectDepileDonnees();
+#endif
+		}
+//			if(SettingsSynchroMax && (SynchroD2lues >= SettingsSynchroMax)) { Acquis[AcquisLocale].etat.active = 0; break; }
+		if(LectDepileInhibe) {
+			if(LectDansTraiteStocke > 1)
+				printf("%s! L'execution de TraiteStocke dure plus de %.3f secondes\n",DateHeure(),(float)(LectDansTraiteStocke*SettingsReadoutPeriod)/1000.0);
+			if(LectDansActionUtilisateur > 1)
+				printf("%s! L'execution de ActionUtilisateur dure plus de %.3f secondes\n",DateHeure(),(float)(LectDansActionUtilisateur*SettingsReadoutPeriod)/1000.0);
+			if(LectDansDisplay > 1)
+				printf("%s! L'execution de Display dure plus de %.3f secondes\n",DateHeure(),(float)(LectDansDisplay*SettingsReadoutPeriod)/1000.0);
+			LectErreur.code = LECT_OVERFLO;
+		}
+	#ifndef CODE_WARRIOR_VSN
+		gettimeofday(&LectDateRun,0);
+		depuis_depile = ((int64)LectDateRun.tv_sec * 1000000) + (int64)LectDateRun.tv_usec - LectDepileTfin;
+		if(LectDepileSousIt && (depuis_depile >= LectEntreDepile)) {
+			LectEntreDepile *= 2;
+			if(LectEntreDepile < (DureeTampons * 1000)) {
+				printf("%s/ Delai depuis derniere lecture anormal: %lld us, relancee avec une tolerance de %lld us\n",DateHeure(),depuis_depile,LectEntreDepile);
+				LectItRecue();
+			} else {
+				printf("%s/ Delai depuis derniere lecture anormal: %lld us, nouvelle session demandee\n",DateHeure(),depuis_depile);
+				LectErreur.code = LECT_SYNC; Acquis[AcquisLocale].etat.active = 0;
+			}
+		}
+		if(entretien_bolo) {
+			char a_suivre; int b;
+			if(LectDateRun.tv_sec >= LectDateRegulBolo) {
+				LectDateRegulBolo = LectDateRun.tv_sec + SettingsDLUdetec;
+				for(bolo=0; bolo<BoloNb; bolo++) if(Bolo[bolo].a_lire && (Bolo[bolo].regul.bloc >= 0)) {
+					if(!LectEntretienEnCours) {
+						printf("%s/ ============================== Debut d'entretien des detecteurs ==============================\n",DateHeure());
+						LectEntretienEnCours = 1;
+						if(NomEntretienStart[0] && strcmp(NomEntretienStart,"neant")) ScriptExec(FichierEntretienStart,NomEntretienStart,"");
+						if(RegenEnCours) LectRegenAffiche(0,0);
+					}
+					printf("%s/ Detecteur %s: activation du script d'entretien '%s'\n",DateHeure(),Bolo[bolo].nom,Bolo[bolo].regul.script);
+					Bolo[bolo].exec.inst = DetecScriptsLibrairie.bloc[Bolo[bolo].regul.bloc].premiere;
+					ScriptBoucleVide(&(Bolo[bolo].exec.boucle)); Bolo[bolo].exec.date = 0; /* pour dire "prochaine instruction: de suite" */
+				}
+				// printf("%s/ Prochaine maintenance detecteurs a %ld secondes\n",DateHeure(),LectDateRegulBolo);
+			}
+			ScriptKill = 0; a_suivre = 0;
+			for(bolo=0; bolo<BoloNb; bolo++) if(Bolo[bolo].a_lire && ((b = Bolo[bolo].regul.bloc) >= 0)) {
+				short derniere;
+				derniere = DetecScriptsLibrairie.bloc[b].derniere;
+				if(Bolo[bolo].exec.inst < derniere) {
+					if(Bolo[bolo].exec.date <= LectDateRun.tv_sec) {
+						short secs; //- char prefixe[80];
+						// printf("%s/ Detecteur %s: execution des instructions [%d, %d[\n",DateHeure(),Bolo[bolo].nom,Bolo[bolo].exec.inst,derniere);
+						while(Bolo[bolo].exec.inst < derniere) {
+							ScriptExecBatch(DetecScriptsLibrairie.action,HW_DETEC,(void *)&(Bolo[bolo]),&(Bolo[bolo].exec),derniere,&secs,"");
+							if(secs) {
+								Bolo[bolo].exec.date = LectDateRun.tv_sec + secs;
+								if(LectDateRegulBolo < (Bolo[bolo].exec.date + SettingsDLUdetec)) LectDateRegulBolo = Bolo[bolo].exec.date + SettingsDLUdetec;
+								// printf("%s/ Detecteur %s: prochaine execution a %ld s\n",DateHeure(),Bolo[bolo].nom,Bolo[bolo].exec.date);
+								break;
+							}
+						}
+						NumeriseurChargeRessourceFin(ScriptMarge());
+						if(Bolo[bolo].exec.inst >= derniere) printf("%s/ Detecteur %s: script d'entretien termine\n",DateHeure(),Bolo[bolo].nom);
+					}
+					if(Bolo[bolo].exec.inst < derniere) a_suivre = 1;
+				}
+			}
+			ScriptKill = 0;
+			if(LectEntretienEnCours && !a_suivre) {
+				printf("%s/ ==============================  Fin  d'entretien des detecteurs ==============================\n",DateHeure());
+				LectEntretienEnCours = 0;
+				if(NomEntretienStop[0] && strcmp(NomEntretienStop,"neant")) ScriptExec(FichierEntretienStop,NomEntretienStop,"");
+				if(RegenEnCours) LectRegenTermine(0);
+			}
+		}
+	#ifdef RELANCE_EXEC
+		if(IPactifs) {
+			if(LectDateRun.tv_sec >= LectDateRelance) {
+				int rep;
+				/* re-demande l'envoi des donnees */
+				IPactifs = 0;
+				for(rep=0; rep<RepartNb; rep++) if((Repart[rep].interf == INTERF_IP) && Repart[rep].actif) {
+					RepartIpContinue(&(Repart[rep]),Repart[rep].s.ip.relance,1); IPactifs++;
+				}
+				if(IPactifs) {
+					struct tm prochain;
+					LectDateRelance = LectDateRun.tv_sec + LectIntervRelance;
+					memcpy(&prochain,localtime(((time_t *)(&LectDateRelance))),sizeof(struct tm));
+					/* verifie si les repartiteurs ont bien cause */
+					if(!LectModeStatus) {
+						if(ip_avant == RepartIpOctetsLus) LectDeclencheErreur(_ORIGINE_,1,LECT_EMPTY);
+						ip_avant = RepartIpOctetsLus;
+						printf("%s/ %lld octets lus, %d repartiteur%s UDP relance%s jusqu'a %02d:%02d:%02d\n",
+							DateHeure(),RepartIpOctetsLus,Accord2s(IPactifs),
+							prochain.tm_hour,prochain.tm_min,prochain.tm_sec);
+					} else {
+						if(ip_avant == RepartIp.traitees) LectDeclencheErreur(_ORIGINE_,2,LECT_EMPTY);
+						ip_avant = RepartIp.traitees;
+						printf("%s/ %lld trames traitees, %d repartiteur%s UDP relance%s jusqu'a %02d:%02d:%02d\n",
+							DateHeure(),RepartIp.traitees,Accord2s(IPactifs),
+							prochain.tm_hour,prochain.tm_min,prochain.tm_sec);
+					}
+				}
+			}
+		}
+	#endif /* RELANCE_EXEC */
+	#endif /* !CODE_WARRIOR_VSN */
+
+		if(SambaMaitre || (SambaEchantillonLngr == 0)) SynchroD2lues = (DateMicroSecs() - LectT0Run) / SynchroD2_us;
+		// if((LectDepileTestees != LectDepileNb) && (synchroD2traitees != SynchroD2lues)) printf("%s/ Maintenant %d lecture%s au lieu de %d, toujours %lld synchro%s lue%s, et pas de traitement a faire\n",DateHeure(),Accord1s(LectDepileNb),LectDepileTestees,Accord2s(synchroD2traitees));
+		if(synchroD2traitees != SynchroD2lues) {
+			synchroD2traitees = SynchroD2lues;
+			if(!LectTrmtSousIt) LectTraiteStocke();
+			LectActionUtilisateur();
+		} else OpiumUserAction();
+		LectDepileTestees = LectDepileNb;
+	#ifdef PAS_D_ERREUR_PERMISE
+		if(LectErreursNb) printf("%s! Trouve %08X, attendu xxxx%04hX @bloc %lld[voie %d, rep %d]\n",DateHeure(),
+			LectEnCours.valeur,LectTypePrevu,LectStampsLus,LectVoieRep,LectEnCours.rep);
+	#else
+		if(LectErreur1) {
+			printf("%s! %d ERREUR%S sur le type de donnee! (entre le point %d,%05d0 (%04X) et le point %d,%05d0)\n",
+				DateHeure(),Accord1S(LectErreursNb),
+				(int)(LectMarque1/100000),Modulo(LectMarque1,100000),(int)LectErreur1 & 0xFFFF,
+				(int)(LectStampsLus/100000),Modulo(LectStampsLus,100000));
+			if(LectErreursNb > MAX_ERREURS) {
+				printf("%s/ Le maximum d'erreurs par lecture (%d) a ete depasse...\n",DateHeure(),MAX_ERREURS);
+				LectDeclencheErreur(_ORIGINE_,3,LECT_UNEXPEC);
+			} else LectErreur1 = 0;
+		}
+	#endif
+		/* A REMETTRE DES QUE POSSIBLE */
+	#ifdef OBSOLETE
+		if(LectErreur.code == LECT_EOF) {
+			LectArchFerme();
+			LectTrancheRelue++;
+			LectErreur.code = 0; Acquis[AcquisLocale].etat.active = 1;
+			LectArchPrepare(0);
+			if(!LectErreur.code) DetecteursLit(FichierPrefDetecteurs,LectSurFichier);
+		}
+	#endif
+		/* autres actions periodiques */
+		if(BancEnTest && BancUrgence) Acquis[AcquisLocale].etat.active = 0;
+		else if((LectRetard.stop.mode == LECT_RETARD_PREVU) || (LectRetard.stop.mode == LECT_RETARD_CALDR)) {
+			maintenant = DateLong();
+			if(maintenant >= LectRetard.stop.date) {
+				Acquis[AcquisLocale].etat.active = 0;
+				LectErreur.code = LECT_PREVU;
+			} else {
+				if(avant != LectDateRun.tv_sec) {
+					secs = (int)(DateLongToSecondes(LectRetard.stop.date) - DateLongToSecondes(maintenant)); S_usPrint(delai,secs,0);
+					sprintf(LectInfo[1],L_("Fin du run prevue dans %s"),delai);
+					if(OpiumAlEcran(pLectRegen)) PanelRefreshVars(pLectRegen);
+					if(pair) MenuItemAllume(mLectArret,1,L_("Prevu   "),GRF_RGB_ORANGE);
+					else MenuItemAllume(mLectArret,1,L_("Stopper "),GRF_RGB_YELLOW);
+					OpiumUserAction();
+					pair = 1 - pair;
+					avant = LectDateRun.tv_sec;
+				}
+			}
+		}
+		if(SambaInfos && !SambaInfos->en_cours) LectStop();
+	}
+}
+
 static TypeADU LectExec(NUMER_MODE mode) {
 /* /docFuncBeg {LectExec}
    	/docFuncReturn  {0 si OK, code d'erreur sinon (voir LectAcqStd)}
@@ -7761,189 +7986,17 @@ relance:
 		ip_avant = RepartIpOctetsLus;
 		LectDerniereNonVide = LectDepileTfin = LectT0Run;
 		/* TimerTrig(LectTaskReadout); pour une lecture des que possible */
-		while(Acquis[AcquisLocale].etat.active) {
-			if(LectDepileSousIt) {
-			#ifdef CODE_WARRIOR_VSN
-				if(SynchroD2lues < LectNextTrmt) TimerMilliSleep(LectDepileWait/1000);
-			#else
-				if(SynchroD2lues < LectNextTrmt) usleep(LectDepileWait);
-			#endif
-				if(!LectModeStatus && !VoiesLocalesNb) SynchroD2lues++; /* ca nous fait des synchros a 10 ms tant que LectNextTrmt est bien gere */
-			} else {
-#ifdef A_TRAVAILLER
-				if(LectPid == -1) LectDepileDonnees();
-				else if(LectPid) {
-					int stat;
-					if(wait4(LectPid,&stat,WNOHANG,0) == LectPid) LectPid = 0;
-				}
-				if(!LectPid) {
-					--LectDepileNb;
-					LectPid = fork(); 
-					if(LectPid) { if(LectPid == -1) LectDepileDonnees(); else usleep(LectDepileWait); } 
-					else if(!LectDepileEnCours) { LectDepileDonnees(); _exit(0); }
-				}
+#ifdef WXWIDGETS
+		// Send off the thread for the actual DAQ
+		pthread_t lectexec_thread;
+		int t = pthread_create(&lectexec_thread, NULL, LectExecThread, 
+			(void *) entretien_bolo,
+			(void *) synchroD2traitees);
+		OpiumStartRenderTimer();
+		return;
 #else
-				LectDepileDonnees();
+		LectExecThread();
 #endif
-			}
-//			if(SettingsSynchroMax && (SynchroD2lues >= SettingsSynchroMax)) { Acquis[AcquisLocale].etat.active = 0; break; }
-			if(LectDepileInhibe) {
-				if(LectDansTraiteStocke > 1)
-					printf("%s! L'execution de TraiteStocke dure plus de %.3f secondes\n",DateHeure(),(float)(LectDansTraiteStocke*SettingsReadoutPeriod)/1000.0);
-				if(LectDansActionUtilisateur > 1)
-					printf("%s! L'execution de ActionUtilisateur dure plus de %.3f secondes\n",DateHeure(),(float)(LectDansActionUtilisateur*SettingsReadoutPeriod)/1000.0);
-				if(LectDansDisplay > 1)
-					printf("%s! L'execution de Display dure plus de %.3f secondes\n",DateHeure(),(float)(LectDansDisplay*SettingsReadoutPeriod)/1000.0);
-				LectErreur.code = LECT_OVERFLO;
-			}
-		#ifndef CODE_WARRIOR_VSN
-			gettimeofday(&LectDateRun,0);
-			depuis_depile = ((int64)LectDateRun.tv_sec * 1000000) + (int64)LectDateRun.tv_usec - LectDepileTfin;
-			if(LectDepileSousIt && (depuis_depile >= LectEntreDepile)) {
-				LectEntreDepile *= 2;
-				if(LectEntreDepile < (DureeTampons * 1000)) {
-					printf("%s/ Delai depuis derniere lecture anormal: %lld us, relancee avec une tolerance de %lld us\n",DateHeure(),depuis_depile,LectEntreDepile);
-					LectItRecue();
-				} else {
-					printf("%s/ Delai depuis derniere lecture anormal: %lld us, nouvelle session demandee\n",DateHeure(),depuis_depile);
-					LectErreur.code = LECT_SYNC; Acquis[AcquisLocale].etat.active = 0;
-				}
-			}
-			if(entretien_bolo) {
-				char a_suivre; int b;
-				if(LectDateRun.tv_sec >= LectDateRegulBolo) {
-					LectDateRegulBolo = LectDateRun.tv_sec + SettingsDLUdetec;
-					for(bolo=0; bolo<BoloNb; bolo++) if(Bolo[bolo].a_lire && (Bolo[bolo].regul.bloc >= 0)) {
-						if(!LectEntretienEnCours) {
-							printf("%s/ ============================== Debut d'entretien des detecteurs ==============================\n",DateHeure());
-							LectEntretienEnCours = 1;
-							if(NomEntretienStart[0] && strcmp(NomEntretienStart,"neant")) ScriptExec(FichierEntretienStart,NomEntretienStart,"");
-							if(RegenEnCours) LectRegenAffiche(0,0);
-						}
-						printf("%s/ Detecteur %s: activation du script d'entretien '%s'\n",DateHeure(),Bolo[bolo].nom,Bolo[bolo].regul.script);
-						Bolo[bolo].exec.inst = DetecScriptsLibrairie.bloc[Bolo[bolo].regul.bloc].premiere;
-						ScriptBoucleVide(&(Bolo[bolo].exec.boucle)); Bolo[bolo].exec.date = 0; /* pour dire "prochaine instruction: de suite" */
-					}
-					// printf("%s/ Prochaine maintenance detecteurs a %ld secondes\n",DateHeure(),LectDateRegulBolo);
-				}
-				ScriptKill = 0; a_suivre = 0;
-				for(bolo=0; bolo<BoloNb; bolo++) if(Bolo[bolo].a_lire && ((b = Bolo[bolo].regul.bloc) >= 0)) {
-					short derniere;
-					derniere = DetecScriptsLibrairie.bloc[b].derniere;
-					if(Bolo[bolo].exec.inst < derniere) {
-						if(Bolo[bolo].exec.date <= LectDateRun.tv_sec) {
-							short secs; //- char prefixe[80];
-							// printf("%s/ Detecteur %s: execution des instructions [%d, %d[\n",DateHeure(),Bolo[bolo].nom,Bolo[bolo].exec.inst,derniere);
-							while(Bolo[bolo].exec.inst < derniere) {
-								ScriptExecBatch(DetecScriptsLibrairie.action,HW_DETEC,(void *)&(Bolo[bolo]),&(Bolo[bolo].exec),derniere,&secs,"");
-								if(secs) {
-									Bolo[bolo].exec.date = LectDateRun.tv_sec + secs;
-									if(LectDateRegulBolo < (Bolo[bolo].exec.date + SettingsDLUdetec)) LectDateRegulBolo = Bolo[bolo].exec.date + SettingsDLUdetec;
-									// printf("%s/ Detecteur %s: prochaine execution a %ld s\n",DateHeure(),Bolo[bolo].nom,Bolo[bolo].exec.date);
-									break;
-								}
-							}
-							NumeriseurChargeRessourceFin(ScriptMarge());
-							if(Bolo[bolo].exec.inst >= derniere) printf("%s/ Detecteur %s: script d'entretien termine\n",DateHeure(),Bolo[bolo].nom);
-						}
-						if(Bolo[bolo].exec.inst < derniere) a_suivre = 1;
-					}
-				}
-				ScriptKill = 0;
-				if(LectEntretienEnCours && !a_suivre) {
-					printf("%s/ ==============================  Fin  d'entretien des detecteurs ==============================\n",DateHeure());
-					LectEntretienEnCours = 0;
-					if(NomEntretienStop[0] && strcmp(NomEntretienStop,"neant")) ScriptExec(FichierEntretienStop,NomEntretienStop,"");
-					if(RegenEnCours) LectRegenTermine(0);
-				}
-			}
-		#ifdef RELANCE_EXEC
-			if(IPactifs) {
-				if(LectDateRun.tv_sec >= LectDateRelance) {
-					int rep;
-					/* re-demande l'envoi des donnees */
-					IPactifs = 0;
-					for(rep=0; rep<RepartNb; rep++) if((Repart[rep].interf == INTERF_IP) && Repart[rep].actif) {
-						RepartIpContinue(&(Repart[rep]),Repart[rep].s.ip.relance,1); IPactifs++;
-					}
-					if(IPactifs) {
-						struct tm prochain;
-						LectDateRelance = LectDateRun.tv_sec + LectIntervRelance;
-						memcpy(&prochain,localtime(((time_t *)(&LectDateRelance))),sizeof(struct tm));
-						/* verifie si les repartiteurs ont bien cause */
-						if(!LectModeStatus) {
-							if(ip_avant == RepartIpOctetsLus) LectDeclencheErreur(_ORIGINE_,1,LECT_EMPTY);
-							ip_avant = RepartIpOctetsLus;
-							printf("%s/ %lld octets lus, %d repartiteur%s UDP relance%s jusqu'a %02d:%02d:%02d\n",
-								DateHeure(),RepartIpOctetsLus,Accord2s(IPactifs),
-								prochain.tm_hour,prochain.tm_min,prochain.tm_sec);
-						} else {
-							if(ip_avant == RepartIp.traitees) LectDeclencheErreur(_ORIGINE_,2,LECT_EMPTY);
-							ip_avant = RepartIp.traitees;
-							printf("%s/ %lld trames traitees, %d repartiteur%s UDP relance%s jusqu'a %02d:%02d:%02d\n",
-								DateHeure(),RepartIp.traitees,Accord2s(IPactifs),
-								prochain.tm_hour,prochain.tm_min,prochain.tm_sec);
-						}
-					}
-				}
-			}
-		#endif /* RELANCE_EXEC */
-		#endif /* !CODE_WARRIOR_VSN */
-			if(SambaMaitre || (SambaEchantillonLngr == 0)) SynchroD2lues = (DateMicroSecs() - LectT0Run) / SynchroD2_us;
-			// if((LectDepileTestees != LectDepileNb) && (synchroD2traitees != SynchroD2lues)) printf("%s/ Maintenant %d lecture%s au lieu de %d, toujours %lld synchro%s lue%s, et pas de traitement a faire\n",DateHeure(),Accord1s(LectDepileNb),LectDepileTestees,Accord2s(synchroD2traitees));
-			if(synchroD2traitees != SynchroD2lues) {
-				synchroD2traitees = SynchroD2lues;
-				if(!LectTrmtSousIt) LectTraiteStocke();
-				LectActionUtilisateur();
-			} else OpiumUserAction();
-			LectDepileTestees = LectDepileNb;
-		#ifdef PAS_D_ERREUR_PERMISE
-			if(LectErreursNb) printf("%s! Trouve %08X, attendu xxxx%04hX @bloc %lld[voie %d, rep %d]\n",DateHeure(),
-				LectEnCours.valeur,LectTypePrevu,LectStampsLus,LectVoieRep,LectEnCours.rep);
-		#else
-			if(LectErreur1) {
-				printf("%s! %d ERREUR%S sur le type de donnee! (entre le point %d,%05d0 (%04X) et le point %d,%05d0)\n",
-					DateHeure(),Accord1S(LectErreursNb),
-					(int)(LectMarque1/100000),Modulo(LectMarque1,100000),(int)LectErreur1 & 0xFFFF,
-					(int)(LectStampsLus/100000),Modulo(LectStampsLus,100000));
-				if(LectErreursNb > MAX_ERREURS) {
-					printf("%s/ Le maximum d'erreurs par lecture (%d) a ete depasse...\n",DateHeure(),MAX_ERREURS);
-					LectDeclencheErreur(_ORIGINE_,3,LECT_UNEXPEC);
-				} else LectErreur1 = 0;
-			}
-		#endif
-			/* A REMETTRE DES QUE POSSIBLE */
-		#ifdef OBSOLETE
-			if(LectErreur.code == LECT_EOF) {
-				LectArchFerme();
-				LectTrancheRelue++;
-				LectErreur.code = 0; Acquis[AcquisLocale].etat.active = 1;
-				LectArchPrepare(0);
-				if(!LectErreur.code) DetecteursLit(FichierPrefDetecteurs,LectSurFichier);
-			}
-		#endif
-			/* autres actions periodiques */
-			if(BancEnTest && BancUrgence) Acquis[AcquisLocale].etat.active = 0;
-			else if((LectRetard.stop.mode == LECT_RETARD_PREVU) || (LectRetard.stop.mode == LECT_RETARD_CALDR)) {
-				maintenant = DateLong();
-				if(maintenant >= LectRetard.stop.date) {
-					Acquis[AcquisLocale].etat.active = 0;
-					LectErreur.code = LECT_PREVU;
-				} else {
-					if(avant != LectDateRun.tv_sec) {
-						secs = (int)(DateLongToSecondes(LectRetard.stop.date) - DateLongToSecondes(maintenant)); S_usPrint(delai,secs,0);
-						sprintf(LectInfo[1],L_("Fin du run prevue dans %s"),delai);
-						if(OpiumAlEcran(pLectRegen)) PanelRefreshVars(pLectRegen);
-						if(pair) MenuItemAllume(mLectArret,1,L_("Prevu   "),GRF_RGB_ORANGE);
-						else MenuItemAllume(mLectArret,1,L_("Stopper "),GRF_RGB_YELLOW);
-						OpiumUserAction();
-						pair = 1 - pair;
-						avant = LectDateRun.tv_sec;
-					}
-				}
-			}
-			if(SambaInfos && !SambaInfos->en_cours) LectStop();
-		}
 		if(SambaInfos) SambaInfos->en_cours = Acquis[AcquisLocale].etat.active;
 		if(LectErreur.code == LECT_ARRETE) LectRelancePrevue = 1; else
 		LectRelancePrevue = (Archive.enservice
@@ -8759,7 +8812,7 @@ int LectAcqStd() {
 			if(!LectVerifieConnections(LECT_DONNEES)) return(0);
 			if(!SambaMaitre) RepartiteursElection(1);
 		}
-		
+
 		/* Initialisation des variables globales de la branche Lecture */
 		if(!LectConstruitTampons(LectureLog)) return(0);
 		if(LectSession < 2) LectJournalTrmt();
@@ -8789,7 +8842,7 @@ int LectAcqStd() {
 		}
 		ArchiveDefini(LectureLog);
 		LectJournalLaSuite((LectSession < 2));
-		
+
 		/* Demarrage de l'electronique */
 		if(OpiumDisplayed(bLecture)) doit_terminer = OpiumRefreshBegin(bLecture); else doit_terminer = 0;
 		MenuItemAllume(mLectDemarrage,1,L_("En cours"),GRF_RGB_GREEN);
@@ -8816,6 +8869,9 @@ int LectAcqStd() {
 		/* Execution de la tache de lecture */
 		erreur_acq = LectExec(NUMER_MODE_ACQUIS);
 
+#ifdef WXWIDGETS
+		return 0;
+#endif
 		/* Remise en etat des affichages */
 		if(OpiumDisplayed(bLecture)) doit_terminer = OpiumRefreshBegin(bLecture); else doit_terminer = 0;
 		MenuItemAllume(mLectDemarrage,1,L_("Demarrer"),GRF_RGB_YELLOW);
@@ -9715,6 +9771,7 @@ static char LectDelaiEcoule() {
 }
 /* ========================================================================== */
 int LectDemarre() {
+
 #ifdef MSGS_RESEAU
 	if(SambaMode == SAMBA_DISTANT) {
 		CarlaMsgBegin("Demarrer"); CarlaMsgEnd(&BalSuperviseur);
