@@ -7991,7 +7991,7 @@ relance:
 		pthread_t lectexec_thread;
 		int t = pthread_create(&lectexec_thread, NULL, LectExecThread, 
 			(void *) entretien_bolo,
-			(void *) syncehroD2traitees);
+			(void *) synchroD2traitees);
 		return;
 #else
 		LectExecThread();
