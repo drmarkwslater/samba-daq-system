@@ -12,6 +12,7 @@ SambaApp *theApp{nullptr};
 struct Cadre *cdr_initial{nullptr};
 bool samba_running{false};
 bool in_paint_event{false};
+int last_evt_ret_code{0};
 
 void InitWxWidgetsApp(int *scr_width, int *scr_height)
 {
@@ -43,7 +44,8 @@ void GetFontInfo(short *width, short *ascent, short *descent, short *leading)
 
 struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int height)
 {
-    return theApp->WndCreate(x, y, width, height);
+    SambaWnd *w = theApp->WndCreate(x, y, width, height);
+    return w;
 }
 
 void WndTitleWx(struct SambaWnd *w, char *title)
@@ -64,7 +66,6 @@ void WndDrawStringWx(struct SambaWnd *w, int x, int y, char *text, unsigned shor
                     unsigned short br, unsigned short bg, unsigned short bb, char draw_bg )
 {
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
-    //std::cout << text << "  "  << fr << " " << fg << " "  << fg << std::endl;
     dc->SetTextForeground(wxColour{(unsigned char)(255 * fr/65535), (unsigned char)(255 * fg/65535), (unsigned char)(255 * fb/65535)});
     dc->SetTextBackground(wxColour{(unsigned char)(255 * br/65535), (unsigned char)(255 * bg/65535), (unsigned char)(255 * bb/65535)});
     if (draw_bg)
@@ -92,9 +93,29 @@ void WndDrawLineWx(struct SambaWnd *w, int x0, int y0, int x1, int y1, short r, 
     dc->DrawLine(x0, y0, x1, y1);
 }
 
+void WndDrawPolyWx(struct SambaWnd *w, int *x, int *y, int num, short r, short g, short b)
+{
+    std::unique_ptr<wxDC> dc = MakeDCPtr(w);
+    dc->SetBrush(wxBrush{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}});
+    dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}}));
+
+    wxPoint points[1000];
+    for (int i = 0; i < num; i++)
+    {
+        points[i].x = x[i];
+        points[i].y = y[i];
+    }
+    dc->DrawLines(num, points);
+}
+
 void WndMoveWx(struct SambaWnd *w, int x, int y)
 {
     w->Move(x, y);
+}
+
+void WndResizeWx(struct SambaWnd *w, int h, int v)
+{
+    w->SetSize(w->GetPosition().x, w->GetPosition().y, h, v);
 }
 
 void WndClearWx(struct SambaWnd *w)
@@ -107,20 +128,38 @@ void WndShowTheTopWx(struct SambaWnd *w)
     w->Raise();
     w->SetFocus();
 }
-void OpiumExecWx(struct Cadre *cdr)
+int OpiumExecWx(struct Cadre *cdr, SambaWnd *w)
 {
-    cdr_initial = cdr;
-    samba_running = true;
-    wxTheApp->OnRun();
-    wxTheApp->OnExit();
-    wxEntryCleanup();
+    if (samba_running)
+    {
+        // called for a modal dialog
+        w->Show( false );
+        w->ShowModal();
+        return last_evt_ret_code;
+    } else {
+        // called for main running
+        cdr_initial = cdr;
+        samba_running = true;
+        wxTheApp->OnRun();
+        wxTheApp->OnExit();
+        wxEntryCleanup();
+    }
+
+    return 0;
+}
+
+void OpiumRefreshAllWindows()
+{
+    theApp->UpdateAllWindows();
 }
 
 void WndEventNewWx(SambaWnd *w, SambaEventWx type, int x, int y, int h, int v)
 {
     if (!samba_running)
         return;
-    OpiumManageWx(cdr_initial, w, type, x, y, h, v);
+    last_evt_ret_code = OpiumManageWx(cdr_initial, w, type, x, y, h, v);
+    if (type == SMBWX_MOUSE_LEFT_UP)
+        theApp->UpdateAllWindows();
 }
 
 struct wxCursor *WndCreateStdCursorWx()

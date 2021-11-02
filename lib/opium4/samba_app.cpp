@@ -15,8 +15,16 @@ SambaWnd *SambaApp::WndCreate(int x, int y, unsigned int width, unsigned int hei
     wnd->Show( true );
     wnd->SetClientSize(wxSize(width, height));
     
+    wndList_.push_back(wnd);
     return wnd;
 }
 
+void SambaApp::UpdateAllWindows()
+{
+    for (const auto &ptr : wndList_)
+    {
+        ptr->Refresh();
+    }
+}
 
 #endif

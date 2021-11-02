@@ -10,8 +10,13 @@
 
 class SambaApp: public wxApp
 {
+private:
+    std::vector<SambaWnd*> wndList_;
+
 public:
     virtual bool OnInit();
+    void StartRenderTimer();
+    void UpdateAllWindows();
 
     SambaWnd *WndCreate(int x, int y, unsigned int width, unsigned int height);
 };
