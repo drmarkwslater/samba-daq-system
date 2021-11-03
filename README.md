@@ -24,7 +24,7 @@ mv ~/Downloads/wxWidgets* ~/wxSamba/.
 tar -xvf wxWidgets*
 
 # change the below to the version of wxwidgets you have
-WXWIDGETS_HOME=`pwd`/wxWidgets-3.15
+WXWIDGETS_HOME=`pwd`/wxWidgets-3.1.5
 
 cd $WXWIDGETS_HOME
 ./configure
