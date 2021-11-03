@@ -26,6 +26,10 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
+#ifdef WXWIDGETS
+#include <pthread.h>
+#endif
+
 #ifdef AVEC_IP
 #include <sys/socket.h>
 #endif
@@ -7589,12 +7593,18 @@ static void LecTraiteFromIt() {
 #pragma mark ---- Commandes executives ----
 #define MAX_ERREURS 0
 
-void LectExecThread(void *entretien_bolo_ptr, void *synchroD2traitees_ptr)
+struct arg_struct {
+    int64 synchroD2traitees;
+    char entretien_bolo;
+};
+
+void LectExecThread(void *arguments)
 {
+	struct arg_struct *args = arguments;
 	int64 depuis_depile;
 	int bolo;
-	char entretien_bolo = (char) entretien_bolo_ptr;
-	int64 synchroD2traitees = (int64) synchroD2traitees_ptr;
+	char entretien_bolo = args->entretien_bolo;
+	int64 synchroD2traitees = args->synchroD2traitees;
 	int64 maintenant;
 	int avant = 0, secs;
 	char delai[DATE_MAX];
@@ -7986,15 +7996,19 @@ relance:
 		ip_avant = RepartIpOctetsLus;
 		LectDerniereNonVide = LectDepileTfin = LectT0Run;
 		/* TimerTrig(LectTaskReadout); pour une lecture des que possible */
+
+		struct arg_struct args;
+		args.synchroD2traitees = synchroD2traitees;
+		args.entretien_bolo = entretien_bolo;
+
 #ifdef WXWIDGETS
 		// Send off the thread for the actual DAQ
 		pthread_t lectexec_thread;
 		int t = pthread_create(&lectexec_thread, NULL, LectExecThread, 
-			(void *) entretien_bolo,
-			(void *) synchroD2traitees);
-		return;
+			(void*)&args);
+		return 0;
 #else
-		LectExecThread();
+		LectExecThread((void*)&args);
 #endif
 		if(SambaInfos) SambaInfos->en_cours = Acquis[AcquisLocale].etat.active;
 		if(LectErreur.code == LECT_ARRETE) LectRelancePrevue = 1; else
