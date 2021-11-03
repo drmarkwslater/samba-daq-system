@@ -14,6 +14,7 @@ public:
     SambaWnd(const wxString& title, const wxPoint& pos, const wxSize& size);
 
     bool isPainting();
+    void RequestUpdate();
 
 private:
     void OnSize(wxSizeEvent& event);
@@ -22,6 +23,7 @@ private:
     void OnMouseDown(wxMouseEvent& event);
     void OnMouseUp(wxMouseEvent& event);
     void OnFocus(wxFocusEvent& event);
+    void OnRequestUpdate(wxCommandEvent& event);
     wxDECLARE_EVENT_TABLE();
 
     bool is_painting{false};

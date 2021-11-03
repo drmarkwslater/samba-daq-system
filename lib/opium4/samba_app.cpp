@@ -23,7 +23,7 @@ void SambaApp::UpdateAllWindows()
 {
     for (const auto &ptr : wndList_)
     {
-        ptr->Refresh();
+        ptr->RequestUpdate();
     }
 }
 
