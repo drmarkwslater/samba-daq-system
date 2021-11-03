@@ -52,6 +52,7 @@ git clone https://gitlab.cern.ch/mslater/samba-daq-system.git
 * Running the following should then configure and build Samba using wxWidgets:
 ```
 mkdir samba-daq-system.build
+cd samba-daq-system.build
 cmake -D CMAKE_PREFIX_PATH=$WXWIDGETS_HOME -D WXWIDGETS=1 ../samba-daq-system
 make
 ```
