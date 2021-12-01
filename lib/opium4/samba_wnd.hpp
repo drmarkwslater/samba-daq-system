@@ -23,6 +23,7 @@ private:
     void OnMouseDown(wxMouseEvent& event);
     void OnMouseUp(wxMouseEvent& event);
     void OnFocus(wxFocusEvent& event);
+    void OnKeyChar(wxKeyEvent& event);
     void OnRequestUpdate(wxCommandEvent& event);
     wxDECLARE_EVENT_TABLE();
 

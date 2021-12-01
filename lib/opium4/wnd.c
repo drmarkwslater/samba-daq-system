@@ -1871,10 +1871,7 @@ static char WndUnstack(WndFrame f) {
 }
 /* ========================================================================== */
 void WndRaise(WndFrame f) {
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
+
 #ifdef X11
 	WndScreen d;
 #endif
@@ -1891,6 +1888,9 @@ void WndRaise(WndFrame f) {
 	if(!(w = f->w)) return;
 #ifdef OPENGL
 	if(!WndCodeHtml) glfwShowWindow(w);
+#endif
+#ifdef WXWIDGETS
+	if(!WndCodeHtml) WndShowTheTopWx(w);
 #endif
 #ifdef X11
 	d = (f->s)->d;

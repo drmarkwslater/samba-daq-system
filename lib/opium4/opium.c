@@ -1803,6 +1803,14 @@ int OpiumManageWx(Cadre *cdr, struct SambaWnd *w, char type, int x, int y, int h
 		case 4: //SMBWX_FOCUS
 			u.type = WND_IN_USE;
 			break;
+
+	        case 5: //SMBWX_KEY
+			u.type = WND_KEY;
+			u.x = u.y = 0;
+			u.h = u.v = 0;
+			u.texte[0] = x;
+			u.texte[1] = '\0';
+			break;
 	}
 
 	int cdr_ouverts = 0;

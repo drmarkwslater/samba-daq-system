@@ -14,6 +14,7 @@ wxBEGIN_EVENT_TABLE(SambaWnd, wxDialog)
     EVT_LEFT_DOWN(SambaWnd::OnMouseDown)
     EVT_LEFT_UP(SambaWnd::OnMouseUp)
     EVT_SET_FOCUS(SambaWnd::OnFocus)
+    EVT_CHAR_HOOK(SambaWnd::OnKeyChar)
     EVT_COMMAND(wxID_ANY, REQUEST_UPDATE, SambaWnd::OnRequestUpdate)
 wxEND_EVENT_TABLE()
 
@@ -23,6 +24,10 @@ SambaWnd::SambaWnd(const wxString& title, const wxPoint& pos, const wxSize& size
         : wxDialog(NULL, wxID_ANY, title, pos, size)
 {
     SetBackgroundStyle(wxBG_STYLE_CUSTOM);
+
+    // create a tiny panel to make sure Key events are captured
+    // Should probably draw to this instead of the raw window
+    wxPanel* mainPane = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(1, 1), wxWANTS_CHARS);
 }
 
 void SambaWnd::OnSize(wxSizeEvent& /*event*/)
@@ -59,6 +64,11 @@ void SambaWnd::OnMouseUp(wxMouseEvent& event)
 void SambaWnd::OnFocus(wxFocusEvent& /*event*/)
 {
     WndEventNewWx(this, SMBWX_FOCUS, 0, 0, 0, 0);
+}
+
+void SambaWnd::OnKeyChar(wxKeyEvent& event)
+{
+    WndEventNewWx(this, SMBWX_KEY, event.GetKeyCode(), 0, 0, 0);
 }
 
 bool SambaWnd::isPainting()
