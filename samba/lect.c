@@ -7594,22 +7594,91 @@ static void LecTraiteFromIt() {
 #define MAX_ERREURS 0
 
 struct arg_struct {
-    int64 synchroD2traitees;
-    char entretien_bolo;
+    char boostee;
+    char it_demandees;
+    NUMER_MODE mode;
 };
 
-void LectExecThread(void *arguments)
+TypeADU LectExecThread(void *arguments)
 {
 	struct arg_struct *args = arguments;
+	int n,m;
 	int64 depuis_depile;
 	int bolo;
-	char entretien_bolo = args->entretien_bolo;
-	int64 synchroD2traitees = args->synchroD2traitees;
+	char entretien_bolo;
+ 	int64 synchroD2traitees;
 	int64 maintenant;
 	int avant = 0, secs;
 	char delai[DATE_MAX];
 	char pair = 0;
 	int loop_num = 0;
+	TypeADU erreur_acq;
+	char ok;
+	char it_demandees = args->it_demandees;
+	char boostee = args->boostee;
+	NUMER_MODE mode = args->mode;
+	int64 min_restart, ip_avant;
+
+relance:
+	min_restart = 100; // 5000; // 5s
+	Acquis[AcquisLocale].etat.active = LectSynchro(mode);
+	if(SambaInfos) SambaInfos->en_cours = Acquis[AcquisLocale].etat.active;
+	if(!Acquis[AcquisLocale].etat.active) {
+		LectAutreSequence = 0;
+		return(LectMessageArret(_ORIGINE_,1,LECT_NFND));
+	}
+	Acquis[AcquisLocale].etat.status = SATELLITE_ACTIF;
+	for(n=0; n<OscilloNb; n++) {
+		OscilloReglage[n]->acq = Acquis[AcquisLocale].etat.active;
+		if(OscilloReglage[n]->iAcq) {
+			if(OpiumDisplayed((OscilloReglage[n]->iAcq)->cdr)) OpiumRefresh((OscilloReglage[n]->iAcq)->cdr);
+		}
+	}
+	// on rappelle que LectEntretien = (BolosAentretenir && SettingsDLUactive && SettingsDLUdetec); dans LectFixeMode()
+	entretien_bolo = (LectEntretien && (LectAcqLanceur == LECT_STD) && !LectModeSpectresAuto);
+//?	ReglagesEtatDemande = 1; if(OpiumDisplayed(iReglagesEtatRun->cdr)) OpiumRefresh(iReglagesEtatRun->cdr);
+//-	printf("%s/ Debut a T0 = %20lld us\n",DateHeure(),LectT0Run);
+
+/*
+ * Suite de la FIFO: cas de la lecture en parallele
+ * ------------------------------------------------
+ */
+#ifdef DEBUG_DEPILE
+	LectDepileStockes = 0;
+#endif
+	avant = 0; pair = 0;
+	if(boostee) {
+		MonitEvtValeurs(-1);
+		synchroD2traitees = 0;
+		LectDeclencheErreur(_ORIGINE_,0,0); 
+		LectErreur.nom[0] = '\0';
+		LectErreursNb = 0;
+		LectDepileEnCours = 0;
+		LectTrmtEnCours = 0;
+		LectDepileDuree = 0;
+		LectDepileIntervMax = 0;
+		LectEntreDepile = (int64)SettingsReadoutPeriod * 10000;
+		LectDelaisTropCourt = LectDelaisTropLong = 0;
+		RepartDataErreurs = 0;
+		RepartIpErreurs = 0;
+		LectEpisodeAgite = 0;
+		LectRelancePrevue = 0;
+	#ifndef ACCES_PCI_DIRECT
+		printf("%s/ Lecture demarree, tolerance: %g ms\n",DateHeure(),(float)LectEntreDepile/1000.0); // LectEntreDepile: int64 ms
+	#endif
+//1		if(mode == NUMER_MODE_ACQUIS) MenuItemAllume(mLectDemarrage,1,"Stopper ",GRF_RGB_GREEN);
+//1		else MenuItemAllume(mLectDemarrage,1,"Stopper ",GRF_RGB_RED);
+//2		if(mode == NUMER_MODE_ACQUIS) MenuItemAllume(mLectArret,1,"Stopper ",GRF_RGB_YELLOW);
+//2		else MenuItemAllume(mLectArret,1,"Stopper ",GRF_RGB_RED);
+		LectDepileInhibe = 0;
+		LectDepileSousIt = it_demandees;
+		LectTrmtSousIt = 0; // it_demandees;
+		if(SambaPartage) SambaPartage->nb_depile = 0;
+		LectDansTraiteStocke = LectDansDisplay = LectDansActionUtilisateur = 0;
+		ip_avant = RepartIpOctetsLus;
+		LectDerniereNonVide = LectDepileTfin = LectT0Run;
+		/* TimerTrig(LectTaskReadout); pour une lecture des que possible */
+
 
 	while(Acquis[AcquisLocale].etat.active) {
 		if(LectDepileSousIt) {
@@ -7795,6 +7864,121 @@ void LectExecThread(void *arguments)
 		}
 		if(SambaInfos && !SambaInfos->en_cours) LectStop();
 	}
+		if(SambaInfos) SambaInfos->en_cours = Acquis[AcquisLocale].etat.active;
+		if(LectErreur.code == LECT_ARRETE) LectRelancePrevue = 1; else
+		LectRelancePrevue = (Archive.enservice
+			&& (((unsigned short)LectErreur.code == LECT_UNEXPEC)
+			||  ((unsigned short)LectErreur.code == CLUZEL_MARQUE_ECHANT)
+			||  ((unsigned short)LectErreur.code == CLUZEL_MARQUE_NEANT) 
+			||  ((unsigned short)LectErreur.code == LECT_SYNC) 
+			||  ((unsigned short)LectErreur.code == LECT_EMPTY) 
+			||  ((unsigned short)LectErreur.code == LECT_ARRETE) 
+			||  ((unsigned short)LectErreur.code == LECT_TOOMUCH) 
+			||  ((unsigned short)LectErreur.code == LECT_OVERFLO)) 
+			&& (SynchroD2lues > min_restart));
+		erreur_acq = LectMessageArret(_DECLENCHE_);
+		if(LectErreur.code == LECT_PREVU) {
+			DateLongPrint(delai,LectRetard.stop.date);
+			printf("%s/ L'arret etait programme pour le %s\n",DateHeure(),delai);
+		} else if(LectErreur.code) {
+			if(LectEnCours.rep >= 0) printf("%s! Arret de type %04X au mot #%d/%d: %08X\n",DateHeure(),(unsigned short)LectErreur.code,Repart[LectEnCours.rep].bottom,Repart[LectEnCours.rep].top,LectEnCours.valeur);
+			else printf("%s! Arret de type %04X a la donnee #%d: %08X\n",DateHeure(),(unsigned short)LectErreur.code,LectEnCours.echantillon,LectEnCours.valeur);
+			if(!LectSurFichier && PCIdemande) {
+				/* CluzelEnvoieCommande(PCIedw[PCInum].port,CLUZEL_SSAD_IDENT,0x0F,CLUZEL_STOP,CLUZEL_IMMEDIAT); pour trigger l'analyseur */
+				printf("%s/ La pile a ete vue %d fois demi-pleine et %d fois pleine\n",DateHeure(),RepartPci.halffull,RepartPci.fullfull);
+			}
+			#ifdef DEBUG_FILL
+			if(LectErreur.code == LECT_INCOHER) printf("%s/ %lld valeurs non nulles et LectFill appele %lld fois\n",DateHeure(),LectNonNulLectFillNb);
+			#endif
+			if(LectErreur.code == LECT_ARRETE) {
+				int rep; char buffer[80];
+				for(rep=0; rep<RepartNb; rep++) if(Repart[rep].actif && (Repart[rep].top == Repart[rep].bottom)) {
+					printf("%s!!! %s arrete, ",DateHeure(),Repart[rep].nom);
+					/* option: tester si ping, l'UDP sera relance par Depile */
+					sprintf(buffer,COMMANDE_PING,IP_CHAMPS(Repart[rep].adrs));
+					if(system(buffer) != 0) {
+						printf(" et l'adresse %d.%d.%d.%d:%d ne repond plus.\n",IP_CHAMPS(Repart[rep].adrs),Repart[rep].ecr.port);
+						LectRelancePrevue = 0;
+					} else printf(" mais'adresse %d.%d.%d.%d:%d repond toujours.\n",IP_CHAMPS(Repart[rep].adrs),Repart[rep].ecr.port);
+				}
+			}
+		}
+#ifndef CODE_WARRIOR_VSN
+		gettimeofday(&LectDateRun,0);
+#endif
+		printf("%s/ Lecture des donnees terminee\n",DateHeure());
+		printf("%s/ Declenchement laisse %s\n",DateHeure(),(Trigger.actif)? "actif": "suspendu");
+		if(LectCntl.LectMode == LECT_IDENT) TrmtSurBuffer();
+		LectDepileInhibe = 0;
+		LectDepileSousIt = 0;
+		LectTrmtSousIt = 0;
+//		printf("%s/ Erreur %04X/%04X detectee\n",DateHeure(),LectErreur.code,CLUZEL_MARQUE_ECHANT);
+		if(LectRelancePrevue) {
+			int rep,attente,patiente; char opera_presente;
+			if((synchroD2traitees != SynchroD2lues) && !LectTrmtSousIt) LectTraiteStocke();
+			LectTexec += (VerifTempsPasse? (DateMicroSecs() - LectT0Run): 0);
+			LectTermineStocke(0,1);
+			LectJournalLaFin(erreur_acq,1,0);
+			n = Acquis[AcquisLocale].etat.evt_trouves;
+			m = LectEvtVus;
+			LectStampPrecedents += LectStampsLus;
+			opera_presente = 0;
+			for(rep=0; rep<RepartNb; rep++) {
+				if(Repart[rep].arrete) Repart[rep].actif = 1;
+				if(Repart[rep].actif && (Repart[rep].famille == FAMILLE_OPERA)) opera_presente = 1;
+			}
+			attente = (opera_presente && (LectErreur.code == LECT_ARRETE))? LectAttenteRebootOpera: LectAttenteErreur;
+			printf("%s! Relance #%d pour %s, dans %d secondes\n",DateHeure(),LectSession,LectSrceTexte,attente+LectAttenteErreur);
+			LectSession++; if(OpiumAlEcran(pReprises)) OpiumRefresh(pReprises->cdr);
+			if(attente) { patiente = attente; while(patiente--) { SambaMicrosec(1000000); OpiumUserAction(); } }
+			// faut voir: printf("%s/ Remise a zero de l'electronique\n",DateHeure()); SambaRepartRestart(0);
+			LogAddFile(RunJournal);
+			//? if(attente) { patiente = attente; while(patiente--) { SambaMicrosec(1000000); OpiumUserAction(); } }
+			LectFixeMode(LECT_DONNEES,0);
+			ok = LectConstruitTampons(0);
+			if(ok) { LectRazPartiel(); ok = TrmtRAZ(0); /* LectBuffStatus(); */ }
+			if(ok) {
+				int fmt;
+				Acquis[AcquisLocale].etat.evt_trouves = n;
+				LectEvtVus = m;
+				ArchiveDefini(log);
+				for(fmt=0; fmt<ARCH_TYPEDATA; fmt++) ArchTrancheReste[fmt] = -1;
+				LectTimeStamp0 = LectTimeStampN = 0;
+				LectJournalDemarrage();
+				goto relance;
+			}
+		}
+
+		for(n=0; n<OscilloNb; n++) {
+			OscilloReglage[n]->acq = Acquis[AcquisLocale].etat.active;
+			if(OscilloReglage[n]->iAcq) {
+				if(OpiumDisplayed((OscilloReglage[n]->iAcq)->cdr)) OpiumRefresh((OscilloReglage[n]->iAcq)->cdr);
+			}
+		}
+		ReglagesEtatDemande = 0; if(OpiumDisplayed(iReglagesEtatRun->cdr)) OpiumRefresh(iReglagesEtatRun->cdr);
+		NumeriseurEtatDemande = 0; if(OpiumDisplayed(bNumeriseurEtat)) OpiumRefresh(bNumeriseurEtat);
+		// if(OpiumDisplayed(iNumeriseurEtatMaj->cdr)) OpiumRefresh(iNumeriseurEtatMaj->cdr);
+		LectModeStatus = 0; ReglagesEtatPeutStopper = NumeriseurEtatPeutStopper = NumeriseurPeutStopper = 0;
+		// if(LectSurFichier) LectArchRewind(); else 
+		if(LectErreur.code) { LectAutreSequence = 0; if(SettingsSecuPolar) LectRegenLance(0); }
+#ifndef CODE_WARRIOR_VSN
+		gettimeofday(&LectDateRun,0);
+#endif
+		if(LectArretePoliment && LectStoppeRepart) RepartiteursInitTous(REPART_STOPPE,Echantillonnage,0);
+		if(OpiumAlEcran(pRepartXmit)) PanelRefreshVars(pRepartXmit);
+		LectTexec += (VerifTempsPasse? (DateMicroSecs() - LectT0Run): 0);
+		if(LectAutreSequence) return(0); else return(erreur_acq);
+
+	} else {
+	/*
+	 * Suite de la FIFO: cas de la lecture en serie
+	 * --------------------------------------------
+	 */
+		OpiumFail("La lecture en serie n'est plus programmee");
+		return(LectMessageArret(_ORIGINE_,7,LECT_NFND));
+	}
+
+	
 }
 
 static TypeADU LectExec(NUMER_MODE mode) {
@@ -7937,69 +8121,10 @@ static TypeADU LectExec(NUMER_MODE mode) {
  * Depart sur une synchro (D2 ou D3)
  * ---------------------------------
  */
-relance:
-	min_restart = 100; // 5000; // 5s
-	Acquis[AcquisLocale].etat.active = LectSynchro(mode);
-	if(SambaInfos) SambaInfos->en_cours = Acquis[AcquisLocale].etat.active;
-	if(!Acquis[AcquisLocale].etat.active) {
-		LectAutreSequence = 0;
-		return(LectMessageArret(_ORIGINE_,1,LECT_NFND));
-	}
-	Acquis[AcquisLocale].etat.status = SATELLITE_ACTIF;
-	for(n=0; n<OscilloNb; n++) {
-		OscilloReglage[n]->acq = Acquis[AcquisLocale].etat.active;
-		if(OscilloReglage[n]->iAcq) {
-			if(OpiumDisplayed((OscilloReglage[n]->iAcq)->cdr)) OpiumRefresh((OscilloReglage[n]->iAcq)->cdr);
-		}
-	}
-	// on rappelle que LectEntretien = (BolosAentretenir && SettingsDLUactive && SettingsDLUdetec); dans LectFixeMode()
-	entretien_bolo = (LectEntretien && (LectAcqLanceur == LECT_STD) && !LectModeSpectresAuto);
-//?	ReglagesEtatDemande = 1; if(OpiumDisplayed(iReglagesEtatRun->cdr)) OpiumRefresh(iReglagesEtatRun->cdr);
-//-	printf("%s/ Debut a T0 = %20lld us\n",DateHeure(),LectT0Run);
-
-/*
- * Suite de la FIFO: cas de la lecture en parallele
- * ------------------------------------------------
- */
-#ifdef DEBUG_DEPILE
-	LectDepileStockes = 0;
-#endif
-	avant = 0; pair = 0;
-	if(boostee) {
-		MonitEvtValeurs(-1);
-		synchroD2traitees = 0;
-		LectDeclencheErreur(_ORIGINE_,0,0); 
-		LectErreur.nom[0] = '\0';
-		LectErreursNb = 0;
-		LectDepileEnCours = 0;
-		LectTrmtEnCours = 0;
-		LectDepileDuree = 0;
-		LectDepileIntervMax = 0;
-		LectEntreDepile = (int64)SettingsReadoutPeriod * 10000;
-		LectDelaisTropCourt = LectDelaisTropLong = 0;
-		RepartDataErreurs = 0;
-		RepartIpErreurs = 0;
-		LectEpisodeAgite = 0;
-		LectRelancePrevue = 0;
-	#ifndef ACCES_PCI_DIRECT
-		printf("%s/ Lecture demarree, tolerance: %g ms\n",DateHeure(),(float)LectEntreDepile/1000.0); // LectEntreDepile: int64 ms
-	#endif
-//1		if(mode == NUMER_MODE_ACQUIS) MenuItemAllume(mLectDemarrage,1,"Stopper ",GRF_RGB_GREEN);
-//1		else MenuItemAllume(mLectDemarrage,1,"Stopper ",GRF_RGB_RED);
-//2		if(mode == NUMER_MODE_ACQUIS) MenuItemAllume(mLectArret,1,"Stopper ",GRF_RGB_YELLOW);
-//2		else MenuItemAllume(mLectArret,1,"Stopper ",GRF_RGB_RED);
-		LectDepileInhibe = 0;
-		LectDepileSousIt = it_demandees;
-		LectTrmtSousIt = 0; // it_demandees;
-		if(SambaPartage) SambaPartage->nb_depile = 0;
-		LectDansTraiteStocke = LectDansDisplay = LectDansActionUtilisateur = 0;
-		ip_avant = RepartIpOctetsLus;
-		LectDerniereNonVide = LectDepileTfin = LectT0Run;
-		/* TimerTrig(LectTaskReadout); pour une lecture des que possible */
-
 		struct arg_struct args;
-		args.synchroD2traitees = synchroD2traitees;
-		args.entretien_bolo = entretien_bolo;
+		args.boostee = boostee;
+		args.it_demandees = it_demandees;
+		args.mode = mode;
 
 #ifdef WXWIDGETS
 		// Send off the thread for the actual DAQ
@@ -8008,121 +8133,8 @@ relance:
 			(void*)&args);
 		return 0;
 #else
-		LectExecThread((void*)&args);
+		return LectExecThread((void*)&args);
 #endif
-		if(SambaInfos) SambaInfos->en_cours = Acquis[AcquisLocale].etat.active;
-		if(LectErreur.code == LECT_ARRETE) LectRelancePrevue = 1; else
-		LectRelancePrevue = (Archive.enservice
-			&& (((unsigned short)LectErreur.code == LECT_UNEXPEC)
-			||  ((unsigned short)LectErreur.code == CLUZEL_MARQUE_ECHANT)
-			||  ((unsigned short)LectErreur.code == CLUZEL_MARQUE_NEANT) 
-			||  ((unsigned short)LectErreur.code == LECT_SYNC) 
-			||  ((unsigned short)LectErreur.code == LECT_EMPTY) 
-			||  ((unsigned short)LectErreur.code == LECT_ARRETE) 
-			||  ((unsigned short)LectErreur.code == LECT_TOOMUCH) 
-			||  ((unsigned short)LectErreur.code == LECT_OVERFLO)) 
-			&& (SynchroD2lues > min_restart));
-		erreur_acq = LectMessageArret(_DECLENCHE_);
-		if(LectErreur.code == LECT_PREVU) {
-			DateLongPrint(delai,LectRetard.stop.date);
-			printf("%s/ L'arret etait programme pour le %s\n",DateHeure(),delai);
-		} else if(LectErreur.code) {
-			if(LectEnCours.rep >= 0) printf("%s! Arret de type %04X au mot #%d/%d: %08X\n",DateHeure(),(unsigned short)LectErreur.code,Repart[LectEnCours.rep].bottom,Repart[LectEnCours.rep].top,LectEnCours.valeur);
-			else printf("%s! Arret de type %04X a la donnee #%d: %08X\n",DateHeure(),(unsigned short)LectErreur.code,LectEnCours.echantillon,LectEnCours.valeur);
-			if(!LectSurFichier && PCIdemande) {
-				/* CluzelEnvoieCommande(PCIedw[PCInum].port,CLUZEL_SSAD_IDENT,0x0F,CLUZEL_STOP,CLUZEL_IMMEDIAT); pour trigger l'analyseur */
-				printf("%s/ La pile a ete vue %d fois demi-pleine et %d fois pleine\n",DateHeure(),RepartPci.halffull,RepartPci.fullfull);
-			}
-			#ifdef DEBUG_FILL
-			if(LectErreur.code == LECT_INCOHER) printf("%s/ %lld valeurs non nulles et LectFill appele %lld fois\n",DateHeure(),LectNonNulLectFillNb);
-			#endif
-			if(LectErreur.code == LECT_ARRETE) {
-				int rep; char buffer[80];
-				for(rep=0; rep<RepartNb; rep++) if(Repart[rep].actif && (Repart[rep].top == Repart[rep].bottom)) {
-					printf("%s!!! %s arrete, ",DateHeure(),Repart[rep].nom);
-					/* option: tester si ping, l'UDP sera relance par Depile */
-					sprintf(buffer,COMMANDE_PING,IP_CHAMPS(Repart[rep].adrs));
-					if(system(buffer) != 0) {
-						printf(" et l'adresse %d.%d.%d.%d:%d ne repond plus.\n",IP_CHAMPS(Repart[rep].adrs),Repart[rep].ecr.port);
-						LectRelancePrevue = 0;
-					} else printf(" mais'adresse %d.%d.%d.%d:%d repond toujours.\n",IP_CHAMPS(Repart[rep].adrs),Repart[rep].ecr.port);
-				}
-			}
-		}
-#ifndef CODE_WARRIOR_VSN
-		gettimeofday(&LectDateRun,0);
-#endif
-		printf("%s/ Lecture des donnees terminee\n",DateHeure());
-		printf("%s/ Declenchement laisse %s\n",DateHeure(),(Trigger.actif)? "actif": "suspendu");
-		if(LectCntl.LectMode == LECT_IDENT) TrmtSurBuffer();
-		LectDepileInhibe = 0;
-		LectDepileSousIt = 0;
-		LectTrmtSousIt = 0;
-//		printf("%s/ Erreur %04X/%04X detectee\n",DateHeure(),LectErreur.code,CLUZEL_MARQUE_ECHANT);
-		if(LectRelancePrevue) {
-			int rep,attente,patiente; char opera_presente;
-			if((synchroD2traitees != SynchroD2lues) && !LectTrmtSousIt) LectTraiteStocke();
-			LectTexec += (VerifTempsPasse? (DateMicroSecs() - LectT0Run): 0);
-			LectTermineStocke(0,1);
-			LectJournalLaFin(erreur_acq,1,0);
-			n = Acquis[AcquisLocale].etat.evt_trouves;
-			m = LectEvtVus;
-			LectStampPrecedents += LectStampsLus;
-			opera_presente = 0;
-			for(rep=0; rep<RepartNb; rep++) {
-				if(Repart[rep].arrete) Repart[rep].actif = 1;
-				if(Repart[rep].actif && (Repart[rep].famille == FAMILLE_OPERA)) opera_presente = 1;
-			}
-			attente = (opera_presente && (LectErreur.code == LECT_ARRETE))? LectAttenteRebootOpera: LectAttenteErreur;
-			printf("%s! Relance #%d pour %s, dans %d secondes\n",DateHeure(),LectSession,LectSrceTexte,attente+LectAttenteErreur);
-			LectSession++; if(OpiumAlEcran(pReprises)) OpiumRefresh(pReprises->cdr);
-			if(attente) { patiente = attente; while(patiente--) { SambaMicrosec(1000000); OpiumUserAction(); } }
-			// faut voir: printf("%s/ Remise a zero de l'electronique\n",DateHeure()); SambaRepartRestart(0);
-			LogAddFile(RunJournal);
-			//? if(attente) { patiente = attente; while(patiente--) { SambaMicrosec(1000000); OpiumUserAction(); } }
-			LectFixeMode(LECT_DONNEES,0);
-			ok = LectConstruitTampons(0);
-			if(ok) { LectRazPartiel(); ok = TrmtRAZ(0); /* LectBuffStatus(); */ }
-			if(ok) {
-				int fmt;
-				Acquis[AcquisLocale].etat.evt_trouves = n;
-				LectEvtVus = m;
-				ArchiveDefini(log);
-				for(fmt=0; fmt<ARCH_TYPEDATA; fmt++) ArchTrancheReste[fmt] = -1;
-				LectTimeStamp0 = LectTimeStampN = 0;
-				LectJournalDemarrage();
-				goto relance;
-			}
-		}
-
-		for(n=0; n<OscilloNb; n++) {
-			OscilloReglage[n]->acq = Acquis[AcquisLocale].etat.active;
-			if(OscilloReglage[n]->iAcq) {
-				if(OpiumDisplayed((OscilloReglage[n]->iAcq)->cdr)) OpiumRefresh((OscilloReglage[n]->iAcq)->cdr);
-			}
-		}
-		ReglagesEtatDemande = 0; if(OpiumDisplayed(iReglagesEtatRun->cdr)) OpiumRefresh(iReglagesEtatRun->cdr);
-		NumeriseurEtatDemande = 0; if(OpiumDisplayed(bNumeriseurEtat)) OpiumRefresh(bNumeriseurEtat);
-		// if(OpiumDisplayed(iNumeriseurEtatMaj->cdr)) OpiumRefresh(iNumeriseurEtatMaj->cdr);
-		LectModeStatus = 0; ReglagesEtatPeutStopper = NumeriseurEtatPeutStopper = NumeriseurPeutStopper = 0;
-		// if(LectSurFichier) LectArchRewind(); else 
-		if(LectErreur.code) { LectAutreSequence = 0; if(SettingsSecuPolar) LectRegenLance(0); }
-#ifndef CODE_WARRIOR_VSN
-		gettimeofday(&LectDateRun,0);
-#endif
-		if(LectArretePoliment && LectStoppeRepart) RepartiteursInitTous(REPART_STOPPE,Echantillonnage,0);
-		if(OpiumAlEcran(pRepartXmit)) PanelRefreshVars(pRepartXmit);
-		LectTexec += (VerifTempsPasse? (DateMicroSecs() - LectT0Run): 0);
-		if(LectAutreSequence) return(0); else return(erreur_acq);
-
-	} else {
-	/*
-	 * Suite de la FIFO: cas de la lecture en serie
-	 * --------------------------------------------
-	 */
-		OpiumFail("La lecture en serie n'est plus programmee");
-		return(LectMessageArret(_ORIGINE_,7,LECT_NFND));
-	}
 }
 /* /docFuncEnd */
 /* ========================================================================== */
