@@ -108,6 +108,16 @@ void WndDrawPolyWx(struct SambaWnd *w, int *x, int *y, int num, short r, short g
     dc->DrawLines(num, points);
 }
 
+void WndDrawArcWx(struct SambaWnd *w, int x, int y, int width, int height, int start, int stop, short r, short g, short b)
+{
+    std::unique_ptr<wxDC> dc = MakeDCPtr(w);
+    dc->SetBrush(*wxTRANSPARENT_BRUSH);
+    dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}}));
+
+    dc->DrawEllipticArc(x, y, width, height, start, stop);
+}
+
+
 void WndMoveWx(struct SambaWnd *w, int x, int y)
 {
     w->Move(x, y);

@@ -28,6 +28,7 @@
 
 #ifdef WXWIDGETS
 #include <pthread.h>
+void OpiumRefreshAllWindows();
 #endif
 
 #ifdef AVEC_IP
@@ -2677,7 +2678,7 @@ static char LectSynchro(NUMER_MODE mode) {
 				nb_fifos++;
 			} else if(repart->interf == INTERF_IP) { nb_val_ip += repart->nbdonnees; IPdemande = 1; IPactifs++; nb_fifos++; }
 		}
-	#ifdef macintosh
+		//#ifdef macintosh
 		dim = FifoIP / sizeof(TypeADU);
 		if(nb_val_ip) {
 			v = (float)(dim / nb_val_ip) / Echantillonnage;
@@ -2685,7 +2686,7 @@ static char LectSynchro(NUMER_MODE mode) {
 				Accord1s(dim),v,100.0*(float)SettingsReadoutPeriod/v);
 			FifoTotale += dim;
 		} else if(LectureLog) printf("           %s FIFO IP%s, %8d valeur%s\n",PCIdemande? " .":"",(nb_fifos > 1)?"  ":"",Accord1s(dim));
-	#endif
+		//#endif
 		if((nb_fifos > 1) && LectureLog) printf("          FIFO totale: %8d valeurs\n",FifoTotale);
 		if(IPdemande) {
 			LectUdpStatus(&LectUdpRecues,&LectUdpErr,&LectUdpOvr);
@@ -3920,7 +3921,13 @@ void LectDisplay() {
 			}
 			if(OpiumAlEcran(oscillo->h.graph)) {
 				GraphAxisReset(oscillo->h.graph,GRF_YAXIS);
+#ifndef WXWIDGETS
 				OpiumRefresh((oscillo->h.graph)->cdr);
+#else
+				// Only tell the windows to refresh rather than actually calling graphics commands
+				OpiumRefreshAllWindows();
+#endif
+
 			}
 			if(VoieManip[voie].def.trmt[TRMT_AU_VOL].gain == 0) VoieManip[voie].def.trmt[TRMT_AU_VOL].gain = 1;
 			position = Modulo(debut,VoieTampon[voie].brutes->max);

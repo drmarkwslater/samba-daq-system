@@ -419,6 +419,10 @@ static int ReglagePlancheCree(int voie);
 static void ReglagePlancheSupprime(int voie);
 static void ReglageDeLaVoie(int bolo, int cap, char avec_trigger);
 
+#ifdef WXWIDGETS
+void OpiumRefreshAllWindows();
+#endif
+
 /* ========================================================================== */
 #ifdef OPIUM_TEST_SELECTEUR
 static char DetecteurParmsC1,DetecteurParmsC2,DetecteurParmsC3,DetecteurParmsC4;
@@ -6549,7 +6553,12 @@ void OscilloCourbesTrace(Oscillo oscillo, int64 debut, int recul) {
 	} // else GraphDataUse(oscillo->ecran,oscillo->marque,0);
 	GraphAxisReset(oscillo->ecran,GRF_XAXIS);
 
+#ifndef WXWIDGETS
 	OpiumRefresh((oscillo->ecran)->cdr);
+#else
+	// Only tell the windows to refresh rather than actually calling graphics commands
+	OpiumRefreshAllWindows();
+#endif
 }
 /* ========================================================================== */
 int OscilloRefresh(Instrum instrum, Oscillo oscillo) {

@@ -28,6 +28,7 @@ EXTERNC void WndDrawStringWx(struct SambaWnd *w, int x, int y, char *text, unsig
 EXTERNC void WndDrawRectWx(struct SambaWnd *w, int x, int y, int width, int height, unsigned short r, unsigned short g, unsigned short b);
 EXTERNC void WndDrawLineWx(struct SambaWnd *w, int x0, int y0, int x1, int y1, short r, short g, short b);
 EXTERNC void WndDrawPolyWx(struct SambaWnd *w, int *x, int *y, int num, short r, short g, short b);
+EXTERNC void WndDrawArcWx(struct SambaWnd *w, int x, int y, int width, int height, int start, int stop, short r, short g, short b);
 EXTERNC void WndMoveWx(struct SambaWnd *w, int x, int y);
 EXTERNC void WndResizeWx(struct SambaWnd *w, int h, int v);
 EXTERNC void WndClearWx(struct SambaWnd *w);

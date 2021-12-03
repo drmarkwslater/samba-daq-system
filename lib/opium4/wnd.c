@@ -4776,10 +4776,6 @@ void WndArc(WndFrame f, WndContextPtr gc, int x, int y, int l, int h,
 	if(WndModeNone) return;
 	w = f->w; s = f->s;
 	if(gc == 0) gc = WND_TEXT;
-#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
 #ifdef OPENGL
 	int sizx,sizy; char doit_terminer;
 	int i,pts_tot,pts_nb; double alpha,delta,fin;
@@ -4808,6 +4804,23 @@ void WndArc(WndFrame f, WndContextPtr gc, int x, int y, int l, int h,
 	}
 	glEnd(); glFlush();
 	if(doit_terminer) WndRefreshEnd(f);
+#endif
+
+#ifdef WXWIDGETS
+	int b0,db;
+	b0 = (90 - a0);
+	db = -da;
+	unsigned short fr = 65535;
+	unsigned short fg = 65535;
+	unsigned short fb = 65535;
+	if(gc) {
+		if(gc->foreground) {
+			fr = gc->foreground->red;
+			fg = gc->foreground->green;
+			fb = gc->foreground->blue;
+		}
+	}
+	WndDrawArcWx(f->w, f->x0 + x, f->y0 + y, l, h, b0, db, fr, fg, fb);
 #endif
 
 #ifdef X11
