@@ -15,19 +15,25 @@ wxBEGIN_EVENT_TABLE(SambaWnd, wxDialog)
     EVT_LEFT_UP(SambaWnd::OnMouseUp)
     EVT_SET_FOCUS(SambaWnd::OnFocus)
     EVT_CHAR_HOOK(SambaWnd::OnKeyChar)
+    EVT_TIMER(1, SambaWnd::OnTimer)
     EVT_COMMAND(wxID_ANY, REQUEST_UPDATE, SambaWnd::OnRequestUpdate)
 wxEND_EVENT_TABLE()
 
 void WndEventNewWx(struct SambaWnd *w, enum SambaEventWx type, int x, int y, int h, int v);
 
 SambaWnd::SambaWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
-        : wxDialog(NULL, wxID_ANY, title, pos, size)
+        : wxDialog(NULL, wxID_ANY, title, pos, size), timer_(this, 1)
 {
     SetBackgroundStyle(wxBG_STYLE_CUSTOM);
 
     // create a tiny panel to make sure Key events are captured
     // Should probably draw to this instead of the raw window
     wxPanel* mainPane = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(1, 1), wxWANTS_CHARS);
+}
+
+void SambaWnd::OnTimer(wxTimerEvent& /*event*/)
+{
+    WndEventNewWx(this, SMBWX_MOUSE_LEFT_DOWN, mousePos_.x, mousePos_.y, 0, 0);
 }
 
 void SambaWnd::OnSize(wxSizeEvent& /*event*/)
@@ -53,11 +59,18 @@ void SambaWnd::OnPaint(wxPaintEvent& /*event*/)
 
 void SambaWnd::OnMouseDown(wxMouseEvent& event)
 {
-    WndEventNewWx(this, SMBWX_MOUSE_LEFT_DOWN, event.GetX(), event.GetY(), 0, 0);
+    timer_.StartOnce(300);
+    mousePos_.x = event.GetX();
+    mousePos_.y = event.GetY();
 }
 
 void SambaWnd::OnMouseUp(wxMouseEvent& event)
 {
+    if (timer_.IsRunning())
+    {
+        timer_.Stop();
+    }
+
     WndEventNewWx(this, SMBWX_MOUSE_LEFT_UP, event.GetX(), event.GetY(), 0, 0);
 }
 
