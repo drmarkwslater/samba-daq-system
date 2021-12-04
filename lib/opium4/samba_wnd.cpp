@@ -57,11 +57,18 @@ void SambaWnd::OnPaint(wxPaintEvent& /*event*/)
     is_painting = false;
 }
 
+void SambaWnd::IgnoreNextMouseRelease()
+{
+    ignoreMouseRelease_ = true;
+}
+
 void SambaWnd::OnMouseDown(wxMouseEvent& event)
 {
     timer_.StartOnce(300);
     mousePos_.x = event.GetX();
     mousePos_.y = event.GetY();
+
+    ignoreMouseRelease_ = false;
 }
 
 void SambaWnd::OnMouseUp(wxMouseEvent& event)
@@ -69,6 +76,12 @@ void SambaWnd::OnMouseUp(wxMouseEvent& event)
     if (timer_.IsRunning())
     {
         timer_.Stop();
+    }
+
+    if (ignoreMouseRelease_)
+    {
+        ignoreMouseRelease_ = false;
+        return;
     }
 
     WndEventNewWx(this, SMBWX_MOUSE_LEFT_UP, event.GetX(), event.GetY(), 0, 0);

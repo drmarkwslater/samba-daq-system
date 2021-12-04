@@ -6,6 +6,7 @@
 #include <memory>
 
 #include <iostream>
+#include <execinfo.h>
 
 wxFont *theFont{nullptr};
 SambaApp *theApp{nullptr};
@@ -13,6 +14,7 @@ struct Cadre *cdr_initial{nullptr};
 bool samba_running{false};
 bool in_paint_event{false};
 int last_evt_ret_code{0};
+SambaWnd *mouse_click_window{nullptr};
 
 void InitWxWidgetsApp(int *scr_width, int *scr_height)
 {
@@ -45,6 +47,12 @@ void GetFontInfo(short *width, short *ascent, short *descent, short *leading)
 struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int height)
 {
     SambaWnd *w = theApp->WndCreate(x, y, width, height);
+
+    if (mouse_click_window)
+    {
+        mouse_click_window->IgnoreNextMouseRelease();
+    }
+
     return w;
 }
 
@@ -165,8 +173,14 @@ void OpiumRefreshAllWindows()
 
 void WndEventNewWx(SambaWnd *w, SambaEventWx type, int x, int y, int h, int v)
 {
+    if (type == SMBWX_MOUSE_LEFT_DOWN)
+    {
+        mouse_click_window = w;
+    }
+
     if (!samba_running)
         return;
+
     last_evt_ret_code = OpiumManageWx(cdr_initial, w, type, x, y, h, v);
     if (type == SMBWX_MOUSE_LEFT_UP)
         theApp->UpdateAllWindows();

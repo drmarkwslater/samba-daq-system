@@ -16,6 +16,7 @@ public:
     bool isPainting();
     void RequestUpdate();
     void OnTimer(wxTimerEvent& event);
+    void IgnoreNextMouseRelease();
 
 private:
     void OnSize(wxSizeEvent& event);
@@ -31,6 +32,7 @@ private:
     bool is_painting{false};
     wxTimer timer_;
     wxPoint mousePos_;
+    bool ignoreMouseRelease_{false};
 };
 
 #endif
