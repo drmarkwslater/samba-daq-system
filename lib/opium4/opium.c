@@ -2266,6 +2266,9 @@ int OpiumManage(Cadre cdr_initial, WndUserRequest *u, int *cdr_ouverts) {
 			a_effacer = (code_rendu > 0);
 			break;
 		}
+#ifdef WXWIDGETS
+		OpiumRefreshAllWindows();
+#endif
 		if(DEBUG_OPIUM(1)) {
 //			WndPrint("(OpiumManage) Reference @%08X: %s %s, pointe @%08X: %s %s\n",
 //					 (hexa)cdr,cdr?OpiumCdrType[(int)cdr->type]:"(?)",cdr?cdr->nom:"(nul)",(hexa)pointe,pointe?OpiumCdrType[(int)pointe->type]:"(?)",pointe?pointe->nom:"(nul)");
