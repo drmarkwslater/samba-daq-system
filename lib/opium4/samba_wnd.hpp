@@ -7,6 +7,7 @@
 #endif
 
 #include <string>
+#include "opium_wx_interface.h"
 
 class SambaWnd: public wxDialog
 {
@@ -33,6 +34,7 @@ private:
     wxTimer timer_;
     wxPoint mousePos_;
     bool ignoreMouseRelease_{false};
+    SambaEventWx lastMouseButton_{SMBWX_MOUSE_LEFT_DOWN};
 };
 
 #endif

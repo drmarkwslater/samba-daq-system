@@ -1655,11 +1655,7 @@ void WndAssignCursor(WndFrame f, WndCursor curseur) {
 }
 /* ========================================================================== */
 void WndExtraInit(WndFrame f, int max) {
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
-#ifdef OPENGL
+#if defined(OPENGL) || defined(WXWIDGETS)
 	if(max >= 0) {
 		if(f->extras) {
 			if((f->extra_max < max) || (max == 0)) {
@@ -1686,11 +1682,7 @@ static void WndExtraExec(WndFrame f, char action, WndContextPtr gc, int i, int j
 }
 /* ========================================================================== */
 void WndExtraAdd(WndFrame f, char action, WndContextPtr gc, int i, int j, int k, int l, void *info) {
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
-#ifdef OPENGL
+#if defined(OPENGL) || defined(WXWIDGETS)
 	if(!(f->extras)) return;
 	if(f->extra_nb >= f->extra_max) return;
 	f->extras[f->extra_nb].gc = gc;

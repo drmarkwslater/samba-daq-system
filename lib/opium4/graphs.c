@@ -24,6 +24,9 @@
 
 #include <environnement.h>
 
+#ifdef WXWIDGETS
+void OpiumRefreshAllWindows();
+#endif
 
 #include <decode.h>
 #include <dateheure.h>
@@ -2544,14 +2547,19 @@ int OpiumRunGraph(Cadre cdr, WndUserRequest *e) {
 		WndPrint("(%s) Mse%s en (%d, %d) + (%d, %d)\n",__func__,
 			(e->code == WND_MSERIGHT)?"Right":"Left",e->x,e->y,cdr->dx,cdr->dy);
 		if(!GraphClicEgale(clic,graph->mouse)) {
+#ifdef WXWIDGETS
+		        OpiumRefreshAllWindows();
+#else
 			OpiumRefreshAgain(cdr);
+#endif
 			if(DEBUG_GRAPH(3)) WndPrint("decalage: (%d, %d), evt: (%d, %d), cadre: (%d, %d)\n",
 				f->x0,f->y0,e->x,e->y,cdr->larg,cdr->haut);
 //-			graph->mouse[0] = e->x;
 //-			graph->mouse[1] = e->y;
 			GraphClicCopie(graph->mouse,clic);
 			// WndContextFgndRGB(f,gc,GRF_RGB_RED);
-#define CLASSIQUE
+// WxWidgets can't use direct drawing from an event call
+//#define CLASSIQUE
 		#ifdef CLASSIQUE
 			doit_terminer = WndRefreshBegin(f);
 			if(OpiumZoomEnCours) {
@@ -2638,6 +2646,14 @@ int OpiumRunGraph(Cadre cdr, WndUserRequest *e) {
 			if(doit_terminer) WndRefreshEnd(f);
 #else
 			WndExtraAdd(f,WND_ACTN_STRING,gc,px,e->y,0,0,graph->usermouse);
+			if(WndExtraNb(f)) {
+#ifdef WXWIDGETS
+			  OpiumRefreshAllWindows();
+#else
+			  OpiumRefreshAgain(cdr);
+#endif
+			}
+
 			if(WndExtraNb(f)) OpiumRefreshAgain(cdr);
 #endif
 		}
@@ -2725,7 +2741,11 @@ int OpiumRunGraph(Cadre cdr, WndUserRequest *e) {
 			if(DEBUG_GRAPH(3)) WndPrint("(OpiumRunGraph) Pas de zoom en cours, souris en (%d, %d)\n",graph->mouse[0],graph->mouse[1]);
 			WndExtraInit(f,-1);
 			if((graph->mouse[0] >= 0) && (graph->mouse[1] >= 0)) {
-				OpiumRefreshAgain(cdr);
+#ifdef WXWIDGETS
+			OpiumRefreshAllWindows();
+#else
+			OpiumRefreshAgain(cdr);
+#endif
 				graph->mouse[0] = graph->mouse[1] = -1;
 			}
 			if((e->x > (cdr->dh - WndColToPix(1))) && (e->y < WndLigToPix(1)))

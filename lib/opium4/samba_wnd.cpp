@@ -13,6 +13,8 @@ wxBEGIN_EVENT_TABLE(SambaWnd, wxDialog)
     EVT_PAINT(SambaWnd::OnPaint)
     EVT_LEFT_DOWN(SambaWnd::OnMouseDown)
     EVT_LEFT_UP(SambaWnd::OnMouseUp)
+    EVT_RIGHT_DOWN(SambaWnd::OnMouseDown)
+    EVT_RIGHT_UP(SambaWnd::OnMouseUp)
     EVT_SET_FOCUS(SambaWnd::OnFocus)
     EVT_CHAR_HOOK(SambaWnd::OnKeyChar)
     EVT_TIMER(1, SambaWnd::OnTimer)
@@ -33,7 +35,7 @@ SambaWnd::SambaWnd(const wxString& title, const wxPoint& pos, const wxSize& size
 
 void SambaWnd::OnTimer(wxTimerEvent& /*event*/)
 {
-    WndEventNewWx(this, SMBWX_MOUSE_LEFT_DOWN, mousePos_.x, mousePos_.y, 0, 0);
+    WndEventNewWx(this, lastMouseButton_, mousePos_.x, mousePos_.y, 0, 0);
 }
 
 void SambaWnd::OnSize(wxSizeEvent& /*event*/)
@@ -69,6 +71,10 @@ void SambaWnd::OnMouseDown(wxMouseEvent& event)
     mousePos_.y = event.GetY();
 
     ignoreMouseRelease_ = false;
+    if (event.LeftDown())
+        lastMouseButton_ = SMBWX_MOUSE_LEFT_DOWN;
+    else if (event.RightDown())
+        lastMouseButton_ = SMBWX_MOUSE_RIGHT_DOWN;
 }
 
 void SambaWnd::OnMouseUp(wxMouseEvent& event)
@@ -84,7 +90,10 @@ void SambaWnd::OnMouseUp(wxMouseEvent& event)
         return;
     }
 
-    WndEventNewWx(this, SMBWX_MOUSE_LEFT_UP, event.GetX(), event.GetY(), 0, 0);
+    if (event.LeftUp())
+        WndEventNewWx(this, SMBWX_MOUSE_LEFT_UP, event.GetX(), event.GetY(), 0, 0);
+    else if (event.RightUp())
+        WndEventNewWx(this, SMBWX_MOUSE_RIGHT_UP, event.GetX(), event.GetY(), 0, 0);
 }
 
 void SambaWnd::OnFocus(wxFocusEvent& /*event*/)

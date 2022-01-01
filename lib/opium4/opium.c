@@ -1811,6 +1811,20 @@ int OpiumManageWx(Cadre *cdr, struct SambaWnd *w, char type, int x, int y, int h
 			u.texte[0] = x;
 			u.texte[1] = '\0';
 			break;
+
+		case 6: //SMBWX_MOUSE_RIGHT_DOWN
+			u.type = WND_PRESS;
+			u.x = x;
+			u.y = y;
+			u.code = (unsigned int)WND_MSERIGHT;
+			break;
+
+		case 7: //SMBWX_MOUSE_RIGHT_UP
+			u.type = WND_RELEASE;
+			u.x = x;
+			u.y = y;
+			u.code = (unsigned int)WND_MSERIGHT;
+			break;
 	}
 
 	int cdr_ouverts = 0;
