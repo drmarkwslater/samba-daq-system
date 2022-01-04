@@ -5302,7 +5302,7 @@ static int SambaInit() {
 }
 //-	#include <GLUT/glut.h>
 /* ========================================================================== */
-int main(int argc, char *argv[]) {
+int main_prev(int argc, char *argv[]) {
 //	int voie;
 	char existe,on_recommence,affiche; char rep;
 #ifdef GADGET

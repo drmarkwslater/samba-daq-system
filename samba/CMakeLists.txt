@@ -22,6 +22,8 @@ add_executable(samba archive.c
   numeriseurs.c
   perso.c
   samba.c
+  Samba.cpp
+  SambaConfig.cpp
   sequences.c
   traitmt.c
   PCI/IcaLib.c
