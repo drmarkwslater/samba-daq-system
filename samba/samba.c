@@ -5302,16 +5302,18 @@ static int SambaInit() {
 }
 //-	#include <GLUT/glut.h>
 /* ========================================================================== */
+void set_globals_from_cpp(struct timeval SambaHeureDebut_)
+{
+	SambaHeureDebut = SambaHeureDebut_;
+}
+
+/* ========================================================================== */
 int main_prev(int argc, char *argv[]) {
-//	int voie;
 	char existe,on_recommence,affiche; char rep;
 #ifdef GADGET
 	char titre[80];
 #endif
 
-//-	glutInit(&argc, argv);
-	gettimeofday(&SambaHeureDebut,0);
-	// malloc_error_break();
     if((argc > 1) && !strcmp(argv[1],"-hw")) SambaConfigHwSw();
 //	memset(&CompteRendu,1,sizeof(CompteRendu));
 	bzero(&CompteRendu,sizeof(CompteRendu));
