@@ -47,7 +47,7 @@ https://cmake.org/download/
 * You can now clone the Samba repo:
 ```
 cd ~/wxSamba
-git clone https://gitlab.cern.ch/mslater/samba-daq-system.git
+git clone https://github.com/drmarkwslater/samba-daq-system.git
 ```
 * Running the following should then configure and build Samba using wxWidgets:
 ```
