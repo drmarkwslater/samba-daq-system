@@ -30,6 +30,13 @@ if (WXWIDGETS)
   set(wxWidgets_CONFIGURATION mswu)
   find_package(wxWidgets COMPONENTS core base REQUIRED)
   include(${wxWidgets_USE_FILE})
+
+  # - Find Boost
+  find_package(Boost 1.54 COMPONENTS program_options log REQUIRED )
+
+  # - Find PLPlot
+  find_package(PLplot 5.15 REQUIRED )
+
 else()
   # - Find OpenGL
   add_compile_definitions(ForOpiumGL UNIX)
