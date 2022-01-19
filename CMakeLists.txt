@@ -35,7 +35,7 @@ if (WXWIDGETS)
   find_package(Boost 1.54 COMPONENTS program_options log REQUIRED )
 
   # - Find PLPlot
-  find_package(PLplot 5.15 REQUIRED )
+  find_package(PLplot COMPONENTS plplot plplotcxx plplotwxwidgets REQUIRED )
 
 else()
   # - Find OpenGL
