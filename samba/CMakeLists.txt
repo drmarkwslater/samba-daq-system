@@ -24,6 +24,7 @@ add_executable(samba archive.c
   samba.c
   Samba.cpp
   SambaConfig.cpp
+  plplot_test.cpp
   sequences.c
   traitmt.c
   PCI/IcaLib.c
