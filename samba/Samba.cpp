@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     wxApp::SetInstance( theApp );
     wxEntryStart(argc, argv);
     wxTheApp->CallOnInit();
-    theApp->OnInit();
+    //theApp->OnInit();
 
     theApp->OnRun();
     theApp->OnExit();

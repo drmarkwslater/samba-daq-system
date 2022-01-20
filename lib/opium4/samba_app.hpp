@@ -7,6 +7,7 @@
 #endif
 
 #include <samba_wnd.hpp>
+#include <vector>
 
 class SambaApp: public wxApp
 {

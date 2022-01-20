@@ -40,15 +40,7 @@ target_include_directories(samba
   PUBLIC ${CMAKE_CURRENT_LIST_DIR}/salsa
   )
 
-if (WXWIDGETS)
-  target_link_libraries(samba PRIVATE opium4 utils FFT fltr tcp notsvr db m db curl 
-                        ${wxWidgets_LIBRARIES} Boost::program_options Boost::log
-                        PLPLOT::plplot PLPLOT::wxwidgets PLPLOT::wxwidgets)
-  #include_directories(${PLplot_INCLUDE_DIRS})
-  #link_directories(${PLplot_LIBRARY_DIRS})
-else()
-  include_directories(${GLUT_INCLUDE_DIR})
-  link_directories(${OPENGL_LIBRARY_DIRS})
-  target_link_libraries(samba PRIVATE opium4 utils FFT fltr tcp notsvr db m db curl glfw3 
-                        ${COREVIDEO_LIBRARY} ${IOKIT_LIBRARY} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
-endif()
+target_compile_definitions(samba PUBLIC BOOST_LOG_DYN_LINK=1)
+target_link_libraries(samba PRIVATE opium4 utils FFT fltr tcp notsvr db m db curl 
+                      ${wxWidgets_LIBRARIES} Boost::program_options Boost::log
+                      PLPLOT::plplot PLPLOT::plplotcxx PLPLOT::plplotwxwidgets)

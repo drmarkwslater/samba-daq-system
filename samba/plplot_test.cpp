@@ -1,6 +1,6 @@
 
 #include "plplot_test.hpp"
-#include "wxPLplotwindow.h"
+#include "wxPLplotwindow.hpp"
 
 #include <cmath>
 

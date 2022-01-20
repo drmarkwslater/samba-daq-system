@@ -23,32 +23,19 @@ if (HAVE_SYS_SYSCTL_H)
   add_compile_definitions(HAVE_SYS_SYSCTL_H)
 endif()
 
-if (WXWIDGETS)
-  add_compile_definitions(WXWIDGETS UNIX)
+# - temporary until WXWIDGETS is adopted going forward
+add_compile_definitions(WXWIDGETS UNIX)
 
-  # - Find wxWidgets
-  set(wxWidgets_CONFIGURATION mswu)
-  find_package(wxWidgets COMPONENTS core base REQUIRED)
-  include(${wxWidgets_USE_FILE})
+# - Find wxWidgets
+set(wxWidgets_CONFIGURATION mswu)
+find_package(wxWidgets COMPONENTS core base REQUIRED)
+include(${wxWidgets_USE_FILE})
 
-  # - Find Boost
-  find_package(Boost 1.54 COMPONENTS program_options log REQUIRED )
+# - Find Boost
+find_package(Boost 1.54 COMPONENTS program_options log REQUIRED )
 
-  # - Find PLPlot
-  find_package(PLplot COMPONENTS plplot plplotcxx plplotwxwidgets REQUIRED )
-
-else()
-  # - Find OpenGL
-  add_compile_definitions(ForOpiumGL UNIX)
-  find_package(GLUT  REQUIRED)
-  find_package(OpenGL  REQUIRED)
-  add_library(glfw3 STATIC IMPORTED)
-  set_target_properties(glfw3 PROPERTIES
-    IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libglfw3.a"
-  )
-  find_library(COREVIDEO_LIBRARY CoreVideo)
-  find_library(IOKIT_LIBRARY IOKit)
-endif()
+# - Find PLPlot
+find_package(plplot COMPONENTS plplot plplotcxx plplotwxwidgets REQUIRED )
 
 # - Add the main library and other subdirectories to the build
 add_subdirectory(lib)
