@@ -21,8 +21,8 @@
 #if !defined ( WXPLPLOTWINDOW_H__INCLUDED_ )
 #define WXPLPLOTWINDOW_H__INCLUDED_
 
-#include <plplot/plplot.h>
-#include <plplot/wxPLplotstream.h>
+#include <plplot.h>
+#include <wxPLplotstream.h>
 #include <wx/window.h>
 #include <wx/dcmemory.h>
 #include <wx/dcclient.h>

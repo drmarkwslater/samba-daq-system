@@ -38,6 +38,7 @@ target_include_directories(samba
   PUBLIC ${CMAKE_CURRENT_LIST_DIR}/PCI
   PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Icones
   PUBLIC ${CMAKE_CURRENT_LIST_DIR}/salsa
+  PUBLIC /usr/include/plplot
   )
 
 target_compile_definitions(samba PUBLIC BOOST_LOG_DYN_LINK=1)
