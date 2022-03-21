@@ -1,0 +1,6 @@
+#
+Figures = (
+	{ biplot := x = date, x.limites = imposees, x.min = 0, x.max = 400, y = base-sphere, y.limites = imposees, y.min = -5000, y.max = 18000  },
+	{ biplot := x = ampl-sphere, x.limites = imposees, x.min = 0, x.max = 5000, y = montee-sphere, y.limites = imposees, y.min = 0, y.max = 0.02  },
+	{ biplot := x = ampl-sphere, x.limites = imposees, x.min = 0, x.max = 5000, y = date, y.limites = imposees, y.min = 0, y.max = 400  }
+)

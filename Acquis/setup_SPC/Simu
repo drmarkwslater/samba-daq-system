@@ -1,0 +1,10 @@
+# Modes de simulation
+#
+Simulations = {
+	voies = "sensor sphere"
+	niveau_DC = 0
+	bruit = 5
+	frequence_evt = 10
+	energie_ADU = 1000
+	resolution = 3
+}

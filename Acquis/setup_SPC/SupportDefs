@@ -1,0 +1,48 @@
+{
+	"variables": [
+		{
+			"name": "Pmain",
+			"type": "float",
+			"keys": "",
+			"status": "read"
+		},
+		{
+			"name": "Pauxi",
+			"type": "float",
+			"keys": "",
+			"status": "read"
+		},
+		{
+			"name": "HVnorth",
+			"type": "int",
+			"keys": "",
+			"status": "read"
+		},
+		{
+			"name": "HVsouth",
+			"type": "int",
+			"keys": "",
+			"status": "read"
+		},
+		{
+			"name": "SourceType",
+			"type": "key",
+			"keys": "Fe/AmBe",
+			"status": "read"
+		},
+		{
+			"name": "SourceInUse",
+			"type": "bool",
+			"keys": "",
+			"status": "read"
+		}
+	]
+}
+{
+	"Pmain": 0,
+	"Pauxi": 0,
+	"HVnorth": 0,
+	"HVsouth": 0,
+	"SourceType": "Fe",
+	"SourceInUse": false
+}

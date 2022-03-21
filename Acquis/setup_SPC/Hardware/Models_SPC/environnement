@@ -1,0 +1,12 @@
+#
+Variables = (
+	{ Type := mot-cle, liste = labo/calibration/fond/debug, description = "Type du run" },
+	{ HV1 := int, description = "Tension capteur HV1 (V)" },
+	{ HV2 := int, description = "Tension correcteur de champ HV2 (V)" },
+	{ Pression_mb := float, description = "Pression totale (mb)" },
+	{ Gaz := mot-cle, liste = He/Ne/Ar/Xe/N2, description = "Gaz principal" },
+	{ Quencher := mot-cle, liste = CH4, description = "Moderateur" },
+	{ Taux := float, description = "Quantite relative de moderateur (%)" },
+	{ Source := mot-cle, liste = neant/ar37/fe55, description = "Source de calibration en place" },
+	{ Blindage := mot-cle, liste = "absent/ouvert/ferme", description = "Configuration du blindage" }
+)

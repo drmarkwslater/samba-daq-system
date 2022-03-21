@@ -1,0 +1,15 @@
+#
+=CALI {
+	adresse = 192.168.2.0
+	etat = valide 	# HS/valide/simule
+	maintenance = .
+	numerisation = standard
+	envoi = stream 	# type de donnees envoyees (stream/event)
+	numeriseurs = "[int]"
+	horloge = interne
+	type = "TCP:Wr"
+	port = 7
+	send = 8388607
+	init = ()
+	start = ()
+}

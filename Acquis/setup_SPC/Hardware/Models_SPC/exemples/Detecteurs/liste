@@ -1,0 +1,5 @@
+modeles @../modeles_EDW/detecteurs
+#
+@s1+s2 = Standard
+@s1 = FID_1
+@s2 = 1voie_1

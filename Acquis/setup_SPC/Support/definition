@@ -1,0 +1,49 @@
+{
+	"variables": [
+		{
+			"name": "Pmain",
+			"type": "float",
+			"keys": "",
+			"status": "read"
+		},
+		{
+			"name": "Pauxi",
+			"type": "float",
+			"keys": "",
+			"status": "read"
+		},
+		{
+			"name": "HVnorth",
+			"type": "int",
+			"keys": "",
+			"status": "free"
+		},
+		{
+			"name": "HVsouth",
+			"type": "int",
+			"keys": "",
+			"status": "free"
+		},
+		{
+			"name": "SourceName",
+			"type": "key",
+			"keys": "Fe/AmBe/Neutrons",
+			"status": "free"
+		},
+		{
+			"name": "SourceInUse",
+			"type": "bool",
+			"keys": "",
+			"status": "free"
+		}
+	]
+}
++
+{
+	"Pmain": 0.5,
+	"Pauxi": 6.4,
+	"HVnorth": 1200,
+	"HVsouth": 1200,
+	"SourceName": "AmBe",
+	"SourceInUse": false
+}

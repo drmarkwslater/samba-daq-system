@@ -1,0 +1,2 @@
+duree.montee = -0.1875 	# Duree utilisee avant le maximum (ms)
+duree.descente = 0.75 	# Duree utilisee apres le maximum (ms)

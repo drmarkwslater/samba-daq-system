@@ -1,0 +1,7 @@
+#
+Detecteurs = Hardware/Models_SPC/detectors
+Numeriseurs = Hardware/Models_SPC/digitizers
+Cablages = Hardware/Models_SPC/cablings
+Repartiteurs = Hardware/Models_SPC/dispatchers
+Support = Hardware/Models_SPC/support
+Environnement = Environment

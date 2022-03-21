@@ -1,0 +1,10 @@
+utilise = (
+	{ Pmain := Pmain, unite = , archive = non, affiche = non, format = float, min = 0, max = 0  },
+	{ Pauxi := Pauxi, unite = , archive = non, affiche = non, format = float, min = 0, max = 0  },
+	{ HVnorth := HVnorth, unite = , archive = non, affiche = non, format = int, min = 0, max = 0  },
+	{ HVsouth := HVsouth, unite = , archive = non, affiche = non, format = int, min = 0, max = 0  },
+	{ SourceType := SourceType, unite = , archive = non, affiche = non, format = key, cles = Fe/AmBe  },
+	{ SourceInUse := SourceInUse, unite = , archive = non, affiche = non, format = bool,   }
+)
+sources = { SourceInUse := "Source in use", role = calib }
+autorisees = non 	# Autorisation de deplacer les sources

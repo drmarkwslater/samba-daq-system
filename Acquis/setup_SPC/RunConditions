@@ -1,0 +1,11 @@
+# [claps]
+Goal = labo 	# Object of the run
+HV1 = 1450 	# Sensor voltage (V)
+HV2 = 1450 	# Field corrector voltage (V)
+Pressure_mb = 1000 	# Total pressure (mb)
+Gas = Ar 	# Main gas
+Quencher = CH4 	# Quencher nature
+Rate = 2 	# Relative quencher rate (%)
+Source = fe55 	# Calibration source in place
+Shielding = none 	# Shielding configuration
+Type = sphere 	# Type of detector in use

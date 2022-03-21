@@ -1,0 +1,41 @@
+# Systeme d'Acquisition Multi-Bolometres sur Apple
+#
+boite = 14 		# Numero de boite (repartiteur IP/carte ADC) par defaut, -1 si a ne pas utiliser
+#
+T = . 			# Racine des fichiers d'acquisition ($top)
+M = . 			# Repertoire principal $maitre (relatif a la racine, ou absolu)
+P = setup_SPC 		# Repertoire des preferences (relatif a la racine, ou absolu)
+#
+E = donnees 		# Espace de sauvegarde des donnees (relatif a la racine, ou absolu)
+S = donnees 		# Espace des donnees en relecture si origine=edw (relatif a la racine, ou absolu)
+#
+R = results 		# Repertoire des resultats  (relatif a la racine, ou absolu)
+G = figures 		# Repertoire des graphiques (relatif a la racine, ou absolu)
+K = . 			# Repertoire du catalogue   (relatif a la racine, ou absolu)
+D = db 			# Racine de la base de donnees des detecteurs (relatif a la racine, ou absolu)
+s = streams 		# Repertoire des donnees brutes [streams] (relatif a l'espace de sauvegarde)
+e = events 		# Repertoire des evenements sauvegardes   (relatif a l'espace de sauvegarde)
+run = 		 	# Fichier a relire
+#
+conf = FileList 	# Configuration generale (relatif au repertoire des preferences)
+ip =  			# Adresse IP de l'hote sur le reseau des repartiteurs (celle de la 1ere interface, par defaut)
+mode = independant 	# Mode de fonctionnement de SAMBA (independant/satellite/maitre/distant/automatique)
+ecoute = 1953 		# Port d'entree des commandes du maitre
+starter = neant 	# Nom de l'hote declenchant la lecture si multitache inactif
+x = oui 		# Execution en mode expert
+info = executables/Samba.app/Contents/Resources/ 	# Repertoire contenant l'aide et le dictionnaire de langue (relatif a la racine, ou absolu)
+langue = English 	# Langage a utiliser dans les dialogues
+dico = maj 		# maj: complete avec les derniers ajouts/ net: retire les termes non traduits (net/fixe/maj)
+init = non 		# Chargement des detecteurs au demarrage de SAMBA
+installe = non 		# Creation du setup par defaut (-create inclus)
+create = oui 		# Creation fichiers si absents
+batch = non 		# Execution en mode batch
+unix = non 		# Execution sous UNIX (SambaArgs optionnel)
+# Si pas batch:
+display = ":0.0" 	# Serveur X11 a utiliser pour l'affichage
+noir = oui 		# Fond noir, texte blanc pour les fenetres de dialogue
+fontname = Monaco 	# Type de caracteres
+fontsize = 10 		# Taille des caracteres
+qualite = ecran 	# Qualite des graphiques (papier/ecran)
+linesize = 1 		# Largeur des traits des graphiques en qualite papier
+NSDocumentRevisionsDebugMode = NO 	# Mode d'execution par Xcode

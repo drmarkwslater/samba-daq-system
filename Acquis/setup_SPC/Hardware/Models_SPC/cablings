@@ -1,0 +1,19 @@
+Version = 2
+Cablages = (
+	{ signal1 := detecteur = ball, numeriseurs = (AdcCali),
+		capteurs = ( { sensor := 1.1 } ),
+		reglages = ()
+	},
+	{ signal12 := detecteur = rod, numeriseurs = (AdcCali),
+		capteurs = ( { sensor := 1.1 }, { corrector := 1.2 } ),
+		reglages = ()
+	},
+	{ signal4 := detecteur = ball, numeriseurs = (AdcCali),
+		capteurs = ( { sensor := 1.4 } ),
+		reglages = ()
+	},
+	{ signal12_UV3 := detecteur = full, numeriseurs = (AdcCali),
+		capteurs = ( { sensor := 1.1 }, { corrector := 1.2 }, { UV := 1.3 } ),
+		reglages = ()
+	}
+)

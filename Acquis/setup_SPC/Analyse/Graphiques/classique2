@@ -1,0 +1,5 @@
+#
+Figures = (
+	{ biplot := x = ampl-sphere, x.limites = imposees, x.min = 0, x.max = 2000, y = montee-sphere, y.limites = imposees, y.min = 0, y.max = 0.03  },
+	{ biplot := x = ampl-sphere, x.limites = imposees, x.min = 0, x.max = 2000, y = montee-sphere, y.limites = imposees, y.min = 0, y.max = 0.07  }
+)

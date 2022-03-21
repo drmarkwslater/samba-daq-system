@@ -1,0 +1,15 @@
+#
+Physique = (
+	{ charge := duree-ms = 2, temps-mort-ms = -1, fenetre-ms = 4, delai-ms = -1, dimtemplate = 64, montee-ms = 0, descente1-ms = 10, descente2-ms = 0, facteur2 = 0 }
+	{ light := duree-ms = 2, temps-mort-ms = -1, fenetre-ms = 4, delai-ms = -1, dimtemplate = 64, montee-ms = 0, descente1-ms = 10, descente2-ms = 0, facteur2 = 0 }
+)
+Voies = (
+	{ sensor := physique = charge, temps-mort-ms = -1, pretrigger_% = 25, base.debut_% = 25, base.fin_% = 75, montee.debut_% = 10, montee.fin_% = 90, coincidence-ms = 20 },
+	{ corrector := physique = charge, temps-mort-ms = -1, pretrigger_% = 25, base.debut_% = 25, base.fin_% = 75, montee.debut_% = 10, montee.fin_% = 90, coincidence-ms = 20 },
+	{ UV := physique = light, temps-mort-ms = -1, pretrigger_% = 25, base.debut_% = 25, base.fin_% = 75, montee.debut_% = 10, montee.fin_% = 90, coincidence-ms = 20 }
+)
+Detecteurs = (
+	{ ball := capteurs = sensor, reglages = (), associes = () },
+	{ rod := capteurs = (sensor, corrector), reglages = (), associes = () },
+	{ full := capteurs = (sensor, corrector, UV ), reglages = (), associes = () },
+)

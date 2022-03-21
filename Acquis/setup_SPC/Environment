@@ -1,0 +1,13 @@
+#
+Variables = (
+	{ Goal := mot-cle, liste = labo/calibration/physics/debug, description = "Object of the run" },
+	{ HV1 := int, description = "Sensor voltage (V)" },
+	{ HV2 := int, description = "Field corrector voltage (V)" },
+	{ Pressure_mb := float, description = "Total pressure (mb)" },
+	{ Gas := mot-cle, liste = He/Ne/Ar/Xe/N2/Other, description = "Main gas" },
+	{ Quencher := mot-cle, liste = CH4/CO2/Other, description = "Quencher nature" },
+	{ Rate := float, description = "Relative quencher rate (%)" },
+	{ Source := mot-cle, liste = neant/ar37/fe55/am241/tungstenRods/other, description = "Calibration source in place" },
+	{ Shielding := mot-cle, liste = "none/open/close", description = "Shielding configuration" },
+	{ Type := mot-cle, liste = "sphere/micromegas/other", description = "Type of detector in use"}
+)

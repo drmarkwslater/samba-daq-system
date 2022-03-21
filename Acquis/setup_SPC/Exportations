@@ -1,0 +1,11 @@
+# [claps]
+# Mesures implementees: trgr_type/trgr_seuil_min/impedance/taux_voie/taux_global
+Exports = {
+	nom = Exportations 	# Identification du paquet
+	timing = periodique 	# Moment d'exportation (periodique/debut_run/fin_run)
+	support = fichier 	# Support d'envoi (fichier/catalogue/log/memoire/udp)
+	chemin = FichierExport 	# Nom du support
+	periode_ms = 1000 	# Intervalle entre exportations (ms)
+	exportable = { taux := taux_voie  }
+	exporte = ( "taux[sensor]", "taux[corrector]" )
+}

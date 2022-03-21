@@ -1,0 +1,3 @@
+#
+Detecteurs = ( { nb = 2, code = 1 } ) 	# Definition du support des detecteurs
+Digitiseurs = ( { nb = 2, code = 1 } ) 	# Definition du support des numeriseurs
