@@ -74,3 +74,10 @@ cd ~/wxSamba/samba-daq-system.build
 samba/samba
 ```
 
+## Setup for Boulby
+
+* To setup Samba for Boulby, before running do the following to make sure you're loading the correct configuration:
+```
+cp `pwd`/samba-daq-system/Acquis/SambaArgs_boulby `pwd`/samba-daq-system/Acquis/SambaArgs
+```
+
