@@ -6446,7 +6446,7 @@ INLINE char SambaDeclenche(int voie, float reelle) {
 	/* Style de recherche */
 	if(VoieTampon[voie].trig.cherche == TRGR_EXTREMA) {
 #ifdef DEBUG_TRIGGER
-		if(!TrmtDejaDit) printf("Recherche des extremas (signal %g -> %g, deja %d0 µs passees)\n",
+		if(!TrmtDejaDit) printf("Recherche des extremas (signal %g -> %g, deja %d0 ï¿½s passees)\n",
 								suivi->precedente,reelle,VoieTampon[voie].signal.climbs);
 #endif
 		/* On recherche un pic => on regarde le changement de derivee */
@@ -6459,7 +6459,7 @@ INLINE char SambaDeclenche(int voie, float reelle) {
 			amplitude = niveau - VoieTampon[voie].signal.base;
 			montee = (float)(abs(VoieTampon[voie].signal.climbs)) * VoieEvent[voie].horloge;
 		#ifdef DEBUG_TRIGGER
-			if(!TrmtDejaDit) printf("Depuis %d%03d,%02d0 ms sur %3g µs: montee de %4d ADU a partir de %4d\n",
+			if(!TrmtDejaDit) printf("Depuis %d%03d,%02d0 ms sur %3g ï¿½s: montee de %4d ADU a partir de %4d\n",
 				(int)suivi->dernierpic/1000000,Modulo(suivi->dernierpic,1000000)/100,Modulo(suivi->dernierpic,1000000)%100,
 				montee,amplitude,VoieTampon[voie].signal.base);
 		#endif
@@ -6475,7 +6475,7 @@ INLINE char SambaDeclenche(int voie, float reelle) {
 				*(VoieTampon[voie].adrs_niveau) = suivi->precedente - amplitude;
 				*(VoieTampon[voie].adrs_duree) = duree;
 			#ifdef DEBUG_PRGM_0
-				if(!TrmtDejaDit) printf("Calcul pour amplitude %f sur %f µs au niveau %f\n",
+				if(!TrmtDejaDit) printf("Calcul pour amplitude %f sur %f ï¿½s au niveau %f\n",
 					*(VoieTampon[voie].adrs_amplitude),*(VoieTampon[voie].adrs_montee),*(VoieTampon[voie].adrs_niveau));
 				if(!TrmtDejaDit) CebExec(TrmtPrgm,1); else
 
@@ -7606,26 +7606,146 @@ struct arg_struct {
     NUMER_MODE mode;
 };
 
-TypeADU LectExecThread(void *arguments)
-{
-	struct arg_struct *args = arguments;
-	int n,m;
-	int64 depuis_depile;
-	int bolo;
-	char entretien_bolo;
- 	int64 synchroD2traitees;
-	int64 maintenant;
-	int avant = 0, secs;
-	char delai[DATE_MAX];
-	char pair = 0;
-	int loop_num = 0;
+static TypeADU LectExec(NUMER_MODE mode) {
+/* /docFuncBeg {LectExec}
+   	/docFuncReturn  {0 si OK, code d'erreur sinon (voir LectAcqStd)}
+   	/docFuncSubject {Tache de lecture, avec retour seulement si erreur ou Acquis[AcquisLocale].etat.active=0}
+*/
+	char diese,boostee,it_demandees,entretien_bolo,log,ok; int n,m;
+	int64 synchroD2traitees,min_restart,ip_avant; int64 depuis_depile;
+	int64 maintenant; char pair; int avant,secs; char delai[DATE_MAX];
 	TypeADU erreur_acq;
-	char ok;
-	char it_demandees = args->it_demandees;
-	char boostee = args->boostee;
-	NUMER_MODE mode = args->mode;
-	int64 min_restart, ip_avant;
+	FILE *f;
+	int bolo;
 
+/*
+ * Initialisations
+ * ---------------
+ */
+	if(SettingsMultitasks == 1) {
+		if(SambaPartage && (SambaPartageId == -1)) {
+			printf("* Liberation de la variable globale SambaPartage[%d] en 0x%08X\n",SambaPartageDim,(hexa)SambaPartage);
+			free(SambaPartage); SambaPartage = 0;
+		}
+		if(!SambaPartage) {
+			SambaPartageId = shmget(IPC_PRIVATE,SambaPartageDim,0644|IPC_CREAT|IPC_EXCL);
+			/* printf("Identifieur cree: %d\n",SambaPartageId); */
+			printf("* shmget(%d octets) a rendu SambaPartageId=%08X (errno=%d)\n",SambaPartageDim,SambaPartageId,errno);
+			if(SambaPartageId != -1) SambaPartage = (TypeSambaPartagee *)shmat(SambaPartageId,0,SHM_RND);
+		}
+	} else {
+		if(SambaPartage && (SambaPartageId != -1)) {
+			printf("* Liberation de la variable partagee SambaPartage[%d] en 0x%08X\n",SambaPartageDim,(hexa)SambaPartage);
+			int i; i = 256; while((shmdt(SambaPartage) != -1) && i) i-- ; SambaPartage = 0; SambaPartageId = -1;
+		}
+		if(!SambaPartage) SambaPartage = (TypeSambaPartagee *)malloc(SambaPartageDim);
+	}
+	if(SambaPartage) printf("* Variable %s SambaPartage[%d] allouee en 0x%08X\n",(SambaPartageId == -1)? "globale": "partagee",SambaPartageDim,(hexa)SambaPartage);
+	else {
+		printf("* Allocation de la variable %s SambaPartage[%d] en erreur: %s\n",(SambaPartageId == -1)? "globale": "partagee",SambaPartageDim,strerror(errno));
+		printf("  => Lecture sous interruption en mode v4\n");
+		SettingsMultitasks = 4;
+	}
+
+	boostee = (SettingsMultitasks && !LectParBloc);
+	if(boostee) {
+		if((SettingsMultitasks <= 1)
+		|| (LectCntl.LectMode == LECT_IDENT)
+		|| (LectCntl.LectMode == LECT_COMP)
+		|| LectSurFichier) it_demandees = 0;
+		else it_demandees = 1;
+	} else it_demandees = 0; /* gcc.. */
+    log = (LectureLog || LectLogComp);
+/*	it_demandees = 0;  pour mise au point */
+	LectErreursNb = 0;
+#ifndef PAS_D_ERREUR_PERMISE
+	LectErreur1 = 0;
+#endif
+	LectArretePoliment = 0;
+	sprintf(RunDateDebut,"%s a %s",DateCivile(),DateHeure());
+	printf("* Demarrage le %s\n",RunDateDebut);
+	LectJournalDemarrage();
+
+/*
+ * Enregistrements divers
+ * ----------------------
+ */
+	if(Archive.enservice && EdbServeur[0] && strcmp(EdbServeur,"neant")) {
+		f = fopen("RunInfo","r");
+		if(f) {
+			DbSendFile(EdbServeur,ArchiveId,f);
+			if(DbStatus) printf("%s/ Base de Donnees renseignee (Id: %s, rev: %s)\n",DateHeure(),DbId,DbRev);
+			else printf("%s/ ! Renseignement Base de Donnees en erreur (%s, raison: %s)\n",DateHeure(),DbErreur,DbRaison);
+			fclose(f);
+			remove("RunInfo");
+		}
+	}
+	if(Archive.enservice && (LectCntl.LectMode == LECT_DONNEES) && (LectSession < 2)) {
+		FILE *f;
+		//- strcat(strcpy(FichierCatalogue,CtlgPath),"Catalogue");
+		f = fopen(FichierCatalogue,"r");
+		if(!f) {
+			RepertoireCreeRacine(FichierCatalogue);
+			f = fopen(FichierCatalogue,"w");
+			if(f) fprintf(f,"# Date    heure   nom       mode  type      duree  taille(MB)  expo(Kg.j)   evts\n");
+		} else {
+			int car;
+			fseek(f,-1,SEEK_END);
+			car = fgetc(f);
+			fclose(f);
+			f = fopen(FichierCatalogue,"a");
+			if(car != '\n') {
+				printf("%s/ Fermeture de la derniere ligne du catalogue\n",DateHeure());
+				fprintf(f," inconnue  inconnue    inconnue     --\n");
+			}
+		}
+		if(f) {
+			char *c; int i,j,k; char *type;
+			LectCommentComplet[0] = '\0'; c = &(LectComment[0][0]);
+			for(i=0; i<MAXCOMMENTNB; i++) if(LectComment[i][0] != '\0') {
+				c = &(LectComment[i][0]);
+				for(j=0; j<MAXCOMMENTLNGR-2; j++) {
+					if((LectComment[i][j] != ' ') && (LectComment[i][j] != 0x09)) c = &(LectComment[i][j]);
+				}
+				c++; *c = '\0';
+				if(i) strcat(strcat(LectCommentComplet," "),LectComment[i]);
+				else strcpy(LectCommentComplet,LectComment[i]);
+			}
+			if((SettingsRunFamille == RUN_FAMILLE_BANC) && (RunTypeName >= 0)) {
+				EnvirVarPrintVal(&(EnvirVar[RunTypeVar]),RunTypeName,TYPERUN_NOM);
+				type = RunTypeName;
+			} else {
+				ArgKeyGetText(RunCategCles,LectCntl.RunCategNum,RunCategName,TYPERUN_NOM);
+				type = RunCategName;
+			}
+			fprintf(f,"%8s %8s %8s %6s %-6s",DateJour(),DateHeure(),Acquis[AcquisLocale].etat.nom_run,
+					(Trigger.demande == NEANT)? "stream": "event",type);
+			for(k=0; k<ExportPackNb; k++) if((ExportPack[k].support_type == EXPORT_CATALOGUE) && (ExportPack[k].quand == EXPORT_RUN_DEBUT)) {
+				if(!diese) { fprintf(f," # "); diese = 1; }
+				ExporteInfos(f,k);
+			}
+			fflush(f);
+			fclose(f);
+			printf("%s/ Mise a jour du catalogue (%s)\n",DateHeure(),FichierCatalogue);
+		} else printf("%s/ Mise a jour du catalogue impossible, fichier inaccessible:\n            '%s'\n",
+					  DateHeure(),FichierCatalogue);
+		if(SettingsChargeBolos && !LectModeSpectresAuto && !RegenEnCours) DetecteurChargeTous(log?"         ":0);
+	};
+	if(TrmtRegulActive && ArchSauve[EVTS]) {
+		int secs,usecs;
+#ifndef CODE_WARRIOR_VSN
+		gettimeofday(&LectDateRun,0);
+		ArchT0sec = LectDateRun.tv_sec;
+		ArchT0msec = LectDateRun.tv_usec;
+#endif /* CODE_WARRIOR_VSN */
+		SambaTempsEchantillon(DernierPointTraite,ArchT0sec,ArchT0msec,&secs,&usecs);					
+		ArchiveSeuils(secs);
+	}
+
+/*
+ * Depart sur une synchro (D2 ou D3)
+ * ---------------------------------
+ */
 relance:
 	min_restart = 100; // 5000; // 5s
 	Acquis[AcquisLocale].etat.active = LectSynchro(mode);
@@ -7986,162 +8106,6 @@ relance:
 	}
 
 	
-}
-
-static TypeADU LectExec(NUMER_MODE mode) {
-/* /docFuncBeg {LectExec}
-   	/docFuncReturn  {0 si OK, code d'erreur sinon (voir LectAcqStd)}
-   	/docFuncSubject {Tache de lecture, avec retour seulement si erreur ou Acquis[AcquisLocale].etat.active=0}
-*/
-	char diese,boostee,it_demandees,entretien_bolo,log,ok; int n,m;
-	int64 synchroD2traitees,min_restart,ip_avant; int64 depuis_depile;
-	int64 maintenant; char pair; int avant,secs; char delai[DATE_MAX];
-	TypeADU erreur_acq;
-	FILE *f;
-	int bolo;
-
-/*
- * Initialisations
- * ---------------
- */
-	if(SettingsMultitasks == 1) {
-		if(SambaPartage && (SambaPartageId == -1)) {
-			printf("* Liberation de la variable globale SambaPartage[%d] en 0x%08X\n",SambaPartageDim,(hexa)SambaPartage);
-			free(SambaPartage); SambaPartage = 0;
-		}
-		if(!SambaPartage) {
-			SambaPartageId = shmget(IPC_PRIVATE,SambaPartageDim,0644|IPC_CREAT|IPC_EXCL);
-			/* printf("Identifieur cree: %d\n",SambaPartageId); */
-			printf("* shmget(%d octets) a rendu SambaPartageId=%08X (errno=%d)\n",SambaPartageDim,SambaPartageId,errno);
-			if(SambaPartageId != -1) SambaPartage = (TypeSambaPartagee *)shmat(SambaPartageId,0,SHM_RND);
-		}
-	} else {
-		if(SambaPartage && (SambaPartageId != -1)) {
-			printf("* Liberation de la variable partagee SambaPartage[%d] en 0x%08X\n",SambaPartageDim,(hexa)SambaPartage);
-			int i; i = 256; while((shmdt(SambaPartage) != -1) && i) i-- ; SambaPartage = 0; SambaPartageId = -1;
-		}
-		if(!SambaPartage) SambaPartage = (TypeSambaPartagee *)malloc(SambaPartageDim);
-	}
-	if(SambaPartage) printf("* Variable %s SambaPartage[%d] allouee en 0x%08X\n",(SambaPartageId == -1)? "globale": "partagee",SambaPartageDim,(hexa)SambaPartage);
-	else {
-		printf("* Allocation de la variable %s SambaPartage[%d] en erreur: %s\n",(SambaPartageId == -1)? "globale": "partagee",SambaPartageDim,strerror(errno));
-		printf("  => Lecture sous interruption en mode v4\n");
-		SettingsMultitasks = 4;
-	}
-
-	boostee = (SettingsMultitasks && !LectParBloc);
-	if(boostee) {
-		if((SettingsMultitasks <= 1)
-		|| (LectCntl.LectMode == LECT_IDENT)
-		|| (LectCntl.LectMode == LECT_COMP)
-		|| LectSurFichier) it_demandees = 0;
-		else it_demandees = 1;
-	} else it_demandees = 0; /* gcc.. */
-    log = (LectureLog || LectLogComp);
-/*	it_demandees = 0;  pour mise au point */
-	LectErreursNb = 0;
-#ifndef PAS_D_ERREUR_PERMISE
-	LectErreur1 = 0;
-#endif
-	LectArretePoliment = 0;
-	sprintf(RunDateDebut,"%s a %s",DateCivile(),DateHeure());
-	printf("* Demarrage le %s\n",RunDateDebut);
-	LectJournalDemarrage();
-
-/*
- * Enregistrements divers
- * ----------------------
- */
-	if(Archive.enservice && EdbServeur[0] && strcmp(EdbServeur,"neant")) {
-		f = fopen("RunInfo","r");
-		if(f) {
-			DbSendFile(EdbServeur,ArchiveId,f);
-			if(DbStatus) printf("%s/ Base de Donnees renseignee (Id: %s, rev: %s)\n",DateHeure(),DbId,DbRev);
-			else printf("%s/ ! Renseignement Base de Donnees en erreur (%s, raison: %s)\n",DateHeure(),DbErreur,DbRaison);
-			fclose(f);
-			remove("RunInfo");
-		}
-	}
-	if(Archive.enservice && (LectCntl.LectMode == LECT_DONNEES) && (LectSession < 2)) {
-		FILE *f;
-		//- strcat(strcpy(FichierCatalogue,CtlgPath),"Catalogue");
-		f = fopen(FichierCatalogue,"r");
-		if(!f) {
-			RepertoireCreeRacine(FichierCatalogue);
-			f = fopen(FichierCatalogue,"w");
-			if(f) fprintf(f,"# Date    heure   nom       mode  type      duree  taille(MB)  expo(Kg.j)   evts\n");
-		} else {
-			int car;
-			fseek(f,-1,SEEK_END);
-			car = fgetc(f);
-			fclose(f);
-			f = fopen(FichierCatalogue,"a");
-			if(car != '\n') {
-				printf("%s/ Fermeture de la derniere ligne du catalogue\n",DateHeure());
-				fprintf(f," inconnue  inconnue    inconnue     --\n");
-			}
-		}
-		if(f) {
-			char *c; int i,j,k; char *type;
-			LectCommentComplet[0] = '\0'; c = &(LectComment[0][0]);
-			for(i=0; i<MAXCOMMENTNB; i++) if(LectComment[i][0] != '\0') {
-				c = &(LectComment[i][0]);
-				for(j=0; j<MAXCOMMENTLNGR-2; j++) {
-					if((LectComment[i][j] != ' ') && (LectComment[i][j] != 0x09)) c = &(LectComment[i][j]);
-				}
-				c++; *c = '\0';
-				if(i) strcat(strcat(LectCommentComplet," "),LectComment[i]);
-				else strcpy(LectCommentComplet,LectComment[i]);
-			}
-			if((SettingsRunFamille == RUN_FAMILLE_BANC) && (RunTypeName >= 0)) {
-				EnvirVarPrintVal(&(EnvirVar[RunTypeVar]),RunTypeName,TYPERUN_NOM);
-				type = RunTypeName;
-			} else {
-				ArgKeyGetText(RunCategCles,LectCntl.RunCategNum,RunCategName,TYPERUN_NOM);
-				type = RunCategName;
-			}
-			fprintf(f,"%8s %8s %8s %6s %-6s",DateJour(),DateHeure(),Acquis[AcquisLocale].etat.nom_run,
-					(Trigger.demande == NEANT)? "stream": "event",type);
-			for(k=0; k<ExportPackNb; k++) if((ExportPack[k].support_type == EXPORT_CATALOGUE) && (ExportPack[k].quand == EXPORT_RUN_DEBUT)) {
-				if(!diese) { fprintf(f," # "); diese = 1; }
-				ExporteInfos(f,k);
-			}
-			fflush(f);
-			fclose(f);
-			printf("%s/ Mise a jour du catalogue (%s)\n",DateHeure(),FichierCatalogue);
-		} else printf("%s/ Mise a jour du catalogue impossible, fichier inaccessible:\n            '%s'\n",
-					  DateHeure(),FichierCatalogue);
-		if(SettingsChargeBolos && !LectModeSpectresAuto && !RegenEnCours) DetecteurChargeTous(log?"         ":0);
-	};
-	if(TrmtRegulActive && ArchSauve[EVTS]) {
-		int secs,usecs;
-#ifndef CODE_WARRIOR_VSN
-		gettimeofday(&LectDateRun,0);
-		ArchT0sec = LectDateRun.tv_sec;
-		ArchT0msec = LectDateRun.tv_usec;
-#endif /* CODE_WARRIOR_VSN */
-		SambaTempsEchantillon(DernierPointTraite,ArchT0sec,ArchT0msec,&secs,&usecs);					
-		ArchiveSeuils(secs);
-	}
-
-/*
- * Depart sur une synchro (D2 ou D3)
- * ---------------------------------
- */
-		struct arg_struct args;
-		args.boostee = boostee;
-		args.it_demandees = it_demandees;
-		args.mode = mode;
-
-#ifdef WXWIDGETS
-		// Send off the thread for the actual DAQ
-		pthread_t lectexec_thread;
-		int t = pthread_create(&lectexec_thread, NULL, LectExecThread, 
-			(void*)&args);
-		return 0;
-#else
-		return LectExecThread((void*)&args);
-#endif
 }
 /* /docFuncEnd */
 /* ========================================================================== */
@@ -8642,8 +8606,30 @@ int LectAcqElementaire(NUMER_MODE mode) {
 		
 	return(0);
 }
+
+int LectAcqStdThread();
+
+int LectAcqStd()
+{
+#ifdef WXWIDGETS
+	if(LectSession < 2) {
+		if(!LectFixeMode(LECT_DONNEES,1)) return(0);
+		LectSelecteVoies();
+	}
+	if(!LectConstruitTampons(LectureLog)) return(0);
+	
+	// Send off the thread for the actual DAQ
+	pthread_t lectacqstd_thread;
+	int t = pthread_create(&lectacqstd_thread, NULL, LectAcqStdThread, NULL);
+	return 0;
+#endif
+
+	return LectAcqStdThread();
+}
+
 /* ========================================================================== */
-int LectAcqStd() {
+int LectAcqStdThread() {
+
 	int rep,voie,rc,i,k,l,num,fmt; char doit_terminer;
 	TypeADU erreur_acq;
 	float nb;
@@ -8682,14 +8668,19 @@ int LectAcqStd() {
 #else
 	LectAutreSequence = 0;
 #endif
+
 	do {
 		if(LectSession < 2) {
+#ifndef WXWIDGETS			
 			if(!LectFixeMode(LECT_DONNEES,1)) return(0);
+#endif
 			for(rep=0; rep<RepartNb; rep++) {
 				Repart[rep].mode = 0;
 				Repart[rep].status_demande = 0;
 			}
+#ifndef WXWIDGETS
 			LectSelecteVoies();
+#endif
 			SambaRunDate();
 			if(Archive.enservice) {
 				if(!LectModeSpectresAuto) {
@@ -8845,8 +8836,10 @@ int LectAcqStd() {
 			if(!SambaMaitre) RepartiteursElection(1);
 		}
 
+#ifndef WXWIDGETS
 		/* Initialisation des variables globales de la branche Lecture */
 		if(!LectConstruitTampons(LectureLog)) return(0);
+#endif
 		if(LectSession < 2) LectJournalTrmt();
 		LectRazCompteurs();
 		if((LectSession < 2) && (SequenceCourante >= 0)) {
@@ -8901,9 +8894,6 @@ int LectAcqStd() {
 		/* Execution de la tache de lecture */
 		erreur_acq = LectExec(NUMER_MODE_ACQUIS);
 
-#ifdef WXWIDGETS
-		return 0;
-#endif
 		/* Remise en etat des affichages */
 		if(OpiumDisplayed(bLecture)) doit_terminer = OpiumRefreshBegin(bLecture); else doit_terminer = 0;
 		MenuItemAllume(mLectDemarrage,1,L_("Demarrer"),GRF_RGB_YELLOW);
@@ -8948,6 +8938,7 @@ int LectAcqStd() {
 				if(stat(ArchiveFichier[fmt],&infos) != -1) ArchiveEcrits[fmt] += (float)infos.st_size / (float)(MB);
 			}
 		}
+
 		/* Normalisation des patterns */
 		for(voie=0; voie<VoiesNb; voie++) if(VoieTampon[voie].lue && VoieTampon[voie].pattern.dim) {
 			if(VoieManip[voie].duree.periodes > 1) {
@@ -8969,6 +8960,7 @@ int LectAcqStd() {
                 printf("%s/ Evenement moyen de la voie %s: normalise\n",DateHeure(),VoieManip[voie].nom);
 			}
 		}
+
 		/* Debriefing */
 		gettimeofday(&LectDateRunFin,0);
 		LectCpuRunFin = clock();
@@ -8982,6 +8974,7 @@ int LectAcqStd() {
 		/* Terminaison de l'affichage des donnees brutes */
 		LectDisplay();
 	} while(LectAutreSequence);
+
 	if(Archive.enservice) {
 		int64 total_simule;
 		int hh,mn,ss,sec_simule;
@@ -9080,12 +9073,17 @@ int LectAcqStd() {
 			for(fmt=0; fmt<ARCH_TYPEDATA; fmt++) ArchiveNouvellePartition(fmt);
 		}
 	}
+
 	LectModeSpectresAuto = 0;
 
 	if(!LectArretePoliment && LectStoppeRepart) for(rep=0; rep<RepartNb; rep++) if(Repart[rep].actif) RepartIpTransmission(&(Repart[rep]),REPART_ENVOI_DETEC,-1,LectureLog);
+
 	/* mail -s "Samba alert" -c juillard@csnsm.in2p3.fr michel.gros@cea.fr */
 	if(erreur_acq) OpiumFail("Erreur %04X (%s), %s est stoppee.",erreur_acq,ArchExplics,LectSrceTexte);
 	else BancEnErreur = 0;
+#ifdef WXWIDGETS
+	OpiumRefreshAllWindows();
+#endif
 
 	return(0);
 }
