@@ -24,6 +24,7 @@ EXTERNC void InitWxWidgetsApp(int *scr_width, int *scr_height);
 EXTERNC void GetFontInfo(short *width, short *ascent, short *descent, short *leading);
 EXTERNC int OpiumExecWx(struct Cadre *cdr, struct SambaWnd *w);
 EXTERNC void OpiumRefreshAllWindows();
+EXTERNC void OpiumCheckThreadRefreshCall();
 EXTERNC struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int height);
 EXTERNC void WndTitleWx(struct SambaWnd *w, char *title);
 EXTERNC void WndDrawStringWx(struct SambaWnd *w, int x, int y, char *text, unsigned short fr, unsigned short fg, unsigned short fb, 

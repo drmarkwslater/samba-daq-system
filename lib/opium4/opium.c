@@ -26,6 +26,7 @@ typedef unsigned long long UInt64;
 #ifdef WXWIDGETS
 int OpiumExecWx(struct Cadre *cdr, struct SambaWnd *w);
 void OpiumRefreshAllWindows();
+void OpiumCheckThreadRefreshCall();
 #endif
 
 #define CHANGE_CURSEUR
@@ -348,7 +349,7 @@ int OpiumInit(char *display) {
 	}
 	/* {
 		char *pomme,*c;
-		pomme = "ð";
+		pomme = "ï¿½";
 		printf("(%s) Symbole pomme: ",__func__);
 		c = pomme; while(*c) printf("%02X",(unsigned char)*c++);
 		printf("\n");
@@ -1378,6 +1379,11 @@ int OpiumRefreshIf(OPIUM_REFRESH_CONDITION condition, Cadre cdr) {
 	WndFrame f; Cadre board;
 	int x,y,h,v; int haut,larg,dx,dy; int64 dispo;
 	char redimensionne,sans_fond,type,doit_terminer;
+
+#ifdef WXWIDGETS
+	// debug to check for calls from secondary threads
+	OpiumCheckThreadRefreshCall();
+#endif
 
 	if(DEBUG_OPIUM(1)) WndPrint("(%s) Commence avec %s '%s' %d x %d, affichage %d x %d\n",__func__,OpiumCdrType[(int)cdr->type],cdr->nom,cdr->larg,cdr->haut,cdr->dh,cdr->dv);
 	if(DEBUG_OPIUM(1)) WndPrint("(%s) Cadre %08llX a rafraichir\n",__func__,(UInt64)cdr);

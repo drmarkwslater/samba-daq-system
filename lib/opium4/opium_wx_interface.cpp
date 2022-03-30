@@ -46,6 +46,12 @@ void GetFontInfo(short *width, short *ascent, short *descent, short *leading)
 
 struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int height)
 {
+    if (!wxThread::IsMain())
+    {
+        std::cout << "WARNING:     WndCreateWx FROM SECONDARY" << std::endl;
+        return NULL;
+    }
+
     SambaWnd *w = theApp->WndCreate(x, y, width, height);
 
     if (mouse_click_window)
@@ -73,6 +79,11 @@ std::unique_ptr<wxDC> MakeDCPtr(SambaWnd *w)
 void WndDrawStringWx(struct SambaWnd *w, int x, int y, char *text, unsigned short fr, unsigned short fg, unsigned short fb, 
                     unsigned short br, unsigned short bg, unsigned short bb, char draw_bg )
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
     dc->SetTextForeground(wxColour{(unsigned char)(255 * fr/65535), (unsigned char)(255 * fg/65535), (unsigned char)(255 * fb/65535)});
     dc->SetTextBackground(wxColour{(unsigned char)(255 * br/65535), (unsigned char)(255 * bg/65535), (unsigned char)(255 * bb/65535)});
@@ -86,6 +97,11 @@ void WndDrawStringWx(struct SambaWnd *w, int x, int y, char *text, unsigned shor
 
 void WndDrawRectWx(struct SambaWnd *w, int x, int y, int width, int height, unsigned short r, unsigned short g, unsigned short b)
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
     dc->SetBrush(wxBrush{wxColour{(unsigned char)(255 * r/65535), (unsigned char)(255 * g/65535), (unsigned char)(255 * b/65535)}});
     dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)(255 * r/65535), (unsigned char)(255 * g/65535), (unsigned char)(255 * b/65535)}}));
@@ -94,6 +110,11 @@ void WndDrawRectWx(struct SambaWnd *w, int x, int y, int width, int height, unsi
 
 void WndDrawLineWx(struct SambaWnd *w, int x0, int y0, int x1, int y1, short r, short g, short b)
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
     dc->SetBrush(wxBrush{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}});
     dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}}));
@@ -103,6 +124,11 @@ void WndDrawLineWx(struct SambaWnd *w, int x0, int y0, int x1, int y1, short r, 
 
 void WndDrawPolyWx(struct SambaWnd *w, int *x, int *y, int num, short r, short g, short b)
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
     dc->SetBrush(wxBrush{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}});
     dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}}));
@@ -118,6 +144,11 @@ void WndDrawPolyWx(struct SambaWnd *w, int *x, int *y, int num, short r, short g
 
 void WndDrawArcWx(struct SambaWnd *w, int x, int y, int width, int height, int start, int stop, short r, short g, short b)
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
     dc->SetBrush(*wxTRANSPARENT_BRUSH);
     dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}}));
@@ -128,21 +159,41 @@ void WndDrawArcWx(struct SambaWnd *w, int x, int y, int width, int height, int s
 
 void WndMoveWx(struct SambaWnd *w, int x, int y)
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     w->Move(x, y);
 }
 
 void WndResizeWx(struct SambaWnd *w, int h, int v)
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     w->SetSize(w->GetPosition().x, w->GetPosition().y, h, v);
 }
 
 void WndClearWx(struct SambaWnd *w)
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     w->Close();
 }
 
 void WndShowTheTopWx(struct SambaWnd *w)
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     w->Raise();
     w->SetFocus();
 }
@@ -164,6 +215,14 @@ int OpiumExecWx(struct Cadre *cdr, SambaWnd *w)
     }
 
     return 0;
+}
+
+void OpiumCheckThreadRefreshCall()
+{
+    if (!wxThread::IsMain())
+    {
+        std::cout << "WARNING: OpiumRefreshIf called from secondary thread" << std::endl;
+    }
 }
 
 void OpiumRefreshAllWindows()
