@@ -8614,14 +8614,6 @@ int LectAcqElementaire(NUMER_MODE mode) {
 	return(0);
 }
 /* ========================================================================== */
-int LectAcqStdThreadWrapper() {
-	// do a wrapper to ensure the painting lock is released
-	LockPaintEvents();
-	int ret = LectAcqStdThread();
-	UnlockPaintEvents();
-	return ret;
-}
-
 int LectAcqStdThread() {
 	int rep,voie,rc,i,k,l,num,fmt; char doit_terminer;
 	TypeADU erreur_acq;
@@ -9078,6 +9070,14 @@ int LectAcqStdThread() {
 
 	OpiumRefreshAllWindows();
 	return(0);
+}
+
+int LectAcqStdThreadWrapper() {
+	// do a wrapper to ensure the painting lock is released
+	LockPaintEvents();
+	int ret = LectAcqStdThread();
+	UnlockPaintEvents();
+	return ret;
 }
 
 int LectAcqStd() {
