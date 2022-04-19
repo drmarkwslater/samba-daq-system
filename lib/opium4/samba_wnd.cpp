@@ -54,9 +54,11 @@ void SambaWnd::OnMove(wxMoveEvent& /*event*/)
 
 void SambaWnd::OnPaint(wxPaintEvent& /*event*/)
 {
+    LockPaintEvents();
     is_painting = true;
     WndEventNewWx(this, SMBWX_PAINT, 0, 0, 0, 0);
     is_painting = false;
+    UnlockPaintEvents();
 }
 
 void SambaWnd::IgnoreNextMouseRelease()

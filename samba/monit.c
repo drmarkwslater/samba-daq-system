@@ -2543,6 +2543,16 @@ static float MonitTraiteeOf7(int voie, TypeTamponDonnees *tampon, int lngr, int6
 	base = (base / (double)nb);
 	return((float)base);
 }
+
+/* ========================================================================== */
+int MonitEvtDetach() {
+	Graph g;
+	if(OpiumDisplayed((gEvtPlanche->cdr)->planche)) g = gEvtPlanche; else g = gEvtSolo;
+
+	GraphDataDisconnect(g,0);
+	GraphDataDisconnect(g,1);
+}
+
 /* ========================================================================== */
 int MonitEvtAffiche(int lequel, void *qui, int affiche) {
 	int voietrig,vm,vt;

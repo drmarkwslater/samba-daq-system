@@ -29,6 +29,8 @@
 #ifdef WXWIDGETS
 #include <pthread.h>
 void OpiumRefreshAllWindows();
+void LockPaintEvents();
+void UnlockPaintEvents();
 #endif
 
 #ifdef AVEC_IP
@@ -7995,6 +7997,8 @@ relance:
 			}
 		}
 		if(SambaInfos && !SambaInfos->en_cours) LectStop();
+
+		}
 	}
 		if(SambaInfos) SambaInfos->en_cours = Acquis[AcquisLocale].etat.active;
 		if(LectErreur.code == LECT_ARRETE) LectRelancePrevue = 1; else
@@ -8077,6 +8081,7 @@ relance:
 				for(fmt=0; fmt<ARCH_TYPEDATA; fmt++) ArchTrancheReste[fmt] = -1;
 				LectTimeStamp0 = LectTimeStampN = 0;
 				LectJournalDemarrage();
+
 				goto relance;
 			}
 		}
@@ -8611,6 +8616,14 @@ int LectAcqElementaire(NUMER_MODE mode) {
 	return(0);
 }
 /* ========================================================================== */
+int LectAcqStdThreadWrapper() {
+	// do a wrapper to ensure the painting lock is released
+	LockPaintEvents();
+	int ret = LectAcqStdThread();
+	UnlockPaintEvents();
+	return ret;
+}
+
 int LectAcqStdThread() {
 	int rep,voie,rc,i,k,l,num,fmt; char doit_terminer;
 	TypeADU erreur_acq;
@@ -8620,7 +8633,6 @@ int LectAcqStdThread() {
 	char note[1024 + (MAXCOMMENTNB * (MAXCOMMENTLNGR + 1))];
 	FILE *f;
 	struct stat infos;
-
 	l = 0; // GCC
 	LectAcqLanceur = LECT_STD;
 	LectureLog = 1;
@@ -8873,7 +8885,15 @@ int LectAcqStdThread() {
 		LectSigne = !LectSurFichier;
 	
 		/* Execution de la tache de lecture */
+#ifdef WXWIDGETS
+		UnlockPaintEvents();
+#endif
 		erreur_acq = LectExec(NUMER_MODE_ACQUIS);
+
+#ifdef WXWIDGETS
+		LockPaintEvents();
+#endif
+		MonitEvtDetach();
 
 		/* Remise en etat des affichages */
 		if(OpiumDisplayed(bLecture)) doit_terminer = OpiumRefreshBegin(bLecture); else doit_terminer = 0;
@@ -9058,6 +9078,7 @@ int LectAcqStdThread() {
 	if(erreur_acq) OpiumFail("Erreur %04X (%s), %s est stoppee.",erreur_acq,ArchExplics,LectSrceTexte);
 	else BancEnErreur = 0;
 
+	OpiumRefreshAllWindows();
 	return(0);
 }
 
@@ -9072,7 +9093,7 @@ int LectAcqStd() {
 
 	// Send off the thread for the actual DAQ
 	pthread_t lectacqstd_thread;
-	int t = pthread_create(&lectacqstd_thread, NULL, LectAcqStdThread, NULL);
+	int t = pthread_create(&lectacqstd_thread, NULL, LectAcqStdThreadWrapper, NULL);
 	return 0;
 #else
 	return LectAcqStdThread();

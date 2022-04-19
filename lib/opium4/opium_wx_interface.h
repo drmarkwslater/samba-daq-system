@@ -39,4 +39,6 @@ EXTERNC void WndClearWx(struct SambaWnd *w);
 EXTERNC void WndShowTheTopWx(struct SambaWnd *w);
 EXTERNC struct wxCursor *WndCreateStdCursorWx();
 EXTERNC void WndGetWindowSizeWx(struct SambaWnd *w, int *width, int *height);
+EXTERNC void LockPaintEvents();
+EXTERNC void UnlockPaintEvents();
 #endif

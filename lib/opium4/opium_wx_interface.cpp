@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <execinfo.h>
+#include <mutex>
 
 wxFont *theFont{nullptr};
 SambaApp *theApp{nullptr};
@@ -15,6 +16,7 @@ bool samba_running{false};
 bool in_paint_event{false};
 int last_evt_ret_code{0};
 SambaWnd *mouse_click_window{nullptr};
+std::mutex paint_mtx;
 
 void InitWxWidgetsApp(int *scr_width, int *scr_height)
 {
@@ -256,6 +258,16 @@ void WndGetWindowSizeWx(struct SambaWnd *w, int *width, int *height)
 {
     *width = w->GetClientSize().GetWidth();
     *height = w->GetClientSize().GetHeight();
+}
+
+void LockPaintEvents()
+{
+    paint_mtx.lock();
+}
+
+void UnlockPaintEvents()
+{
+    paint_mtx.unlock();
 }
 
 #endif // WXWIDGETS
