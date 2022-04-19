@@ -7997,8 +7997,6 @@ relance:
 			}
 		}
 		if(SambaInfos && !SambaInfos->en_cours) LectStop();
-
-		}
 	}
 		if(SambaInfos) SambaInfos->en_cours = Acquis[AcquisLocale].etat.active;
 		if(LectErreur.code == LECT_ARRETE) LectRelancePrevue = 1; else
