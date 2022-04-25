@@ -8603,7 +8603,7 @@ int LectAcqElementaire(NUMER_MODE mode) {
 	return(0);
 }
 /* ========================================================================== */
-int LectAcqStdThread() {
+int LectAcqStd() {
 	int rep,voie,rc,i,k,l,num,fmt; char doit_terminer;
 	TypeADU erreur_acq;
 	float nb;
@@ -8643,16 +8643,12 @@ int LectAcqStdThread() {
 #endif
 	do {
 		if(LectSession < 2) {
-#ifndef WXWIDGETS
 			if(!LectFixeMode(LECT_DONNEES,1)) return(0);
-#endif
 			for(rep=0; rep<RepartNb; rep++) {
 				Repart[rep].mode = 0;
 				Repart[rep].status_demande = 0;
 			}
-#ifndef WXWIDGETS
 			LectSelecteVoies();
-#endif
 			SambaRunDate();
 			if(Archive.enservice) {
 				if(!LectModeSpectresAuto) {
@@ -8809,9 +8805,7 @@ int LectAcqStdThread() {
 		}
 
 		/* Initialisation des variables globales de la branche Lecture */
-#ifndef WXWIDGETS
 		if(!LectConstruitTampons(LectureLog)) return(0);
-#endif
 		if(LectSession < 2) LectJournalTrmt();
 		LectRazCompteurs();
 		if((LectSession < 2) && (SequenceCourante >= 0)) {
@@ -8865,12 +8859,12 @@ int LectAcqStdThread() {
 	
 		/* Execution de la tache de lecture */
 #ifdef WXWIDGETS
-		UnlockPaintEvents();
+//		UnlockPaintEvents();
 #endif
 		erreur_acq = LectExec(NUMER_MODE_ACQUIS);
 
 #ifdef WXWIDGETS
-		LockPaintEvents();
+//		LockPaintEvents();
 #endif
 		MonitEvtDetach();
 
@@ -9061,15 +9055,15 @@ int LectAcqStdThread() {
 	return(0);
 }
 
-int LectAcqStdThreadWrapper() {
+/*int LectAcqStdThreadWrapper() {
 	// do a wrapper to ensure the painting lock is released
 	LockPaintEvents();
 	int ret = LectAcqStdThread();
 	UnlockPaintEvents();
 	return ret;
-}
+}*/
 
-int LectAcqStd() {
+/*int LectAcqStd() {
 
 #ifdef WXWIDGETS
 	if(LectSession < 2) {
@@ -9085,7 +9079,7 @@ int LectAcqStd() {
 #else
 	return LectAcqStdThread();
 #endif
-}
+}*/
 
 #ifdef SPECTRES_SEQUENCES
 /* ========================================================================== */
@@ -9879,6 +9873,14 @@ int LectDemarre() {
 #endif
 	return(0);
 }
+
+int LectDemarreMT() {
+	// call LectDemarre in a separate thread to avoid blocking
+	pthread_t thd;
+	int t = pthread_create(&thd, NULL, LectDemarre, NULL);
+	return 0;
+}
+
 /* ========================================================================== */
 int LectEtat() {
 /* /docFuncBeg {LectEtat}
@@ -10317,7 +10319,12 @@ MenuItem iLectSpectreControle[] = {
 };
 #endif /* SPECTRES_COMPACTE */
 
+#ifdef WXWIDGETS
+static MenuItem iLectDemarrage[] = { { "Demarrer", MNU_FONCTION LectDemarreMT }, MNU_END };
+#else
 static MenuItem iLectDemarrage[] = { { "Demarrer", MNU_FONCTION LectDemarre }, MNU_END };
+#endif
+
 static MenuItem iLectArret[]     = { { "Stopper ", MNU_FONCTION LectStop }, MNU_END };
 static MenuItem iLectRegen[]     = { { "Lancer  regeneration",   MNU_FONCTION LectRegenChange }, MNU_END };
 static MenuItem iLectSupplements[] = {
