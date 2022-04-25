@@ -7602,12 +7602,6 @@ static void LecTraiteFromIt() {
 #pragma mark ---- Commandes executives ----
 #define MAX_ERREURS 0
 
-struct arg_struct {
-    char boostee;
-    char it_demandees;
-    NUMER_MODE mode;
-};
-
 static TypeADU LectExec(NUMER_MODE mode) {
 /* /docFuncBeg {LectExec}
    	/docFuncReturn  {0 si OK, code d'erreur sinon (voir LectAcqStd)}
@@ -7748,11 +7742,6 @@ static TypeADU LectExec(NUMER_MODE mode) {
  * Depart sur une synchro (D2 ou D3)
  * ---------------------------------
  */
-		struct arg_struct args;
-		args.boostee = boostee;
-		args.it_demandees = it_demandees;
-		args.mode = mode;
-
 relance:
 	min_restart = 100; // 5000; // 5s
 	Acquis[AcquisLocale].etat.active = LectSynchro(mode);
