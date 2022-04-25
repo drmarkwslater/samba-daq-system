@@ -50,7 +50,9 @@ struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int heig
 {
     if (!wxThread::IsMain())
     {
-        std::cout << "WARNING:     WndCreateWx FROM SECONDARY" << std::endl;
+        // we're not the main thread so send an event and wait for return
+        wxCommandEvent event(CREATE_WINDOW);
+        wxQueueEvent(&theApp->evtHandler_, event);
         return NULL;
     }
 
@@ -67,6 +69,47 @@ struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int heig
 void WndTitleWx(struct SambaWnd *w, char *title)
 {
     w->SetLabel(title);
+}
+
+void WndMoveWx(struct SambaWnd *w, int x, int y)
+{
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
+    w->Move(x, y);
+}
+
+void WndResizeWx(struct SambaWnd *w, int h, int v)
+{
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
+    w->SetSize(w->GetPosition().x, w->GetPosition().y, h, v);
+}
+
+void WndClearWx(struct SambaWnd *w)
+{
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
+    w->Close();
+}
+
+void WndShowTheTopWx(struct SambaWnd *w)
+{
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
+    w->Raise();
+    w->SetFocus();
 }
 
 std::unique_ptr<wxDC> MakeDCPtr(SambaWnd *w)
@@ -158,47 +201,6 @@ void WndDrawArcWx(struct SambaWnd *w, int x, int y, int width, int height, int s
     dc->DrawEllipticArc(x, y, width, height, start, stop);
 }
 
-
-void WndMoveWx(struct SambaWnd *w, int x, int y)
-{
-    if (!wxThread::IsMain())
-    {
-        return;
-    }
-
-    w->Move(x, y);
-}
-
-void WndResizeWx(struct SambaWnd *w, int h, int v)
-{
-    if (!wxThread::IsMain())
-    {
-        return;
-    }
-
-    w->SetSize(w->GetPosition().x, w->GetPosition().y, h, v);
-}
-
-void WndClearWx(struct SambaWnd *w)
-{
-    if (!wxThread::IsMain())
-    {
-        return;
-    }
-
-    w->Close();
-}
-
-void WndShowTheTopWx(struct SambaWnd *w)
-{
-    if (!wxThread::IsMain())
-    {
-        return;
-    }
-
-    w->Raise();
-    w->SetFocus();
-}
 int OpiumExecWx(struct Cadre *cdr, SambaWnd *w)
 {
     if (samba_running)

@@ -8,6 +8,7 @@
 
 #include <samba_wnd.hpp>
 #include <vector>
+#include <samba_evt_handler.hpp>
 
 class SambaApp: public wxApp
 {
@@ -18,8 +19,11 @@ public:
     virtual bool OnInit();
     void StartRenderTimer();
     void UpdateAllWindows();
-
+    
     SambaWnd *WndCreate(int x, int y, unsigned int width, unsigned int height);
+
+    SambaEvtHandler evtHandler_;
+
 };
 
 #endif
