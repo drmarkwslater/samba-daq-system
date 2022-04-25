@@ -6,6 +6,7 @@
 
 // create a custom event to request a refresh OUTSIDE the main GUI thread
 wxDEFINE_EVENT(REQUEST_UPDATE, wxCommandEvent);
+wxDEFINE_EVENT(SET_WND_TITLE, wxCommandEvent);
 
 wxBEGIN_EVENT_TABLE(SambaWnd, wxDialog)
     EVT_SIZE(SambaWnd::OnSize)
@@ -19,6 +20,7 @@ wxBEGIN_EVENT_TABLE(SambaWnd, wxDialog)
     EVT_CHAR_HOOK(SambaWnd::OnKeyChar)
     EVT_TIMER(1, SambaWnd::OnTimer)
     EVT_COMMAND(wxID_ANY, REQUEST_UPDATE, SambaWnd::OnRequestUpdate)
+    EVT_COMMAND(wxID_ANY, SET_WND_TITLE, SambaWnd::OnSetWndTitle)
 wxEND_EVENT_TABLE()
 
 void WndEventNewWx(struct SambaWnd *w, enum SambaEventWx type, int x, int y, int h, int v);
@@ -122,6 +124,11 @@ void SambaWnd::RequestUpdate()
 void SambaWnd::OnRequestUpdate(wxCommandEvent& event)
 {
     Refresh();
+}
+
+void SambaWnd::OnSetWndTitle(wxCommandEvent& event)
+{
+    SetLabel(event.GetString());
 }
 
 #endif //WXWIDGETS

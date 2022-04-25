@@ -51,9 +51,7 @@ struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int heig
     if (!wxThread::IsMain())
     {
         // we're not the main thread so send an event and wait for return
-        wxCommandEvent event(CREATE_WINDOW);
-        wxQueueEvent(&theApp->evtHandler_, event);
-        return NULL;
+        return theApp->SendWndCreateEvent(x, y, width, height);
     }
 
     SambaWnd *w = theApp->WndCreate(x, y, width, height);
@@ -68,6 +66,14 @@ struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int heig
 
 void WndTitleWx(struct SambaWnd *w, char *title)
 {
+    if (!wxThread::IsMain())
+    {
+        wxCommandEvent event(SET_WND_TITLE);
+        event.SetString(title);
+        wxQueueEvent(w, event.Clone());
+        return;
+    }
+
     w->SetLabel(title);
 }
 

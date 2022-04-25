@@ -9,6 +9,8 @@
 #include <string>
 #include "opium_wx_interface.h"
 
+wxDECLARE_EVENT(SET_WND_TITLE, wxCommandEvent);
+
 class SambaWnd: public wxDialog
 {
 public:
@@ -28,6 +30,7 @@ private:
     void OnFocus(wxFocusEvent& event);
     void OnKeyChar(wxKeyEvent& event);
     void OnRequestUpdate(wxCommandEvent& event);
+    void OnSetWndTitle(wxCommandEvent& event);
     wxDECLARE_EVENT_TABLE();
 
     bool is_painting{false};
