@@ -8,6 +8,7 @@
 
 #include <samba_wnd.hpp>
 #include <vector>
+#include <atomic>
 #include <samba_evt_handler.hpp>
 
 class SambaApp: public wxApp
