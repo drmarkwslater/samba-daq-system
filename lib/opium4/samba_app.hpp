@@ -27,7 +27,7 @@ public:
     SambaEvtHandler evtHandler_;
     std::atomic_bool creationDone_{false};
     SambaWnd *lastWindowCreated_{nullptr};
-
+    void RemoveWindow(SambaWnd *w);
 };
 
 #endif

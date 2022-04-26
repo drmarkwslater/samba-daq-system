@@ -17,9 +17,15 @@ SambaWnd *SambaApp::WndCreate(int x, int y, unsigned int width, unsigned int hei
     SambaWnd *wnd = new SambaWnd( "Hello World", wxPoint(x, y), wxSize(width, height) );
     wnd->Show( true );
     wnd->SetClientSize(wxSize(width, height));
-    
+    wnd->SetSambaApp(this);
+
     wndList_.push_back(wnd);
     return wnd;
+}
+
+void SambaApp::RemoveWindow(SambaWnd *w)
+{
+    wndList_.erase( std::remove(wndList_.begin(), wndList_.end(), w), wndList_.end() );
 }
 
 void SambaApp::ManageWndCreateEvent(int x, int y, unsigned int width, unsigned int height)

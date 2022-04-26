@@ -101,6 +101,8 @@ void WndClearWx(struct SambaWnd *w)
 {
     if (!wxThread::IsMain())
     {
+        wxCommandEvent event(REQUEST_CLOSE);
+        wxQueueEvent(w, event.Clone());
         return;
     }
 
