@@ -427,7 +427,12 @@ int OpiumRunPrompt(Cadre cdr, WndUserRequest *e) {
 		}
 	} else if(e->type == WND_RELEASE) switch(e->code) {
 	  case WND_MSELEFT:
+#ifdef WXWIDGETS
+		// for wx widgets, the buttons are placed on line 2
+		if(lig == 2) {
+#else
 		if(lig == 1) {
+#endif
 			if(OpiumPromptNb == 1) code_rendu = 1;
 			else { h = cdr->larg / OpiumPromptNb; code_rendu = e->x / h; }
 		};
