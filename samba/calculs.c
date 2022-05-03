@@ -34,6 +34,11 @@
 #include <monit.h>
 #include <autom.h>
 
+#ifdef WXWIDGETS
+#include <pthread.h>
+void OpiumRefreshAllWindows();
+#endif
+
 typedef enum {
 	AVEC_T1 = 0,
 	NB_POINTS
@@ -794,10 +799,14 @@ int CalcSpectreAutoParms() {
 /* ========================================================================== */
 #endif /* SPECTRES_SEQUENCES */
 
-int LectSpectresAutoMesure(),LectStop();
+int LectSpectresAutoMesure(),LectSpectresAutoMesureMT(),LectStop();
 int CalcSpectreAutoAffiche(),CalcSpectreAutoSauve(),CalcSpectreAutoEfface(),CalcSpectreAutoRetrouve();
 MenuItem iCalcSpectreControle[] = {
+#ifdef WXWIDGETS
+	{ "Mesurer  ",  MNU_FONCTION LectSpectresAutoMesureMT },
+#else
 	{ "Mesurer  ",  MNU_FONCTION LectSpectresAutoMesure },
+#endif
 	{ "Afficher ",  MNU_FONCTION CalcSpectreAutoAffiche },
 	{ "Stopper  ",  MNU_FONCTION LectStop },
 	{ "Sauver   ",  MNU_FONCTION CalcSpectreAutoSauve },
@@ -1024,11 +1033,15 @@ int CalcSpectreAutoConstruit() {
 /* ========================================================================== */
 int CalcSpectreAutoAffiche() {
 	int i;
-	
+
+#ifndef WXWIDGETS
 	for(i=0; i<CalcSpectreFenNb; i++) {
 		if(!LectCompacteUtilisee) OpiumDisplay(gCalcSpectreAffiche[i]->cdr);
 		else OpiumRefresh(gCalcSpectreAffiche[i]->cdr);
 	}
+#else
+		OpiumRefreshAllWindows();
+#endif
 	
 	return(0);
 }

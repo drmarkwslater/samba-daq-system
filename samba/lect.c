@@ -3449,7 +3449,6 @@ void LectActionUtilisateur() {
 #ifdef MSGS_RESEAU
 	char msg[256];
 #endif
-
 	LectDansActionUtilisateur = 1;
 	/* Action utilisateur possible */
 	/* { struct timeval heure;
@@ -9136,6 +9135,30 @@ int LectSpectresAutoMesure(Menu menu, MenuItem *item) {
 	
 	return(0);
 }
+
+struct LectSpectresAutoMesureArgs {
+	Menu menu;
+	MenuItem *item;
+};
+
+static int LectSpectresAutoMesureThread(void *args_ptr) {
+	struct LectSpectresAutoMesureArgs* args = (struct LectSpectresAutoMesureArgs*) args_ptr;
+	int ret = LectSpectresAutoMesure(args->menu, args->item);
+	free(args);
+	return ret;
+}
+
+int LectSpectresAutoMesureMT(Menu menu, MenuItem *item) {
+	// call LectSpectresAutoMesure in a separate thread to avoid blocking
+	struct LectSpectresAutoMesureArgs *args = malloc(sizeof(struct LectSpectresAutoMesureArgs));
+	args->menu = menu;
+	args->item = item;
+
+	pthread_t thd;
+	int t = pthread_create(&thd, NULL, LectSpectresAutoMesureThread, args);
+	return 0;
+}
+
 #ifdef SPECTRES_COMPACTE
 /* ========================================================================== */
 int LectCompacteSpectres(Menu menu, MenuItem *item) {
