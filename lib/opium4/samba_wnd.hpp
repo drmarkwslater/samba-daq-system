@@ -24,8 +24,10 @@ public:
     void OnTimer(wxTimerEvent& event);
     void IgnoreNextMouseRelease();
     void SetSambaApp(SambaApp *app) {theApp_ = app;}
+    void MenuClose();
 
 private:
+    void OnClose(wxCloseEvent& event);
     void OnSize(wxSizeEvent& event);
     void OnMove(wxMoveEvent& event);
     void OnPaint(wxPaintEvent& event);
@@ -44,6 +46,7 @@ private:
     bool ignoreMouseRelease_{false};
     SambaEventWx lastMouseButton_{SMBWX_MOUSE_LEFT_DOWN};
     SambaApp *theApp_;
+    bool menuClose_{false};
 };
 
 #endif

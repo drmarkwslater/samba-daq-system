@@ -106,7 +106,7 @@ void WndClearWx(struct SambaWnd *w)
         return;
     }
 
-    w->Close();
+    w->MenuClose();
 }
 
 void WndShowTheTopWx(struct SambaWnd *w)

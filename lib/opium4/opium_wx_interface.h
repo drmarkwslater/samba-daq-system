@@ -9,8 +9,8 @@ enum SambaEventWx {
     SMBWX_FOCUS,
     SMBWX_KEY,
     SMBWX_MOUSE_RIGHT_DOWN,
-    SMBWX_MOUSE_RIGHT_UP
-
+    SMBWX_MOUSE_RIGHT_UP,
+    SMBWX_DELETE
 };
 
 #ifdef __cplusplus

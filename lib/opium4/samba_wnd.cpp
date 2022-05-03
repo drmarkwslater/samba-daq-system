@@ -10,6 +10,7 @@ wxDEFINE_EVENT(SET_WND_TITLE, wxCommandEvent);
 wxDEFINE_EVENT(REQUEST_CLOSE, wxCommandEvent);
 
 wxBEGIN_EVENT_TABLE(SambaWnd, wxDialog)
+    EVT_CLOSE(SambaWnd::OnClose)
     EVT_SIZE(SambaWnd::OnSize)
     EVT_MOVE(SambaWnd::OnMove)
     EVT_PAINT(SambaWnd::OnPaint)
@@ -135,8 +136,28 @@ void SambaWnd::OnSetWndTitle(wxCommandEvent& event)
 
 void SambaWnd::OnRequestClose(wxCommandEvent& event)
 {
-    theApp_->RemoveWindow(this);
+    MenuClose();
+}
+
+void SambaWnd::MenuClose()
+{
+    menuClose_ = true;
     Close();
+}
+
+void SambaWnd::OnClose(wxCloseEvent& event)
+{
+    // closing from a menu or samba request so just destroy the window
+    if (menuClose_)
+    {
+        theApp_->RemoveWindow(this);
+        event.Skip();
+        return;
+    }
+
+    // OS request to close so send an event instead
+    // should probably *not* do this if DAQ is running....
+    WndEventNewWx(this, SMBWX_DELETE, 0, 0, 0, 0);
 }
 
 #endif //WXWIDGETS

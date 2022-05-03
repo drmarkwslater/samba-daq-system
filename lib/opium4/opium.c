@@ -1831,6 +1831,13 @@ int OpiumManageWx(Cadre *cdr, struct SambaWnd *w, char type, int x, int y, int h
 			u.y = y;
 			u.code = (unsigned int)WND_MSERIGHT;
 			break;
+
+		case 8: //SMBWX_DELETE
+			u.type = WND_DELETE;
+			u.x = 0;
+			u.y = 0;
+			break;
+
 	}
 
 	int cdr_ouverts = 0;
