@@ -157,7 +157,14 @@ void SambaWnd::OnClose(wxCloseEvent& event)
 
     // OS request to close so send an event instead
     // should probably *not* do this if DAQ is running....
-    WndEventNewWx(this, SMBWX_DELETE, 0, 0, 0, 0);
+    // Also, this doesn't seem to work with modal dialogs properly so just disable it in that instance
+    if (IsModal() && event.CanVeto())
+    {
+        event.Veto();
+        return;
+    } else {
+        WndEventNewWx(this, SMBWX_DELETE, 0, 0, 0, 0);
+    }
 }
 
 #endif //WXWIDGETS
