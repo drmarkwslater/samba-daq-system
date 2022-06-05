@@ -3,11 +3,14 @@
 #include <samba_wnd.hpp>
 #include <samba_app.hpp>
 #include <opium_wx_interface.h>
+#include <thread>
+#include <chrono>
 
 // create a custom event to request a refresh OUTSIDE the main GUI thread
 wxDEFINE_EVENT(REQUEST_UPDATE, wxCommandEvent);
 wxDEFINE_EVENT(SET_WND_TITLE, wxCommandEvent);
 wxDEFINE_EVENT(REQUEST_CLOSE, wxCommandEvent);
+wxDEFINE_EVENT(RUN_MODAL, wxCommandEvent);
 
 wxBEGIN_EVENT_TABLE(SambaWnd, wxDialog)
     EVT_CLOSE(SambaWnd::OnClose)
@@ -24,6 +27,7 @@ wxBEGIN_EVENT_TABLE(SambaWnd, wxDialog)
     EVT_COMMAND(wxID_ANY, REQUEST_UPDATE, SambaWnd::OnRequestUpdate)
     EVT_COMMAND(wxID_ANY, SET_WND_TITLE, SambaWnd::OnSetWndTitle)
     EVT_COMMAND(wxID_ANY, REQUEST_CLOSE, SambaWnd::OnRequestClose)
+    EVT_COMMAND(wxID_ANY, RUN_MODAL, SambaWnd::OnRunModal)
 wxEND_EVENT_TABLE()
 
 void WndEventNewWx(struct SambaWnd *w, enum SambaEventWx type, int x, int y, int h, int v);
@@ -55,6 +59,28 @@ void SambaWnd::OnMove(wxMoveEvent& /*event*/)
     const wxPoint ps = GetScreenPosition();
     const wxSize sz = GetClientSize();
     WndEventNewWx(this, SMBWX_CONFIG, ps.x, ps.y, sz.GetWidth(), sz.GetHeight());
+}
+
+void SambaWnd::ExecModal()
+{
+    // prepare and send the event
+    modalDone_ = false;
+    wxCommandEvent event(RUN_MODAL);
+    wxQueueEvent(this, event.Clone());
+
+    // wait for completion
+    while(!modalDone_.load())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+}
+
+void SambaWnd::OnRunModal(wxCommandEvent& /*event*/)
+{
+    Show(false);
+    ShowModal();
+
+    modalDone_ = true;
 }
 
 void SambaWnd::OnPaint(wxPaintEvent& /*event*/)

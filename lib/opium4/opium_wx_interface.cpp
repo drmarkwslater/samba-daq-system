@@ -213,9 +213,18 @@ int OpiumExecWx(struct Cadre *cdr, SambaWnd *w)
 {
     if (samba_running)
     {
-        // called for a modal dialog
-        w->Show( false );
-        w->ShowModal();
+        if (wxThread::IsMain())
+        {
+            // called for a modal dialog
+            w->Show( false );
+            w->ShowModal();
+        }
+        else
+        {
+            // we're not the main thread so send an event and wait for return
+            w->ExecModal();
+        }
+
         return last_evt_ret_code;
     } else {
         // called for main running
