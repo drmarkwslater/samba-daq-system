@@ -3,11 +3,17 @@
 #include <samba_wnd.hpp>
 #include <samba_app.hpp>
 #include <opium_wx_interface.h>
+#include <thread>
+#include <chrono>
 
 // create a custom event to request a refresh OUTSIDE the main GUI thread
 wxDEFINE_EVENT(REQUEST_UPDATE, wxCommandEvent);
+wxDEFINE_EVENT(SET_WND_TITLE, wxCommandEvent);
+wxDEFINE_EVENT(REQUEST_CLOSE, wxCommandEvent);
+wxDEFINE_EVENT(RUN_MODAL, wxCommandEvent);
 
 wxBEGIN_EVENT_TABLE(SambaWnd, wxDialog)
+    EVT_CLOSE(SambaWnd::OnClose)
     EVT_SIZE(SambaWnd::OnSize)
     EVT_MOVE(SambaWnd::OnMove)
     EVT_PAINT(SambaWnd::OnPaint)
@@ -19,6 +25,9 @@ wxBEGIN_EVENT_TABLE(SambaWnd, wxDialog)
     EVT_CHAR_HOOK(SambaWnd::OnKeyChar)
     EVT_TIMER(1, SambaWnd::OnTimer)
     EVT_COMMAND(wxID_ANY, REQUEST_UPDATE, SambaWnd::OnRequestUpdate)
+    EVT_COMMAND(wxID_ANY, SET_WND_TITLE, SambaWnd::OnSetWndTitle)
+    EVT_COMMAND(wxID_ANY, REQUEST_CLOSE, SambaWnd::OnRequestClose)
+    EVT_COMMAND(wxID_ANY, RUN_MODAL, SambaWnd::OnRunModal)
 wxEND_EVENT_TABLE()
 
 void WndEventNewWx(struct SambaWnd *w, enum SambaEventWx type, int x, int y, int h, int v);
@@ -52,11 +61,35 @@ void SambaWnd::OnMove(wxMoveEvent& /*event*/)
     WndEventNewWx(this, SMBWX_CONFIG, ps.x, ps.y, sz.GetWidth(), sz.GetHeight());
 }
 
+void SambaWnd::ExecModal()
+{
+    // prepare and send the event
+    modalDone_ = false;
+    wxCommandEvent event(RUN_MODAL);
+    wxQueueEvent(this, event.Clone());
+
+    // wait for completion
+    while(!modalDone_.load())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+}
+
+void SambaWnd::OnRunModal(wxCommandEvent& /*event*/)
+{
+    Show(false);
+    ShowModal();
+
+    modalDone_ = true;
+}
+
 void SambaWnd::OnPaint(wxPaintEvent& /*event*/)
 {
+    LockPaintEvents();
     is_painting = true;
     WndEventNewWx(this, SMBWX_PAINT, 0, 0, 0, 0);
     is_painting = false;
+    UnlockPaintEvents();
 }
 
 void SambaWnd::IgnoreNextMouseRelease()
@@ -120,6 +153,44 @@ void SambaWnd::RequestUpdate()
 void SambaWnd::OnRequestUpdate(wxCommandEvent& event)
 {
     Refresh();
+}
+
+void SambaWnd::OnSetWndTitle(wxCommandEvent& event)
+{
+    SetLabel(event.GetString());
+}
+
+void SambaWnd::OnRequestClose(wxCommandEvent& event)
+{
+    MenuClose();
+}
+
+void SambaWnd::MenuClose()
+{
+    menuClose_ = true;
+    Close();
+}
+
+void SambaWnd::OnClose(wxCloseEvent& event)
+{
+    // closing from a menu or samba request so just destroy the window
+    if (menuClose_)
+    {
+        theApp_->RemoveWindow(this);
+        event.Skip();
+        return;
+    }
+
+    // OS request to close so send an event instead
+    // should probably *not* do this if DAQ is running....
+    // Also, this doesn't seem to work with modal dialogs properly so just disable it in that instance
+    if (IsModal() && event.CanVeto())
+    {
+        event.Veto();
+        return;
+    } else {
+        WndEventNewWx(this, SMBWX_DELETE, 0, 0, 0, 0);
+    }
 }
 
 #endif //WXWIDGETS

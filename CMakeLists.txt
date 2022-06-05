@@ -15,6 +15,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 # - make sure we have a clean build
 set(CMAKE_CXX_FLAGS "-g")
+set(CMAKE_C_FLAGS "-g")
 
 # - check some OS dependent stuff
 INCLUDE (CheckIncludeFiles)

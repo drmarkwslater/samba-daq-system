@@ -180,6 +180,7 @@ void MonitFenClear(TypeMonitFenetre *f);
 void MonitFenFree(TypeMonitFenetre *f);
 float MonitUnitesADU(Graph g, int sens, float val);
 int MonitEvtAffiche(int lequel, void *qui, int affiche);
+int MonitEvtDetach();
 int MonitEvtPrecedent(Menu menu, MenuItem *item);
 int MonitEvtSuivant(Menu menu, MenuItem *item);
 int MonitSauve();

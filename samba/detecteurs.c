@@ -420,6 +420,7 @@ static void ReglagePlancheSupprime(int voie);
 static void ReglageDeLaVoie(int bolo, int cap, char avec_trigger);
 
 #ifdef WXWIDGETS
+#include <pthread.h>
 void OpiumRefreshAllWindows();
 #endif
 
@@ -6818,6 +6819,30 @@ static int OscilloAcqBrute(Menu menu, MenuItem *item) {
 	OscilloAcqRun(1,0,menu);
 	return(0);
 }
+
+struct OscilloOscilloAcqBruteArgs {
+	Menu menu;
+	MenuItem *item;
+};
+
+static int OscilloAcqBruteThread(void *args_ptr) {
+	struct OscilloOscilloAcqBruteArgs* args = (struct OscilloOscilloAcqBruteArgs*) args_ptr;
+	int ret = OscilloAcqBrute(args->menu, args->item);
+	free(args);
+	return ret;
+}
+
+static int OscilloAcqBruteMT(Menu menu, MenuItem *item) {
+	
+	// call OscilloAcqBrute in a separate thread to avoid blocking
+	struct OscilloOscilloAcqBruteArgs *args = malloc(sizeof(struct OscilloOscilloAcqBruteArgs));
+	args->menu = menu;
+	args->item = item;
+
+	pthread_t thd;
+	int t = pthread_create(&thd, NULL, OscilloAcqBruteThread, args);
+	return 0;
+}
 /* ========================================================================== */
 static int OscilloAcqDemod(Menu menu, MenuItem *item) {
 	OscilloAcqRun(1,1,menu);
@@ -7603,7 +7628,11 @@ static int ReglagePlancheCree(int voie) {
 #endif
 	if(VoieInfo[voie].complete) {
 		xb += (2 * Dx); // pour l'anglois
+#ifdef WXWIDGETS
+		BoardAddMenu(VoieInfo[voie].planche,MenuBouton(L_("Signal brut"),MNU_FONCTION OscilloAcqBruteMT),xb,y,0); xb += (14 * Dx);
+#else
 		BoardAddMenu(VoieInfo[voie].planche,MenuBouton(L_("Signal brut"),MNU_FONCTION OscilloAcqBrute),xb,y,0); xb += (14 * Dx);
+#endif
 		BoardAddMenu(VoieInfo[voie].planche,MenuBouton(L_("Arret"),      MNU_FONCTION OscilloAcqStop), xb,y,0); xb += ( 8 * Dx);
 		if(VoieManip[voie].modulee) {
 			BoardAddMenu(VoieInfo[voie].planche,MenuBouton(L_("Signal demodule"),MNU_FONCTION OscilloAcqDemod),xb,y,0); xb += (18 * Dx);

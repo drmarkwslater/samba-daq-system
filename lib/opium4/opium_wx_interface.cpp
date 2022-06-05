@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <execinfo.h>
+#include <mutex>
 
 wxFont *theFont{nullptr};
 SambaApp *theApp{nullptr};
@@ -15,6 +16,7 @@ bool samba_running{false};
 bool in_paint_event{false};
 int last_evt_ret_code{0};
 SambaWnd *mouse_click_window{nullptr};
+std::mutex paint_mtx;
 
 void InitWxWidgetsApp(int *scr_width, int *scr_height)
 {
@@ -46,6 +48,12 @@ void GetFontInfo(short *width, short *ascent, short *descent, short *leading)
 
 struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int height)
 {
+    if (!wxThread::IsMain())
+    {
+        // we're not the main thread so send an event and wait for return
+        return theApp->SendWndCreateEvent(x, y, width, height);
+    }
+
     SambaWnd *w = theApp->WndCreate(x, y, width, height);
 
     if (mouse_click_window)
@@ -58,7 +66,58 @@ struct SambaWnd *WndCreateWx(int x, int y, unsigned int width, unsigned int heig
 
 void WndTitleWx(struct SambaWnd *w, char *title)
 {
+    if (!wxThread::IsMain())
+    {
+        wxCommandEvent event(SET_WND_TITLE);
+        event.SetString(title);
+        wxQueueEvent(w, event.Clone());
+        return;
+    }
+
     w->SetLabel(title);
+}
+
+void WndMoveWx(struct SambaWnd *w, int x, int y)
+{
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
+    w->Move(x, y);
+}
+
+void WndResizeWx(struct SambaWnd *w, int h, int v)
+{
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
+    w->SetSize(w->GetPosition().x, w->GetPosition().y, h, v);
+}
+
+void WndClearWx(struct SambaWnd *w)
+{
+    if (!wxThread::IsMain())
+    {
+        wxCommandEvent event(REQUEST_CLOSE);
+        wxQueueEvent(w, event.Clone());
+        return;
+    }
+
+    w->MenuClose();
+}
+
+void WndShowTheTopWx(struct SambaWnd *w)
+{
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
+    w->Raise();
+    w->SetFocus();
 }
 
 std::unique_ptr<wxDC> MakeDCPtr(SambaWnd *w)
@@ -73,6 +132,11 @@ std::unique_ptr<wxDC> MakeDCPtr(SambaWnd *w)
 void WndDrawStringWx(struct SambaWnd *w, int x, int y, char *text, unsigned short fr, unsigned short fg, unsigned short fb, 
                     unsigned short br, unsigned short bg, unsigned short bb, char draw_bg )
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
     dc->SetTextForeground(wxColour{(unsigned char)(255 * fr/65535), (unsigned char)(255 * fg/65535), (unsigned char)(255 * fb/65535)});
     dc->SetTextBackground(wxColour{(unsigned char)(255 * br/65535), (unsigned char)(255 * bg/65535), (unsigned char)(255 * bb/65535)});
@@ -86,6 +150,11 @@ void WndDrawStringWx(struct SambaWnd *w, int x, int y, char *text, unsigned shor
 
 void WndDrawRectWx(struct SambaWnd *w, int x, int y, int width, int height, unsigned short r, unsigned short g, unsigned short b)
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
     dc->SetBrush(wxBrush{wxColour{(unsigned char)(255 * r/65535), (unsigned char)(255 * g/65535), (unsigned char)(255 * b/65535)}});
     dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)(255 * r/65535), (unsigned char)(255 * g/65535), (unsigned char)(255 * b/65535)}}));
@@ -94,6 +163,11 @@ void WndDrawRectWx(struct SambaWnd *w, int x, int y, int width, int height, unsi
 
 void WndDrawLineWx(struct SambaWnd *w, int x0, int y0, int x1, int y1, short r, short g, short b)
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
     dc->SetBrush(wxBrush{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}});
     dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}}));
@@ -103,6 +177,11 @@ void WndDrawLineWx(struct SambaWnd *w, int x0, int y0, int x1, int y1, short r, 
 
 void WndDrawPolyWx(struct SambaWnd *w, int *x, int *y, int num, short r, short g, short b)
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
     dc->SetBrush(wxBrush{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}});
     dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}}));
@@ -118,6 +197,11 @@ void WndDrawPolyWx(struct SambaWnd *w, int *x, int *y, int num, short r, short g
 
 void WndDrawArcWx(struct SambaWnd *w, int x, int y, int width, int height, int start, int stop, short r, short g, short b)
 {
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
     dc->SetBrush(*wxTRANSPARENT_BRUSH);
     dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}}));
@@ -125,34 +209,22 @@ void WndDrawArcWx(struct SambaWnd *w, int x, int y, int width, int height, int s
     dc->DrawEllipticArc(x, y, width, height, start, stop);
 }
 
-
-void WndMoveWx(struct SambaWnd *w, int x, int y)
-{
-    w->Move(x, y);
-}
-
-void WndResizeWx(struct SambaWnd *w, int h, int v)
-{
-    w->SetSize(w->GetPosition().x, w->GetPosition().y, h, v);
-}
-
-void WndClearWx(struct SambaWnd *w)
-{
-    w->Close();
-}
-
-void WndShowTheTopWx(struct SambaWnd *w)
-{
-    w->Raise();
-    w->SetFocus();
-}
 int OpiumExecWx(struct Cadre *cdr, SambaWnd *w)
 {
     if (samba_running)
     {
-        // called for a modal dialog
-        w->Show( false );
-        w->ShowModal();
+        if (wxThread::IsMain())
+        {
+            // called for a modal dialog
+            w->Show( false );
+            w->ShowModal();
+        }
+        else
+        {
+            // we're not the main thread so send an event and wait for return
+            w->ExecModal();
+        }
+
         return last_evt_ret_code;
     } else {
         // called for main running
@@ -164,6 +236,14 @@ int OpiumExecWx(struct Cadre *cdr, SambaWnd *w)
     }
 
     return 0;
+}
+
+void OpiumCheckThreadRefreshCall()
+{
+    if (!wxThread::IsMain())
+    {
+        std::cout << "WARNING: OpiumRefreshIf called from secondary thread" << std::endl;
+    }
 }
 
 void OpiumRefreshAllWindows()
@@ -197,6 +277,16 @@ void WndGetWindowSizeWx(struct SambaWnd *w, int *width, int *height)
 {
     *width = w->GetClientSize().GetWidth();
     *height = w->GetClientSize().GetHeight();
+}
+
+void LockPaintEvents()
+{
+    paint_mtx.lock();
+}
+
+void UnlockPaintEvents()
+{
+    paint_mtx.unlock();
 }
 
 #endif // WXWIDGETS

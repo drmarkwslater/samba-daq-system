@@ -53,6 +53,7 @@ add_library(opium4 STATIC
   opium4/opium_wx_interface.cpp
   opium4/samba_wnd.cpp
   opium4/samba_app.cpp
+  opium4/samba_evt_handler.cpp
   )
 
 target_include_directories(opium4
