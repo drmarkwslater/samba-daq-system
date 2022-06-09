@@ -40,7 +40,7 @@
 	sigset_t TimerPrevMask;
 	struct sigaction TimerAction,TimerPrevActn;
 	#define TIMER_EN_MICROSECONDES
-	#define TIMER_UNIT 100          /* soit 0,0001 seconde */
+	#define TIMER_UNIT 1000          /* soit 0,001 seconde */
 	#ifdef hpux
 		#define TIMER_FLAGS SA_RESETHAND;
 	#else
