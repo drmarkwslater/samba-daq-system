@@ -970,10 +970,6 @@ static void WndContextValSetColors(WndContextVal *gcval, WndColor *fond, WndColo
 }
 /* ========================================================================== */
 void WndExit() {
-#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
 #ifdef OPENGL
 	glfwTerminate();
 #endif

@@ -99,7 +99,10 @@ void WndResizeWx(struct SambaWnd *w, int h, int v)
 
 void WndClearAllWx()
 {
-    theApp->ExitMainLoop();
+    if (samba_running) 
+    {
+        theApp->ExitMainLoop();
+    }
 }
 
 void WndClearWx(struct SambaWnd *w)

@@ -4,6 +4,7 @@
 #include <samba_wnd.hpp>
 #include <thread>
 #include <chrono>
+#include <algorithm>
 
 bool SambaApp::OnInit()
 {
