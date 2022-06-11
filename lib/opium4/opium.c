@@ -27,6 +27,7 @@ typedef unsigned long long UInt64;
 int OpiumExecWx(struct Cadre *cdr, struct SambaWnd *w);
 void OpiumRefreshAllWindows();
 void OpiumCheckThreadRefreshCall();
+void WndClearAllWx();
 #endif
 
 #define CHANGE_CURSEUR
@@ -2549,6 +2550,14 @@ int OpiumClear(Cadre cdr) {
 #endif
 	if(DEBUG_OPIUM(1)) WndPrint("(%s) Reste %d frame(s) executable(s)\n",__func__,OpiumNbExec);
 	if((fctn = cdr->clear)) rc = (*fctn)(cdr,cdr->clear_arg);
+
+#ifdef WXWIDGETS
+	if (!OpiumNbExec)
+	{
+		WndClearAllWx();
+	}
+#endif
+
 	return(rc);
 }
 /* ======================================================================== */

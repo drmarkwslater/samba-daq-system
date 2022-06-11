@@ -35,6 +35,7 @@ EXTERNC void WndDrawPolyWx(struct SambaWnd *w, int *x, int *y, int num, short r,
 EXTERNC void WndDrawArcWx(struct SambaWnd *w, int x, int y, int width, int height, int start, int stop, short r, short g, short b);
 EXTERNC void WndMoveWx(struct SambaWnd *w, int x, int y);
 EXTERNC void WndResizeWx(struct SambaWnd *w, int h, int v);
+EXTERNC void WndClearAllWx();
 EXTERNC void WndClearWx(struct SambaWnd *w);
 EXTERNC void WndShowTheTopWx(struct SambaWnd *w);
 EXTERNC struct wxCursor *WndCreateStdCursorWx();

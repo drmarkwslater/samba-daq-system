@@ -97,6 +97,11 @@ void WndResizeWx(struct SambaWnd *w, int h, int v)
     w->SetSize(w->GetPosition().x, w->GetPosition().y, h, v);
 }
 
+void WndClearAllWx()
+{
+    theApp->ExitMainLoop();
+}
+
 void WndClearWx(struct SambaWnd *w)
 {
     if (!wxThread::IsMain())
@@ -106,11 +111,19 @@ void WndClearWx(struct SambaWnd *w)
         return;
     }
 
-    w->MenuClose();
+    if (samba_running)
+    {
+        w->MenuClose();
+    }
 }
 
 void WndShowTheTopWx(struct SambaWnd *w)
 {
+    if (!samba_running)
+    {
+        return;
+    }
+
     if (!wxThread::IsMain())
     {
         return;
@@ -233,6 +246,7 @@ int OpiumExecWx(struct Cadre *cdr, SambaWnd *w)
         wxTheApp->OnRun();
         wxTheApp->OnExit();
         wxEntryCleanup();
+        samba_running = false;
     }
 
     return 0;
