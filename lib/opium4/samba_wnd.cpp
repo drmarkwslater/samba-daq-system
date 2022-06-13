@@ -33,7 +33,7 @@ wxEND_EVENT_TABLE()
 void WndEventNewWx(struct SambaWnd *w, enum SambaEventWx type, int x, int y, int h, int v);
 
 SambaWnd::SambaWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
-        : wxDialog(NULL, wxID_ANY, title, pos, size), timer_(this, 1)
+        : wxDialog(NULL, wxID_ANY, title, pos, size, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER), timer_(this, 1)
 {
     SetBackgroundStyle(wxBG_STYLE_CUSTOM);
 
