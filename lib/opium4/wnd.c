@@ -45,6 +45,7 @@ typedef unsigned long long UInt64,uint64;
 	static void *WndFontPtr = NULL;
 	// GLUT_BITMAP_8_BY_13; // GLUT_BITMAP_9_BY_15 // == &glutBitmap8By13 ou &glutBitmap9By15
 	static char WndFontName[MAXFILENAME] = "Bitmap8By13";
+	static WndCursor WndCursorDefaut;
 
 #endif
 
@@ -789,6 +790,7 @@ Bool WndOpen(WndServer *s, char *display) {
 
 #ifdef WXWIDGETS
 	InitWxWidgetsApp(&(s->larg), &(s->haut));
+	WndCursorDefaut = WndCreateStdCursor(4);
 	GetFontInfo(&(s->fonte.width),&(s->fonte.ascent), &(s->fonte.descent), &(s->fonte.leading));
 	(s->fonte).leading = 1;
 	printf("  Caracteres: %d x %d [%d+%d+%d]\n",(s->fonte).width,(s->fonte).ascent+(s->fonte).descent+(s->fonte).leading,(s->fonte).ascent,(s->fonte).descent,(s->fonte).leading);
@@ -1297,6 +1299,7 @@ WndFrame WndCreate(int type, int qualite, int posx, int posy, int sizx, int sizy
 	#ifdef WXWIDGETS
 		w = WndCreateWx(posx, posy, sizx+WND_ASCINT_WIDZ,sizy+WND_ASCINT_WIDZ);
 		if(w) {
+			WndAssignCursorWx(w, WndCursorDefaut);
 			WndNum++;
 		} else {
 			fprintf( stderr, "Failed to open WxWidgets window.\n" );
@@ -1590,7 +1593,7 @@ void WndBorders(WndFrame f) {
 WndCursor WndCreateStdCursor(int num) {
 	WndCursor curseur;
 #ifdef WXWIDGETS
-	return WndCreateStdCursorWx();
+	return WndCreateStdCursorWx(num);
 #endif
 #ifdef OPENGL
 	return(glfwCreateStandardCursor(num));
@@ -1632,9 +1635,8 @@ void WndAssignCursor(WndFrame f, WndCursor curseur) {
 
 	if(WndModeNone) return;
 	w = f->w;
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
+#ifdef WXWIDGETS
+	WndAssignCursorWx(f, curseur);
 #endif
 #ifdef OPENGL
 	glfwSwapBuffers(w);

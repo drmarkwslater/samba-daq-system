@@ -283,10 +283,33 @@ void WndEventNewWx(SambaWnd *w, SambaEventWx type, int x, int y, int h, int v)
         theApp->UpdateAllWindows();
 }
 
-struct wxCursor *WndCreateStdCursorWx()
+void WndAssignCursorWx(SambaWnd *w, wxCursor *c)
+{
+    ::wxSetCursor(*c);
+}
+
+struct wxCursor *WndCreateStdCursorWx(int cur_type)
 {
     wxCursor *cur_ptr = new wxCursor;
-    *cur_ptr = *wxSTANDARD_CURSOR;
+
+    switch (cur_type)
+    {
+        case 2:
+            cur_ptr = new wxCursor(wxCURSOR_ARROW);
+            break;
+
+        case 3:
+            cur_ptr = new wxCursor(wxCURSOR_CROSS);
+            break;
+
+        case 4:
+            cur_ptr = new wxCursor(wxCURSOR_HAND);
+            break;
+
+        default:
+            *cur_ptr = *wxSTANDARD_CURSOR;
+    }
+
     return cur_ptr;
 }
 
