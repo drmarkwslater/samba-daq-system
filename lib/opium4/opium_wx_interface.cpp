@@ -259,6 +259,23 @@ void OpiumCheckThreadRefreshCall()
 {
     if (!wxThread::IsMain())
     {
+        void* callstack[128];\
+	int frame_num, frames_nb = backtrace(callstack, 128);\
+	char** frame_texte = backtrace_symbols(callstack, frames_nb);\
+	printf("| Suite des %d appel%s jusqu'a %s\n",frames_nb,(frames_nb > 1)?"s":"",__func__);\
+	for (frame_num = 0; frame_num < frames_nb; ++frame_num) {\
+		char *r,*s,c;\
+		s = r = frame_texte[frame_num];\
+		while((*s != '\0') && (*s != ' ')) s++; c = *s;\
+		*s = '\0'; printf("| %s) ",r); if(c == '\0') continue;\
+		r = s + 1; while((*r != '\0') && (*r == ' ')) r++; if(*r == '\0') continue;\
+		s = r; while((*s != '\0') && (*s != ' ')) s++; c = *s; if(c == '\0') continue;\
+		r = s + 1; while((*r != '\0') && (*r == ' ')) r++; if(*r == '\0') continue;\
+		s = r; while((*s != '\0') && (*s != ' ')) s++; c = *s;\
+		*s = '\0'; printf("@%s: ",r); if(c == '\0') continue;\
+		r = s + 1; printf("%s\n",r);\
+	}\
+	free(frame_texte);\
         std::cout << "WARNING: OpiumRefreshIf called from secondary thread" << std::endl;
     }
 }

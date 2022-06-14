@@ -24,6 +24,10 @@ using namespace System::Diagnostics;
 #endif
 #endif
 
+#ifdef WXWIDGETS
+void OpiumRefreshAllWindows();
+#endif
+
 static int OpiumPromptNb,OpiumPromptPremier;
 static char **OpiumPromptReponses;
 static char OpiumPromptNiveau;
@@ -219,7 +223,14 @@ void OpiumProgresInit(int total) {
 	OpiumProgresReste = OpiumProgresTotal = 0.0;
 	OpiumProgresDebut = DateMicroSecs();
 	OpiumFork(OpiumProgresPlanche);
+
+#ifndef WXWIDGETS
 	OpiumRefresh(OpiumProgresPlanche);
+#else
+	// Only tell the windows to refresh rather than actually calling graphics commands
+	OpiumRefreshAllWindows();
+#endif
+
 	OpiumUserAction();
 }
 /* ========================================================================== */
@@ -234,7 +245,13 @@ char OpiumProgresRefresh(int actuel) {
 			OpiumProgresTotal = (float)deja_passe * (float)OpiumProgresFini / (float)actuel / 1000000.0;
 			OpiumProgresReste = OpiumProgresTotal - ((float)deja_passe / 1000000.0);
 		}
+#ifndef WXWIDGETS
 		OpiumRefresh(OpiumProgresNiveau->cdr);
+#else
+		// Only tell the windows to refresh rather than actually calling graphics commands
+		OpiumRefreshAllWindows();
+#endif
+
 		PanelRefreshVars(OpiumProgresPanel);
 		OpiumUserAction();
 	}

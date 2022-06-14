@@ -5932,6 +5932,14 @@ int DetecteurRegenLimitee() {
 		(float)ecoule/60.0,duree);
 	return(0);
 }
+
+int DetecteurRegenLimiteeMT() {
+	// call DetecteurRegenLimitee in a separate thread to avoid blocking
+	pthread_t thd;
+	int t = pthread_create(&thd, NULL, DetecteurRegenLimitee, NULL);
+	return 0;
+}
+
 /* ========================================================================== */
 static Oscillo OscilloCreate(int voie) {
 	Oscillo oscillo;

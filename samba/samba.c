@@ -1710,7 +1710,7 @@ int LectAcqStd(),LectStop();
 int LectCompensation();
 #endif
 int LectVI(),LectRT();
-int RepartiteurContacte(),RepartiteurStoppe(),DetecteurRegenLimitee();
+int RepartiteurContacte(),RepartiteurStoppe(),DetecteurRegenLimitee(), DetecteurRegenLimiteeMT();
 MenuItem iSambaProcsComplet[] = {
 	{ "Mise en route",              MNU_SEPARATION },
 //	{ "Verification electronique",  MNU_FONCTION DiagComplet },
@@ -1726,7 +1726,11 @@ MenuItem iSambaProcsComplet[] = {
 	{ "Scripts",                    MNU_FONCTION SambaScriptLance },
 	{ "Inversion polarisation",     MNU_FONCTION DetecteurFlip },
 	{ "RAZ FETs",                   MNU_FONCTION DetecteurRazFetEDW },
+#ifdef WXWIDGETS
+	{ "Regeneration",               MNU_FONCTION DetecteurRegenLimiteeMT },
+#else
 	{ "Regeneration",               MNU_FONCTION DetecteurRegenLimitee },
+#endif
 	{ "Procedures complexes",       MNU_SEPARATION },
 //	{ "Spectres multiples",         MNU_FONCTION LectSpectres },
 	{ "Spectres de bruit",          MNU_FORK   &bLectSpectres },
