@@ -177,7 +177,7 @@ void WndDrawRectWx(struct SambaWnd *w, int x, int y, int width, int height, unsi
     dc->DrawRectangle(x, y, width, height);
 }
 
-void WndDrawLineWx(struct SambaWnd *w, int x0, int y0, int x1, int y1, short r, short g, short b)
+void WndDrawLineWx(struct SambaWnd *w, int x0, int y0, int x1, int y1, unsigned short r, unsigned short g, unsigned short b)
 {
     if (!wxThread::IsMain())
     {
@@ -185,13 +185,12 @@ void WndDrawLineWx(struct SambaWnd *w, int x0, int y0, int x1, int y1, short r, 
     }
 
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
-    dc->SetBrush(wxBrush{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}});
-    dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}}));
-
+    dc->SetBrush(wxBrush{wxColour{(unsigned char)(255 * r/65535), (unsigned char)(255 * g/65535), (unsigned char)(255 * b/65535)}});
+    dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)(255 * r/65535), (unsigned char)(255 * g/65535), (unsigned char)(255 * b/65535)}}));
     dc->DrawLine(x0, y0, x1, y1);
 }
 
-void WndDrawPolyWx(struct SambaWnd *w, int *x, int *y, int num, short r, short g, short b)
+void WndDrawPolyWx(struct SambaWnd *w, int *x, int *y, int num, unsigned short r, unsigned short g, unsigned short b)
 {
     if (!wxThread::IsMain())
     {
@@ -199,8 +198,8 @@ void WndDrawPolyWx(struct SambaWnd *w, int *x, int *y, int num, short r, short g
     }
 
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
-    dc->SetBrush(wxBrush{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}});
-    dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}}));
+    dc->SetBrush(wxBrush{wxColour{(unsigned char)(255 * r/65535), (unsigned char)(255 * g/65535), (unsigned char)(255 * b/65535)}});
+    dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)(255 * r/65535), (unsigned char)(255 * g/65535), (unsigned char)(255 * b/65535)}}));
 
     wxPoint points[1000];
     for (int i = 0; i < num; i++)
@@ -211,7 +210,7 @@ void WndDrawPolyWx(struct SambaWnd *w, int *x, int *y, int num, short r, short g
     dc->DrawLines(num, points);
 }
 
-void WndDrawArcWx(struct SambaWnd *w, int x, int y, int width, int height, int start, int stop, short r, short g, short b)
+void WndDrawArcWx(struct SambaWnd *w, int x, int y, int width, int height, int start, int stop, unsigned short r, unsigned short g, unsigned short b)
 {
     if (!wxThread::IsMain())
     {
@@ -220,7 +219,7 @@ void WndDrawArcWx(struct SambaWnd *w, int x, int y, int width, int height, int s
 
     std::unique_ptr<wxDC> dc = MakeDCPtr(w);
     dc->SetBrush(*wxTRANSPARENT_BRUSH);
-    dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)r, (unsigned char)g, (unsigned char)b}}));
+    dc->SetPen(wxPen(wxPen{wxColour{(unsigned char)(255 * r/65535), (unsigned char)(255 * g/65535), (unsigned char)(255 * b/65535)}}));
 
     dc->DrawEllipticArc(x, y, width, height, start, stop);
 }
