@@ -790,7 +790,7 @@ Bool WndOpen(WndServer *s, char *display) {
 
 #ifdef WXWIDGETS
 	InitWxWidgetsApp(&(s->larg), &(s->haut));
-	WndCursorDefaut = WndCreateStdCursor(4);
+	WndCursorDefaut = WndCreateStdCursor(2);
 	GetFontInfo(&(s->fonte.width),&(s->fonte.ascent), &(s->fonte.descent), &(s->fonte.leading));
 	(s->fonte).leading = 1;
 	printf("  Caracteres: %d x %d [%d+%d+%d]\n",(s->fonte).width,(s->fonte).ascent+(s->fonte).descent+(s->fonte).leading,(s->fonte).ascent,(s->fonte).descent,(s->fonte).leading);
@@ -1241,7 +1241,7 @@ WndFrame WndAttach(int qualite, int posx, int posy, int sizx, int sizy) {
 }
 /* ========================================================================== */
 WndFrame WndCreate(int type, int qualite, int posx, int posy, int sizx, int sizy) {
-	WndIdent w;
+	WndIdent w = 0;
 	WndFrame f;
 	int qual,num;
 	int lig,col,colmax;

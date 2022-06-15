@@ -27,6 +27,7 @@ public:
     void SetSambaApp(SambaApp *app) {theApp_ = app;}
     void MenuClose();
     void ExecModal();
+    void SetSambaCursor(wxCursor *c);
 
 private:
     void OnClose(wxCloseEvent& event);
@@ -41,6 +42,7 @@ private:
     void OnSetWndTitle(wxCommandEvent& event);
     void OnRequestClose(wxCommandEvent& event);
     void OnRunModal(wxCommandEvent&);
+    void OnMouseEnter(wxMouseEvent& event);
     wxDECLARE_EVENT_TABLE();
 
     bool is_painting{false};
@@ -51,6 +53,8 @@ private:
     SambaApp *theApp_;
     bool menuClose_{false};
     std::atomic_bool modalDone_{false};
+    wxCursor *reqCursor_;
+
 };
 
 #endif

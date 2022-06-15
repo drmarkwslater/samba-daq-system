@@ -24,6 +24,7 @@ wxBEGIN_EVENT_TABLE(SambaWnd, wxDialog)
     EVT_SET_FOCUS(SambaWnd::OnFocus)
     EVT_CHAR_HOOK(SambaWnd::OnKeyChar)
     EVT_TIMER(1, SambaWnd::OnTimer)
+    EVT_ENTER_WINDOW(SambaWnd::OnMouseEnter)
     EVT_COMMAND(wxID_ANY, REQUEST_UPDATE, SambaWnd::OnRequestUpdate)
     EVT_COMMAND(wxID_ANY, SET_WND_TITLE, SambaWnd::OnSetWndTitle)
     EVT_COMMAND(wxID_ANY, REQUEST_CLOSE, SambaWnd::OnRequestClose)
@@ -40,6 +41,8 @@ SambaWnd::SambaWnd(const wxString& title, const wxPoint& pos, const wxSize& size
     // create a tiny panel to make sure Key events are captured
     // Should probably draw to this instead of the raw window
     wxPanel* mainPane = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(1, 1), wxWANTS_CHARS);
+
+    reqCursor_ = new wxCursor(wxCURSOR_ARROW);
 }
 
 void SambaWnd::OnTimer(wxTimerEvent& /*event*/)
@@ -59,6 +62,12 @@ void SambaWnd::OnMove(wxMoveEvent& /*event*/)
     const wxPoint ps = GetScreenPosition();
     const wxSize sz = GetClientSize();
     WndEventNewWx(this, SMBWX_CONFIG, ps.x, ps.y, sz.GetWidth(), sz.GetHeight());
+}
+
+void SambaWnd::OnMouseEnter(wxMouseEvent& /*event*/)
+{
+    printf("========================= EH{ASOJCOASNCOASUNCOAUSN   %p  %p\n", this, reqCursor_);
+    ::wxSetCursor(*reqCursor_);
 }
 
 void SambaWnd::ExecModal()
@@ -191,6 +200,11 @@ void SambaWnd::OnClose(wxCloseEvent& event)
     } else {
         WndEventNewWx(this, SMBWX_DELETE, 0, 0, 0, 0);
     }
+}
+
+void SambaWnd::SetSambaCursor(wxCursor *c)
+{
+    reqCursor_ = c;
 }
 
 #endif //WXWIDGETS
