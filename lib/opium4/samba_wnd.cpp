@@ -66,7 +66,6 @@ void SambaWnd::OnMove(wxMoveEvent& /*event*/)
 
 void SambaWnd::OnMouseEnter(wxMouseEvent& /*event*/)
 {
-    printf("========================= EH{ASOJCOASNCOASUNCOAUSN   %p  %p\n", this, reqCursor_);
     ::wxSetCursor(*reqCursor_);
 }
 

@@ -302,12 +302,9 @@ void WndEventNewWx(SambaWnd *w, SambaEventWx type, int x, int y, int h, int v)
 void WndAssignCursorWx(SambaWnd *w, wxCursor *c)
 {
     if (w) {
-        printf("--------------------------------- asdasdasd    %p  %p\n", w, c);
-     w->SetSambaCursor(c);   
+        // for some reason just running w->SetCurosr doesn't work here
+        w->SetSambaCursor(c);
     }
-
-    
-    //::wxSetCursor(*c);
 }
 
 struct wxCursor *WndCreateStdCursorWx(int cur_type)

@@ -1636,7 +1636,7 @@ void WndAssignCursor(WndFrame f, WndCursor curseur) {
 	if(WndModeNone) return;
 	w = f->w;
 #ifdef WXWIDGETS
-	WndAssignCursorWx(f, curseur);
+	WndAssignCursorWx(w, curseur);
 #endif
 #ifdef OPENGL
 	glfwSwapBuffers(w);
