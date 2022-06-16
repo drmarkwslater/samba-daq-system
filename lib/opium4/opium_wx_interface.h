@@ -43,4 +43,8 @@ EXTERNC struct wxCursor *WndCreateStdCursorWx(int cur_type);
 EXTERNC void WndGetWindowSizeWx(struct SambaWnd *w, int *width, int *height);
 EXTERNC void LockPaintEvents();
 EXTERNC void UnlockPaintEvents();
+EXTERNC void WndDestroyImageWx(struct wxImage *img);
+EXTERNC struct wxImage *WndCreateImageWx(int width, int height);
+EXTERNC void WndSetPixelWx(struct wxImage *img, int x, int y, unsigned short r, unsigned short g, unsigned short b);
+EXTERNC void WndImageShowWx(struct SambaWnd *w, struct wxImage *img, int x, int y);
 #endif

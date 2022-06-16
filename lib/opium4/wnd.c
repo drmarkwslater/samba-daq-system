@@ -3745,12 +3745,11 @@ static void WndImageCree(WndFrame f, int larg, int haut, WndColor *lut, int dim)
 
 	// f->image.dx = f->image.dy = 0; par defaut a la creation de f. Peut avoir ete modifie par WndImageOffset
 	surface = larg * haut;
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
 #ifdef WXWIDGETS
-
+	WndIdent w; WndServer *s; WndScreen d;
+	w = f->w; s = f->s; d = s->d;
+	if(f->image.surf) WndDestroyImageWx(f->image.surf);
+	f->image.surf = WndCreateImageWx(f->xm, f->ym);
 #elif defined X11
 	WndIdent w; WndServer *s; WndScreen d;
 	w = f->w; s = f->s; d = s->d;
@@ -3823,7 +3822,17 @@ static void WndImageCree(WndFrame f, int larg, int haut, WndColor *lut, int dim)
 	if(f->image.surf) {
 		if((p = (f->image.surf)->pixels)) { i = nb; while(i--) *p++ = 0; }
 	}
+#else
+	if(f->image.surf) {
+		for (int x = 0; x < f->xm; x++)
+		{
+			for (int y = 0; y < f->ym; y++)
+			{
+				WndSetPixelWx(f->image.surf, x, y, 0, 0, 0);
 
+			}
+		}
+	}
 #endif
 }
 /* ========================================================================== */
@@ -3917,6 +3926,9 @@ static void WndImageFill8bits(WndFrame f, int x, int y, WndCol8bits *c) {
 #ifndef OPENGL
 /* ========================================================================== */
 static void WndImageDrawColor(WndFrame f, int x, int y, WndColor *c) {
+#ifdef WXWIDGETS
+	if((f->image.surf)) WndSetPixelWx(f->image.surf,x,y,c->red, c->green, c->blue);
+#endif
 #ifdef X11
 	if((f->image.surf)) XPutPixel(f->image.surf,x,y,c->pixel);
 #endif
@@ -3956,8 +3968,8 @@ void WndImagePixel(WndFrame f, int x, int y, int val) {
 }
 /* ========================================================================== */
 void WndIconeInit(WndFrame f,WndIcone icone) {
-	#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
+#ifdef WXWIDGETS
+	WndImageInit(f,(int)icone->larg,(int)icone->haut,0,0);
 	return;
 #endif
 #ifdef OPENGL
@@ -3986,10 +3998,7 @@ void WndIconeInit(WndFrame f,WndIcone icone) {
 /* ========================================================================== */
 void WndIconePixel(WndFrame f, int x, int y, WndIcnPxl pixel) {
 	WndCol8bits c8; WndColor *c;
-#ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
-	return;
-#endif
+
 	if(WndModeNone) return;
 	if(WndPS) {
 		if((pixel->m)) { c8.r = pixel->r; c8.g = pixel->g; c8.b = pixel->b; }
@@ -4026,7 +4035,7 @@ void WndIconePixel(WndFrame f, int x, int y, WndIcnPxl pixel) {
 void WndImageShow(WndFrame f) {
 	unsigned char *pixels;
 #ifdef WXWIDGETS
-	printf("WND FUNCTION:   %d\n", __LINE__);
+	WndImageShowWx(f->w, f->image.surf, f->x0,f->y0);
 	return;
 #endif
 #ifndef WXWIDGETS
@@ -4797,9 +4806,15 @@ void WndArc(WndFrame f, WndContextPtr gc, int x, int y, int l, int h,
 #endif
 
 #ifdef WXWIDGETS
-	int b0,db;
-	b0 = (90 - a0);
-	db = -da;
+	int start,stop;
+	start = (90 - a0);
+	stop = start - da;
+	if (start > stop)
+	{
+		start = stop;
+		stop = (90 - a0);
+	}
+
 	unsigned short fr = 65535;
 	unsigned short fg = 65535;
 	unsigned short fb = 65535;
@@ -4810,7 +4825,7 @@ void WndArc(WndFrame f, WndContextPtr gc, int x, int y, int l, int h,
 			fb = gc->foreground->blue;
 		}
 	}
-	WndDrawArcWx(f->w, f->x0 + x, f->y0 + y, l, h, b0, db, fr, fg, fb);
+	WndDrawArcWx(f->w, f->x0 + x, f->y0 + y, l, h, start, stop, fr, fg, fb);
 #endif
 
 #ifdef X11

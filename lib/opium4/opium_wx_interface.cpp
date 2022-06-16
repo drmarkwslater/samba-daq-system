@@ -332,6 +332,44 @@ struct wxCursor *WndCreateStdCursorWx(int cur_type)
     return cur_ptr;
 }
 
+void WndDestroyImageWx(struct wxImage *img)
+{
+    delete img;
+}
+
+struct wxImage *WndCreateImageWx(int width, int height)
+{
+    wxImage *img = new wxImage(width, height);
+    img->InitAlpha();
+    return img;
+}
+
+void WndSetPixelWx(struct wxImage *img, int x, int y, unsigned short r, unsigned short g, unsigned short b)
+{
+    img->SetRGB(x, y, (unsigned char)(255 * r/65535), (unsigned char)(255 * g/65535), (unsigned char)(255 * b/65535));
+    //img->SetRGB(x, y, 0, 0, 0);
+
+    if ((r == 0) && (g == 0) && (b == 0))
+    {
+        img->SetAlpha(x, y, 0);
+    }
+    else
+    {
+        img->SetAlpha(x, y, 255);
+    }
+}
+
+void WndImageShowWx(struct SambaWnd *w, struct wxImage *img, int x, int y)
+{
+    if (!wxThread::IsMain())
+    {
+        return;
+    }
+
+    std::unique_ptr<wxDC> dc = MakeDCPtr(w);
+    dc->DrawBitmap(wxBitmap{*img}, x, y, true);
+}
+
 void WndGetWindowSizeWx(struct SambaWnd *w, int *width, int *height)
 {
     *width = w->GetClientSize().GetWidth();
