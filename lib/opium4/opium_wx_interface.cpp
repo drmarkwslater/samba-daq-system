@@ -17,6 +17,7 @@ bool in_paint_event{false};
 int last_evt_ret_code{0};
 SambaWnd *mouse_click_window{nullptr};
 std::mutex paint_mtx;
+int (*WndExitFuncWx)();
 
 void InitWxWidgetsApp(int *scr_width, int *scr_height)
 {
@@ -97,10 +98,27 @@ void WndResizeWx(struct SambaWnd *w, int h, int v)
     w->SetSize(w->GetPosition().x, w->GetPosition().y, h, v);
 }
 
+void SetWndExitFuncWX(int (*func)())
+{
+    WndExitFuncWx = func;
+}
+
+int CheckMainWindowCloseWx(struct Cadre *cdr)
+{
+    // is this the main window?
+    if (cdr != cdr_initial) return 1;
+
+    // any clean up to do?
+    if ( (*WndExitFuncWx)() ) return 0;
+
+    return 1;
+}
+
 void WndClearAllWx()
 {
-    if (samba_running) 
+    if (samba_running)
     {
+        // wxwidgets clean up
         theApp->ExitMainLoop();
     }
 }

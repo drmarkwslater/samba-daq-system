@@ -28,6 +28,7 @@ int OpiumExecWx(struct Cadre *cdr, struct SambaWnd *w);
 void OpiumRefreshAllWindows();
 void OpiumCheckThreadRefreshCall();
 void WndClearAllWx();
+int CheckMainWindowCloseWx(struct Cadre *cdr);
 #endif
 
 #define CHANGE_CURSEUR
@@ -2308,13 +2309,18 @@ int OpiumManage(Cadre cdr_initial, WndUserRequest *u, int *cdr_ouverts) {
 		pointe->code_rendu = code_rendu;
 		if(pointe == cdr_initial) code_a_rendre = code_rendu;
 		if(a_effacer) {
-			code_a_rendre = code_rendu;
-			OpiumPrioritaire = 0;
-			OpiumClear(pointe);
-			if((pointe->modexec == OPIUM_EXEC) || (pointe->modexec == OPIUM_SUBWND))
-				*cdr_ouverts = *cdr_ouverts - 1;
-			if(DEBUG_OPIUM(1)) WndPrint("(OpiumManage) %s termine, %d cadre(s) encore ouvert(s)\n",
-				OpiumExecName[(int)pointe->modexec],*cdr_ouverts);
+#ifdef WXWIDGETS
+			if (CheckMainWindowCloseWx(pointe))
+#endif
+			{
+				code_a_rendre = code_rendu;
+				OpiumPrioritaire = 0;
+				OpiumClear(pointe);
+				if((pointe->modexec == OPIUM_EXEC) || (pointe->modexec == OPIUM_SUBWND))
+					*cdr_ouverts = *cdr_ouverts - 1;
+				if(DEBUG_OPIUM(1)) WndPrint("(OpiumManage) %s termine, %d cadre(s) encore ouvert(s)\n",
+					OpiumExecName[(int)pointe->modexec],*cdr_ouverts);
+			}
 		}
 			//- OpiumDebugLevel[OPIUM_DEBUG_OPIUM] = 0;
 		break;

@@ -47,4 +47,6 @@ EXTERNC void WndDestroyImageWx(struct wxImage *img);
 EXTERNC struct wxImage *WndCreateImageWx(int width, int height);
 EXTERNC void WndSetPixelWx(struct wxImage *img, int x, int y, unsigned short r, unsigned short g, unsigned short b);
 EXTERNC void WndImageShowWx(struct SambaWnd *w, struct wxImage *img, int x, int y);
+EXTERNC void SetWndExitFuncWX(int (*func)());
+EXTERNC int CheckMainWindowCloseWx(struct Cadre *cdr);
 #endif

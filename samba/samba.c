@@ -65,6 +65,9 @@
 #include <decode.h>
 #include <dico.h>
 #include <opium.h>
+#ifdef WXWIDGETS
+void SetWndExitFuncWX(int (*func)());
+#endif
 #include <impression.h>
 #include <nanopaw.h>
 unsigned long TickCount(void);
@@ -5304,6 +5307,31 @@ static int SambaInit() {
 
 	return(0);
 }
+
+int SambaWndExitFuncWx()
+{
+	if(SambaMode != SAMBA_DISTANT) {
+		int mode;
+		if(!SettingsExit()) {  return 1; }
+		if(!DetecteursExit()) {  return 1; }
+		if(!SambaSauve(&RepartiteursASauver,"systeme de repartition",0,0,&RepartiteursSauve)) {  return 1; }
+		if(!OrgaMagModifie[0]) for(mode=ORGA_MAG_REPART; mode <= ORGA_MAG_MAX; mode++) if(OrgaMagModifie[mode]) { OrgaMagModifie[0] = 1; return 0; }
+		OrgaMagMode = 0;
+		if(!SambaSauve(&OrgaMagModifie[0],"organigramme",-1,0,(TypeFctn)(&OrgaMagasinEnregistre))) { return 1; }
+	#ifdef BRANCHE_TESTS
+		if(!TestsExit()) {  return 1; }
+	#endif
+		if(!LectExit())  {  return 1; }
+		if(!MonitExit()) {  return 1; }
+		if(!PlotExit())  { return 1; }
+		if(!CalcExit())  {  return 1; }
+		if(!BasicExit()) {return 1; }
+		if(!DiagExit())  {  return 1; }
+	}
+
+	return 0;
+}
+
 //-	#include <GLUT/glut.h>
 /* ========================================================================== */
 int main(int argc, char *argv[]) {
@@ -5436,9 +5464,13 @@ int main(int argc, char *argv[]) {
 			MenuBarreExec();
 		#else
 			// OpiumDebug(OPIUM_DEBUG_OPIUM,1);
-			OpiumExec(mSambaBarre->cdr);
+		#ifdef WXWIDGETS
+			SetWndExitFuncWX(SambaWndExitFuncWx);
 		#endif
+			OpiumExec(mSambaBarre->cdr);
+#endif
 
+#ifndef WXWIDGETS
 			if(SambaMode != SAMBA_DISTANT) {
 				int mode;
 				if(!SettingsExit()) { on_recommence = 1; continue; }
@@ -5457,6 +5489,8 @@ int main(int argc, char *argv[]) {
 				if(!BasicExit()) { on_recommence = 1; continue; }
 				if(!DiagExit())  { on_recommence = 1; continue; }
 			}
+#endif
+
 		} while(on_recommence);
 	}
 
