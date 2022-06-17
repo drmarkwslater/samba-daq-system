@@ -265,7 +265,9 @@ int OpiumExecWx(struct Cadre *cdr, SambaWnd *w)
         samba_running = true;
         wxTheApp->OnRun();
         wxTheApp->OnExit();
-        wxEntryCleanup();
+        // This seems to occasionally cause a crash on exit so I'm removing it
+        // if we get to this point we're *definitely* exiting so it doesn't matter
+        //wxEntryCleanup();
         samba_running = false;
     }
 
