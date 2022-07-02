@@ -4460,8 +4460,9 @@ void LectDisplay() {
 	if(n > 0)
 		PerteEvts = (100.0 * (float)(PileUp + TrmtEvtJetes + TrmtNbEchecs + ArchEvtsPerdus)) / (float)n;
 	else PerteEvts = 0.0;
-#ifndef WXWIDGETS
+
 	if(OpiumDisplayed(bLecture)) {
+#ifndef WXWIDGETS
 		doit_terminer = OpiumRefreshBegin(bLecture);
 		PanelRefreshVars(pLectEvtNum); // pour MonitT0 mais melange avec infos evt affiche - ou pas
 		PanelRefreshVars(pEtatTrigger);
@@ -4474,8 +4475,10 @@ void LectDisplay() {
 		InstrumRefreshVar(cPerteEvts);
 		PanelRefreshVars(pLectPileMax);
 		if(doit_terminer) OpiumRefreshEnd(bLecture);
-	}
+#else
+		OpiumRefreshAllWindows();
 #endif
+	}
 	if(SambaSat && (EcritureMaitre >= 0)) {
 		unsigned char buffer[80]; int i,n;
 		i = 0;
