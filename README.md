@@ -64,6 +64,7 @@ Samba is now built and ready to run.
 
 * Before running Samba, run the following to setup the `~/.samba_top` file:
 ```
+cd ~/wxSamba
 echo `pwd`/samba-daq-system/Acquis > ~/.samba_top
 echo `pwd`/samba-daq-system/Acquis >> ~/.samba_top
 ```
