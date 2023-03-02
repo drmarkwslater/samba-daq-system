@@ -44,6 +44,9 @@
 #define MAXARCHNOM 80
 #define MAXPAQUET 256
 
+#include <math.h>
+
+
 extern float *Base[VOIES_MAX];
 extern float *Energie[VOIES_MAX];
 

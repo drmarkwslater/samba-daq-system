@@ -177,7 +177,7 @@ void EvtUniteInit();
 #endif
 
 /* ========================================================================== */
-int SvrExited() { return(1); }
+//int SvrExited() { return(1); }
 /* ========================================================================== */
 int HttpTraiteRequete(char *url, char *demandeur, char *requete) {
 	return(0);
