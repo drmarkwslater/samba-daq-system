@@ -59,11 +59,11 @@ char ArchReadInit(int max) {
 	EvtsParFichier = 0;
 	EvtAuPif = 1;
 	OctetsDejaLus = 0;
-
+	printf("EVTMAX:   %d\n", max);
 	if(max) EvtsMax = max; else EvtsMax = 1;
 	EvtSel = (char *)malloc(EvtsMax * sizeof(char));
 	EvtPos = (off_t *)malloc((EvtsMax + 1) * sizeof(off_t));
-	EvtStock = (TypeEvtStocke **)malloc(EvtsMax * sizeof(TypeEvtStocke *));
+	EvtStock = (TypeEvtStocke **)malloc((EvtsMax + 1) * sizeof(TypeEvtStocke *));
 	for(i=0; i<EvtsMax+1; i++) { EvtPos[i] = -1; EvtStock[i] = 0; }
 #ifdef DATEHEURE_H
 	EvtDateExacte = (TypeS_us *)malloc((EvtsMax + 1) * sizeof(TypeS_us));
@@ -149,6 +149,7 @@ char ArchRunOpenRange(char *nom, int premiere, int derniere, char log, char *rai
 				sprintf(numero,"_R%02d",tranche);
 				strcat(strcat(strcat(nomcomplet,DelimNomFichier),nomrun),numero);
 				if((f = open(nomcomplet,MODE_OPEN,0)) < 0) {
+					printf(nomcomplet);
 					sprintf(raison,L_("Repertoire vide, run inutilisable (%s)"),strerror(errno));
 					return(0);
 				} else { close(f); type_run = REGEN; }
