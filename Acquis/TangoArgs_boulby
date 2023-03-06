@@ -1,0 +1,43 @@
+# [claps]
+# Traitement et Analyse Nouvelle GeneratiOn
+#E = donnees 		# Espace de sauvegarde des donnees
+E = /Volumes/Data/boulby_data_new/donnees
+evts = events 		# Repertoire des evenements sauvegardes (relatif a l'espace de sauvegarde)
+o =  			# Options specifiques a la manip
+#tl05n002 		# Nom du fichier a analyser
+xb27n002 		# Nom du fichier a analyser
+m = 40000000 		# Nombre d'evenements maximum (0 si evenements de longueur fixe)
+#
+P = setup_SPC 		# Repertoire des preferences SAMBA/TANGO (relatif au repertoire courant)
+R = resultats 		# Repertoire des resultats (idem)
+G = figures 		# Repertoire des figures sauvees (idem)
+D = db 			# Racine de la base de donnees des detecteurs (idem)
+#
+exec =  		# Commande a executer
+liste =  		# Demande une liste de runs
+fast = oui 		# Ouverture seule (ou lecture prealable) des archives
+aleat = non 		# Ne verifie PAS la continuite de la numerotation des evenements
+#info = executables/tango.app/Contents/Resources/ 	# Repertoire contenant l'aide et le dictionnaire de langue
+info = Resources
+langages = standard 	# Repertoire des dictionnaires (relatif au repertoire des preferences)
+langue = native 	# Langage a utiliser dans les dialogues
+langue = English 	# Langage a utiliser dans les dialogues
+dico = fixe 		# maj: complete avec les derniers ajouts/ net: retire les termes non traduits (net/fixe/maj)
+verbeux = non 		# Mode bavard
+batch = non 		# Execution en mode batch
+unix = non 		# Execution sous UNIX (TangoArgs optionnel)
+# Si pas batch:
+display =  		# Serveur X11 a utiliser pour l'affichage
+noir = oui 		# Fond noir, texte blanc pour les fenetres de dialogue
+fontname = Courier 	# Type de caracteres
+fontsize = 10 		# Taille des caracteres
+qualite = ecran 	# Qualite des graphiques (papier/ecran)
+linesize = 3 		# Largeur des traits des graphiques en qualite papier
+#
+RC_us = 0.14 		# Temps de descente par defaut de l'ampli
+#filtres = Filtres 	# Nom du fichier de filtres pre-definis (relatif aux preferences)
+filtres = Filters 	# Nom du fichier de filtres pre-definis (relatif aux preferences)
+T = Analyse 		# Repertoire des preferences TANGO (relatif aux preferences)
+calib = evt 		# Nom du fichier de l'evenement unite (relatif aux preferences TANGO)
+A =  			# Repertoire contenant l'aide
+NSDocumentRevisionsDebugMode = NO 	# Execute via Xcode
