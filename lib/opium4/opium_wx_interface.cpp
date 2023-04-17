@@ -225,6 +225,11 @@ void WndDrawPolyWx(struct SambaWnd *w, int *x, int *y, int num, unsigned short r
         points[i].x = x[i];
         points[i].y = y[i];
     }
+
+    // will cause an assert in WxWidgets
+    if (num < 2)
+        return;
+
     dc->DrawLines(num, points);
 }
 
